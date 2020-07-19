@@ -11,7 +11,7 @@ varBondYield = 0.0907
 varHisseFiyati = 274.90
 
 
-reportFile = "D:\\bist\\Report_2020_03.xls"
+reportFile = "D:\\bist\\Report_2020_06_tum.xls"
 
 def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati):
     def birOncekiBilancoDoneminiHesapla(dnm):
@@ -129,44 +129,45 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati):
 
         return likidasyonDegeri
 
-    # 1.kriter hesabi
-    print("---------------------------------------------------------------------------------")
-    print("1.Kriter: Son ceyrek satisi onceki yil ayni ceyrege göre en az %10 fazla olacak")
+        # 1.kriter hesabi
+        print("---------------------------------------------------------------------------------")
+        print("1.Kriter: Satış gelirleri bir önceki yılın aynı dönemine göre en az %10 artmalı")
 
-    kriter1SatisGelirArtisi = oncekiYilAyniCeyrekDegisimiHesapla(hasilatRow, bilancoDonemi)
-    kriter1GecmeDurumu = (kriter1SatisGelirArtisi > 0.1)
-    print("Kriter1: Satis Geliri Artisi:", "{:.2%}".format(kriter1SatisGelirArtisi), kriter1GecmeDurumu)
+        kriter1SatisGelirArtisi = oncekiYilAyniCeyrekDegisimiHesapla(hasilatRow, bilancoDonemi)
+        kriter1GecmeDurumu = (kriter1SatisGelirArtisi > 0.1)
+        print("Kriter1: Satis Geliri Artisi:", "{:.2%}".format(kriter1SatisGelirArtisi), kriter1GecmeDurumu)
 
-    # 2.kriter hesabi
-    print("---------------------------------------------------------------------------------")
-    print("2.Kriter: Son ceyrek faaliyet kari onceki yil ayni ceyrege göre en az %15 fazla olacak")
+        # 2.kriter hesabi
+        print("---------------------------------------------------------------------------------")
+        print("2.Kriter: Son ceyrek faaliyet kari onceki yil ayni ceyrege göre en az %15 fazla olacak")
 
-    if getBilancoDegeri("Net Dönem Karı veya Zararı",bilancoDonemiColumn)<0:
-        kriter2FaaliyetKariArtisi = oncekiYilAyniCeyrekDegisimiHesapla(faaliyetKariRow, bilancoDonemi)
-        kriter2GecmeDurumu = False
-        print("Kriter2: Faaliyet Kari Artisi:", kriter2GecmeDurumu, "Son Ceyrek Faaliyet Kari Negatif")
+        if getBilancoDegeri("Net Dönem Karı veya Zararı", bilancoDonemiColumn) < 0:
+            kriter2FaaliyetKariArtisi = oncekiYilAyniCeyrekDegisimiHesapla(faaliyetKariRow, bilancoDonemi)
+            kriter2GecmeDurumu = False
+            print("Kriter2: Faaliyet Kari Artisi:", kriter2GecmeDurumu, "Son Ceyrek Faaliyet Kari Negatif")
 
-    else:
-        kriter2FaaliyetKariArtisi = oncekiYilAyniCeyrekDegisimiHesapla(faaliyetKariRow, bilancoDonemi)
-        kriter2GecmeDurumu = (kriter2FaaliyetKariArtisi > 0.15)
-        print("Kriter2: Faaliyet Kari Artisi:", "{:.2%}".format(kriter2FaaliyetKariArtisi), kriter2GecmeDurumu)
+        else:
+            kriter2FaaliyetKariArtisi = oncekiYilAyniCeyrekDegisimiHesapla(faaliyetKariRow, bilancoDonemi)
+            kriter2GecmeDurumu = (kriter2FaaliyetKariArtisi > 0.15)
+            print("Kriter2: Faaliyet Kari Artisi:", "{:.2%}".format(kriter2FaaliyetKariArtisi), kriter2GecmeDurumu)
 
+        # 3.kriter hesabı
+        print("---------------------------------------------------------------------------------")
+        print("3.Kriter: Bir önceki çeyrekteki satış artış yüzdesi cari dönemden düşük olmalı")
 
-    # 3.kriter hesabı
-    print("---------------------------------------------------------------------------------")
-    print("3.Kriter: Bir Onceki Ceyrek Satis Artis Yuzdesi Cari Donemden Dusuk Olmali")
+        kriter3OncekiCeyrekArtisi = oncekiYilAyniCeyrekDegisimiHesapla(hasilatRow, birOncekiBilancoDonemi)
+        kriter3GecmeDurumu = (kriter3OncekiCeyrekArtisi < kriter1SatisGelirArtisi)
+        print("Kriter3: Onceki Ceyrek Satis Geliri Artisi:", "{:.2%}".format(kriter3OncekiCeyrekArtisi),
+              kriter3GecmeDurumu)
 
-    kriter3OncekiCeyrekArtisi = oncekiYilAyniCeyrekDegisimiHesapla(hasilatRow, birOncekiBilancoDonemi)
-    kriter3GecmeDurumu = (kriter3OncekiCeyrekArtisi < kriter1SatisGelirArtisi)
-    print("Kriter3: Onceki Ceyrek Satis Geliri Artisi:", "{:.2%}".format(kriter3OncekiCeyrekArtisi), kriter3GecmeDurumu)
-
-    # 4.kriter hesabi
-    print("---------------------------------------------------------------------------------")
-    print("4.Kriter: Bir Onceki Ceyrek Faaliyet Kar Artis Yuzdesi Cari Donemden Dusuk Olmali")
-    kriter4OncekiCeyrekFaaliyetKariArtisi = oncekiYilAyniCeyrekDegisimiHesapla(faaliyetKariRow, birOncekiBilancoDonemi)
-    kriter4GecmeDurumu = (kriter4OncekiCeyrekFaaliyetKariArtisi < kriter2FaaliyetKariArtisi)
-    print("Kriter4: Onceki Yila Gore Faaliyet Kari Artisi:", "{:.2%}".format(kriter4OncekiCeyrekFaaliyetKariArtisi),
-          kriter4GecmeDurumu)
+        # 4.kriter hesabi
+        print("---------------------------------------------------------------------------------")
+        print("4.Kriter: Bir önceki çeyrekteki faaliyet karı artış yüzdesi cari dönemden düşük olmalı")
+        kriter4OncekiCeyrekFaaliyetKariArtisi = oncekiYilAyniCeyrekDegisimiHesapla(faaliyetKariRow,
+                                                                                   birOncekiBilancoDonemi)
+        kriter4GecmeDurumu = (kriter4OncekiCeyrekFaaliyetKariArtisi < kriter2FaaliyetKariArtisi)
+        print("Kriter4: Onceki Yila Gore Faaliyet Kari Artisi:", "{:.2%}".format(kriter4OncekiCeyrekFaaliyetKariArtisi),
+              kriter4GecmeDurumu)
 
     # Gercek Deger Hesapla
     print("----------------Gercek Deger Hesabi-----------------------------------------------------------------")
@@ -288,10 +289,11 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati):
             bookSheetWrite.write(0, 20, "Ortalama Faaliyet Kar Tahmini")
             bookSheetWrite.write(0, 21, "Hisse Başına Kar Tahmini")
             bookSheetWrite.write(0, 22, "Bilanço Etkisi")
-            bookSheetWrite.write(0, 23, "Gerçek Hisse Değeri")
-            bookSheetWrite.write(0, 24, "Target Buy")
-            bookSheetWrite.write(0, 25, "NET Pro")
-            bookSheetWrite.write(0, 26, "Forward PE")
+            bookSheetWrite.write(0, 23, "Bilanço Tarihi Hisse Fiyatı")
+            bookSheetWrite.write(0, 24, "Gerçek Hisse Değeri")
+            bookSheetWrite.write(0, 25, "Target Buy")
+            bookSheetWrite.write(0, 26, "NET Pro")
+            bookSheetWrite.write(0, 27, "Forward PE")
 
         def reportResults(rowNumber):
 
@@ -318,10 +320,11 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati):
             bookSheetWrite.write(rowNumber, 20, ortalamaFaaliyetKariTahmini)
             bookSheetWrite.write(rowNumber, 21, hisseBasinaOrtalamaKarTahmini)
             bookSheetWrite.write(rowNumber, 22, bilancoEtkisi)
-            bookSheetWrite.write(rowNumber, 23, gercekDeger)
-            bookSheetWrite.write(rowNumber, 24, targetBuy)
-            bookSheetWrite.write(rowNumber, 25, netProKriteri)
-            bookSheetWrite.write(rowNumber, 26, forwardPeKriteri)
+            bookSheetWrite.write(rowNumber, 23, varHisseFiyati)
+            bookSheetWrite.write(rowNumber, 24, gercekDeger)
+            bookSheetWrite.write(rowNumber, 25, targetBuy)
+            bookSheetWrite.write(rowNumber, 26, netProKriteri)
+            bookSheetWrite.write(rowNumber, 27, forwardPeKriteri)
 
         if os.path.isfile(reportFile):
             print("Rapor dosyası var, güncellenecek:", reportFile)

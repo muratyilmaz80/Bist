@@ -3,12 +3,12 @@ import xlwt
 from xlutils.copy import copy
 import os.path
 
-varBilancoDosyasi = ("D:\\bist\\bilancolar\\EMKEL.xlsx")
-varBilancoDonemi = 202003
+varBilancoDosyasi = ("D:\\bist\\bilancolar\\DERAS.xlsx")
+varBilancoDonemi = 202006
 varBondYield = 0.0907
-varHisseFiyati = 274.90
+varHisseFiyati = 7.26
 
-reportFile = "D:\\bist\\Report_2020_03.xls"
+reportFile = "D:\\bist\\Report_2020_06.xls"
 
 def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati):
     def birOncekiBilancoDoneminiHesapla(dnm):
@@ -80,7 +80,7 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati):
     netKarRow = getBilancoTitleRow("Net Dönem Karı veya Zararı");
 
     def ceyrekDegeriHesapla(r, c):
-        quarter = int(sheet.cell_value(0, c)) % (100)
+        quarter = (sheet.cell_value(0, c)) % (100)
         if (quarter == 3):
             return sheet.cell_value(r, c)
         else:
@@ -88,9 +88,14 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati):
 
     def oncekiYilAyniCeyrekDegisimiHesapla(row, donem):
         donemColumn = donemColumnFind(donem)
+        #print ("DonemColumn:", donemColumn)
         oncekiYilAyniDonemColumn = donemColumnFind(donem - 100)
+        #print("Onceki Yıl Aynı DonemColumn:", oncekiYilAyniDonemColumn)
+        #print("Row:",row, "Column:", donemColumn)
         ceyrekDegeri = ceyrekDegeriHesapla(row, donemColumn)
+        #print("Çeyrek Değeri:", ceyrekDegeri)
         oncekiCeyrekDegeri = ceyrekDegeriHesapla(row, oncekiYilAyniDonemColumn)
+        #print ("Önceki Çeyrek Değeri:", oncekiCeyrekDegeri)
         degisimSonucu = ceyrekDegeri / oncekiCeyrekDegeri - 1
         print(int(sheet.cell_value(0, donemColumn)), sheet.cell_value(row, 0), int(ceyrekDegeri))
         print(int(sheet.cell_value(0, oncekiYilAyniDonemColumn)), sheet.cell_value(row, 0), int(oncekiCeyrekDegeri))
@@ -128,7 +133,7 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati):
 
     # 1.kriter hesabi
     print("---------------------------------------------------------------------------------")
-    print("1.Kriter: Son ceyrek satisi onceki yil ayni ceyrege göre en az %10 fazla olacak")
+    print("1.Kriter: Satış gelirleri bir önceki yılın aynı dönemine göre en az %10 artmalı")
 
     kriter1SatisGelirArtisi = oncekiYilAyniCeyrekDegisimiHesapla(hasilatRow, bilancoDonemi)
     kriter1GecmeDurumu = (kriter1SatisGelirArtisi > 0.1)
@@ -151,7 +156,7 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati):
 
     # 3.kriter hesabı
     print("---------------------------------------------------------------------------------")
-    print("3.Kriter: Bir Onceki Ceyrek Satis Artis Yuzdesi Cari Donemden Dusuk Olmali")
+    print("3.Kriter: Bir önceki çeyrekteki satış artış yüzdesi cari dönemden düşük olmalı")
 
     kriter3OncekiCeyrekArtisi = oncekiYilAyniCeyrekDegisimiHesapla(hasilatRow, birOncekiBilancoDonemi)
     kriter3GecmeDurumu = (kriter3OncekiCeyrekArtisi < kriter1SatisGelirArtisi)
@@ -159,7 +164,7 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati):
 
     # 4.kriter hesabi
     print("---------------------------------------------------------------------------------")
-    print("4.Kriter: Bir Onceki Ceyrek Faaliyet Kar Artis Yuzdesi Cari Donemden Dusuk Olmali")
+    print("4.Kriter: Bir önceki çeyrekteki faaliyet karı artış yüzdesi cari dönemden düşük olmalı")
     kriter4OncekiCeyrekFaaliyetKariArtisi = oncekiYilAyniCeyrekDegisimiHesapla(faaliyetKariRow, birOncekiBilancoDonemi)
     kriter4GecmeDurumu = (kriter4OncekiCeyrekFaaliyetKariArtisi < kriter2FaaliyetKariArtisi)
     print("Kriter4: Onceki Yila Gore Faaliyet Kari Artisi:", "{:.2%}".format(kriter4OncekiCeyrekFaaliyetKariArtisi),
@@ -285,10 +290,11 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati):
             bookSheetWrite.write(0, 20, "Ortalama Faaliyet Kar Tahmini")
             bookSheetWrite.write(0, 21, "Hisse Başına Kar Tahmini")
             bookSheetWrite.write(0, 22, "Bilanço Etkisi")
-            bookSheetWrite.write(0, 23, "Gerçek Hisse Değeri")
-            bookSheetWrite.write(0, 24, "Target Buy")
-            bookSheetWrite.write(0, 25, "NET Pro")
-            bookSheetWrite.write(0, 26, "Forward PE")
+            bookSheetWrite.write(0, 23, "Bilanço Tarihi Hisse Fiyatı")
+            bookSheetWrite.write(0, 24, "Gerçek Hisse Değeri")
+            bookSheetWrite.write(0, 25, "Target Buy")
+            bookSheetWrite.write(0, 26, "NET Pro")
+            bookSheetWrite.write(0, 27, "Forward PE")
 
         def reportResults(rowNumber):
 
@@ -315,10 +321,11 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati):
             bookSheetWrite.write(rowNumber, 20, ortalamaFaaliyetKariTahmini)
             bookSheetWrite.write(rowNumber, 21, hisseBasinaOrtalamaKarTahmini)
             bookSheetWrite.write(rowNumber, 22, bilancoEtkisi)
-            bookSheetWrite.write(rowNumber, 23, gercekDeger)
-            bookSheetWrite.write(rowNumber, 24, targetBuy)
-            bookSheetWrite.write(rowNumber, 25, netProKriteri)
-            bookSheetWrite.write(rowNumber, 26, forwardPeKriteri)
+            bookSheetWrite.write(rowNumber, 23, varHisseFiyati)
+            bookSheetWrite.write(rowNumber, 24, gercekDeger)
+            bookSheetWrite.write(rowNumber, 25, targetBuy)
+            bookSheetWrite.write(rowNumber, 26, netProKriteri)
+            bookSheetWrite.write(rowNumber, 27, forwardPeKriteri)
 
         if os.path.isfile(reportFile):
             print("Rapor dosyası var, güncellenecek:", reportFile)
@@ -333,7 +340,7 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati):
         else:
             print("Rapor dosyası yeni oluşturulacak: ", reportFile)
             bookWrite = xlwt.Workbook()
-            bookSheetWrite = bookWrite.add_sheet("2020_03")
+            bookSheetWrite = bookWrite.add_sheet(str(varBilancoDonemi))
             createTopRow()
             reportResults(1)
             bookWrite.save(reportFile)
