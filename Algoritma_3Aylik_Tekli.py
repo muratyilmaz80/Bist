@@ -3,12 +3,12 @@ import xlwt
 from xlutils.copy import copy
 import os.path
 
-varBilancoDosyasi = ("D:\\bist\\bilancolar\\DERAS.xlsx")
-varBilancoDonemi = 202006
+varBilancoDosyasi = ("D:\\bist\\bilancolar\\ARENA.xlsx")
+varBilancoDonemi = 202003
 varBondYield = 0.0907
-varHisseFiyati = 7.26
+varHisseFiyati = 11.05
 
-reportFile = "D:\\bist\\Report_2020_06.xls"
+reportFile = "D:\\bist\\Report_2020_03_shortlist.xls"
 
 def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati):
     def birOncekiBilancoDoneminiHesapla(dnm):
@@ -137,13 +137,18 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati):
 
     kriter1SatisGelirArtisi = oncekiYilAyniCeyrekDegisimiHesapla(hasilatRow, bilancoDonemi)
     kriter1GecmeDurumu = (kriter1SatisGelirArtisi > 0.1)
-    print("Kriter1: Satis Geliri Artisi:", "{:.2%}".format(kriter1SatisGelirArtisi), kriter1GecmeDurumu)
+    print("Kriter1: Satis Geliri Artisi:", "{:.2%}".format(kriter1SatisGelirArtisi), "> 10%", kriter1GecmeDurumu)
 
     # 2.kriter hesabi
     print("---------------------------------------------------------------------------------")
     print("2.Kriter: Son ceyrek faaliyet kari onceki yil ayni ceyrege göre en az %15 fazla olacak")
 
-    if getBilancoDegeri("Net Dönem Karı veya Zararı",bilancoDonemiColumn)<0:
+    if ceyrekDegeriHesapla(netKarRow,bilancoDonemiColumn)<0:
+        kriter2FaaliyetKariArtisi = oncekiYilAyniCeyrekDegisimiHesapla(faaliyetKariRow, bilancoDonemi)
+        kriter2GecmeDurumu = False
+        print("Kriter2: Faaliyet Kari Artisi:", kriter2GecmeDurumu, "Son Ceyrek Net Kar Negatif")
+
+    elif ceyrekDegeriHesapla(faaliyetKariRow, bilancoDonemiColumn) < 0:
         kriter2FaaliyetKariArtisi = oncekiYilAyniCeyrekDegisimiHesapla(faaliyetKariRow, bilancoDonemi)
         kriter2GecmeDurumu = False
         print("Kriter2: Faaliyet Kari Artisi:", kriter2GecmeDurumu, "Son Ceyrek Faaliyet Kari Negatif")
@@ -151,24 +156,42 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati):
     else:
         kriter2FaaliyetKariArtisi = oncekiYilAyniCeyrekDegisimiHesapla(faaliyetKariRow, bilancoDonemi)
         kriter2GecmeDurumu = (kriter2FaaliyetKariArtisi > 0.15)
-        print("Kriter2: Faaliyet Kari Artisi:", "{:.2%}".format(kriter2FaaliyetKariArtisi), kriter2GecmeDurumu)
+        print("Kriter2: Faaliyet Kari Artisi:", "{:.2%}".format(kriter2FaaliyetKariArtisi), "> 15%", kriter2GecmeDurumu)
 
 
     # 3.kriter hesabı
     print("---------------------------------------------------------------------------------")
     print("3.Kriter: Bir önceki çeyrekteki satış artış yüzdesi cari dönemden düşük olmalı")
 
-    kriter3OncekiCeyrekArtisi = oncekiYilAyniCeyrekDegisimiHesapla(hasilatRow, birOncekiBilancoDonemi)
-    kriter3GecmeDurumu = (kriter3OncekiCeyrekArtisi < kriter1SatisGelirArtisi)
-    print("Kriter3: Onceki Ceyrek Satis Geliri Artisi:", "{:.2%}".format(kriter3OncekiCeyrekArtisi), kriter3GecmeDurumu)
+    if kriter1SatisGelirArtisi >= 1:
+        kriter3OncekiCeyrekArtisi = oncekiYilAyniCeyrekDegisimiHesapla(hasilatRow, birOncekiBilancoDonemi)
+        kriter3GecmeDurumu = True
+        print("Kriter3: Onceki Ceyrek Satis Geliri Artisi %100'ün Üzerinde, Karşılaştırma Yapılmayacak!:", "{:.2%}".format(kriter3OncekiCeyrekArtisi), "<",
+              "{:.2%}".format(kriter1SatisGelirArtisi), kriter3GecmeDurumu)
+
+    else:
+        kriter3OncekiCeyrekArtisi = oncekiYilAyniCeyrekDegisimiHesapla(hasilatRow, birOncekiBilancoDonemi)
+        kriter3GecmeDurumu = (kriter3OncekiCeyrekArtisi < kriter1SatisGelirArtisi)
+        print("Kriter3: Onceki Ceyrek Satis Geliri Artisi:", "{:.2%}".format(kriter3OncekiCeyrekArtisi),"<","{:.2%}".format(kriter1SatisGelirArtisi), kriter3GecmeDurumu)
+
 
     # 4.kriter hesabi
     print("---------------------------------------------------------------------------------")
     print("4.Kriter: Bir önceki çeyrekteki faaliyet karı artış yüzdesi cari dönemden düşük olmalı")
-    kriter4OncekiCeyrekFaaliyetKariArtisi = oncekiYilAyniCeyrekDegisimiHesapla(faaliyetKariRow, birOncekiBilancoDonemi)
-    kriter4GecmeDurumu = (kriter4OncekiCeyrekFaaliyetKariArtisi < kriter2FaaliyetKariArtisi)
-    print("Kriter4: Onceki Yila Gore Faaliyet Kari Artisi:", "{:.2%}".format(kriter4OncekiCeyrekFaaliyetKariArtisi),
-          kriter4GecmeDurumu)
+
+    if kriter2FaaliyetKariArtisi >= 1:
+        kriter4OncekiCeyrekFaaliyetKariArtisi = oncekiYilAyniCeyrekDegisimiHesapla(faaliyetKariRow,
+                                                                                   birOncekiBilancoDonemi)
+        kriter4GecmeDurumu = True
+        print("Kriter4: Onceki Ceyrek Faaliyet Kari Artisi %100'ün Üzerinde, Karşılaştırma Yapılmayacak:", "{:.2%}".format(kriter4OncekiCeyrekFaaliyetKariArtisi),
+              "<", "{:.2%}".format(kriter2FaaliyetKariArtisi), kriter4GecmeDurumu)
+
+
+    else:
+        kriter4OncekiCeyrekFaaliyetKariArtisi = oncekiYilAyniCeyrekDegisimiHesapla(faaliyetKariRow, birOncekiBilancoDonemi)
+        kriter4GecmeDurumu = (kriter4OncekiCeyrekFaaliyetKariArtisi < kriter2FaaliyetKariArtisi)
+        print("Kriter4: Onceki Yila Gore Faaliyet Kari Artisi:", "{:.2%}".format(kriter4OncekiCeyrekFaaliyetKariArtisi),
+          "<" , "{:.2%}".format(kriter2FaaliyetKariArtisi) , kriter4GecmeDurumu)
 
     # Gercek Deger Hesapla
     print("----------------Gercek Deger Hesabi-----------------------------------------------------------------")
