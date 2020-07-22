@@ -3,12 +3,12 @@ import xlwt
 from xlutils.copy import copy
 import os.path
 
-varBilancoDosyasi = ("D:\\bist\\bilancolar\\ARENA.xlsx")
-varBilancoDonemi = 202003
-varBondYield = 0.0907
-varHisseFiyati = 11.05
+varBilancoDosyasi = ("D:\\bist\\bilancolar\\DESPC.xlsx")
+varBilancoDonemi = 202006
+varBondYield = 0.1022
+varHisseFiyati = 8
 
-reportFile = "D:\\bist\\Report_2020_03_shortlist.xls"
+reportFile = "D:\\bist\\Report_2020_06.xls"
 
 def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati):
     def birOncekiBilancoDoneminiHesapla(dnm):
@@ -258,6 +258,11 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati):
     targetBuy = gercekDeger * 0.66
     print("Target buy:", format(targetBuy, ".2f"))
 
+    print("Bilanço tarihindeki hisse fiyatı:", format(varHisseFiyati, ".2f"))
+
+    gercekFiyataUzaklik = varHisseFiyati / targetBuy
+    print("Gerçek fiyata uzaklık:", "{:.2%}".format(gercekFiyataUzaklik))
+
     # Netpro Hesapla
     print("----------------NetPro Kriteri-----------------------------------------------------------------")
 
@@ -316,8 +321,9 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati):
             bookSheetWrite.write(0, 23, "Bilanço Tarihi Hisse Fiyatı")
             bookSheetWrite.write(0, 24, "Gerçek Hisse Değeri")
             bookSheetWrite.write(0, 25, "Target Buy")
-            bookSheetWrite.write(0, 26, "NET Pro")
-            bookSheetWrite.write(0, 27, "Forward PE")
+            bookSheetWrite.write(0, 26, "Gerçek Fiyata Uzaklık")
+            bookSheetWrite.write(0, 27, "NET Pro")
+            bookSheetWrite.write(0, 28, "Forward PE")
 
         def reportResults(rowNumber):
 
@@ -347,8 +353,9 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati):
             bookSheetWrite.write(rowNumber, 23, varHisseFiyati)
             bookSheetWrite.write(rowNumber, 24, gercekDeger)
             bookSheetWrite.write(rowNumber, 25, targetBuy)
-            bookSheetWrite.write(rowNumber, 26, netProKriteri)
-            bookSheetWrite.write(rowNumber, 27, forwardPeKriteri)
+            bookSheetWrite.write(rowNumber, 26, gercekFiyataUzaklik)
+            bookSheetWrite.write(rowNumber, 27, netProKriteri)
+            bookSheetWrite.write(rowNumber, 28, forwardPeKriteri)
 
         if os.path.isfile(reportFile):
             print("Rapor dosyası var, güncellenecek:", reportFile)
