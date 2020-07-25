@@ -3,12 +3,12 @@ import xlwt
 from xlutils.copy import copy
 import os.path
 
-varBilancoDosyasi = ("D:\\bist\\bilancolar\\DESPC.xlsx")
+varBilancoDosyasi = ("D:\\bist\\bilancolar\\DEVA.xlsx")
 varBilancoDonemi = 202006
 varBondYield = 0.1022
-varHisseFiyati = 8
+varHisseFiyati = 14.40
 
-reportFile = "D:\\bist\\Report_2020_06.xls"
+reportFile = "D:\\bist\\Report_2020_06_3Ayliklar.xls"
 
 def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati):
     def birOncekiBilancoDoneminiHesapla(dnm):
@@ -97,8 +97,8 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati):
         oncekiCeyrekDegeri = ceyrekDegeriHesapla(row, oncekiYilAyniDonemColumn)
         #print ("Önceki Çeyrek Değeri:", oncekiCeyrekDegeri)
         degisimSonucu = ceyrekDegeri / oncekiCeyrekDegeri - 1
-        print(int(sheet.cell_value(0, donemColumn)), sheet.cell_value(row, 0), int(ceyrekDegeri))
-        print(int(sheet.cell_value(0, oncekiYilAyniDonemColumn)), sheet.cell_value(row, 0), int(oncekiCeyrekDegeri))
+        print(int(sheet.cell_value(0, donemColumn)), sheet.cell_value(row, 0), "{:,.0f}".format(ceyrekDegeri).replace(",","."), "TL")
+        print(int(sheet.cell_value(0, oncekiYilAyniDonemColumn)), sheet.cell_value(row, 0), "{:,.0f}".format(oncekiCeyrekDegeri).replace(",","."), "TL")
         return degisimSonucu
 
     # def yilCeyrekAyir (a):
@@ -137,7 +137,7 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati):
 
     kriter1SatisGelirArtisi = oncekiYilAyniCeyrekDegisimiHesapla(hasilatRow, bilancoDonemi)
     kriter1GecmeDurumu = (kriter1SatisGelirArtisi > 0.1)
-    print("Kriter1: Satis Geliri Artisi:", "{:.2%}".format(kriter1SatisGelirArtisi), "> 10%", kriter1GecmeDurumu)
+    print("Kriter1: Satis Geliri Artisi:", "{:.2%}".format(kriter1SatisGelirArtisi), ">? 10%", kriter1GecmeDurumu)
 
     # 2.kriter hesabi
     print("---------------------------------------------------------------------------------")
@@ -156,7 +156,7 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati):
     else:
         kriter2FaaliyetKariArtisi = oncekiYilAyniCeyrekDegisimiHesapla(faaliyetKariRow, bilancoDonemi)
         kriter2GecmeDurumu = (kriter2FaaliyetKariArtisi > 0.15)
-        print("Kriter2: Faaliyet Kari Artisi:", "{:.2%}".format(kriter2FaaliyetKariArtisi), "> 15%", kriter2GecmeDurumu)
+        print("Kriter2: Faaliyet Kari Artisi:", "{:.2%}".format(kriter2FaaliyetKariArtisi), ">? 15%", kriter2GecmeDurumu)
 
 
     # 3.kriter hesabı
@@ -172,7 +172,7 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati):
     else:
         kriter3OncekiCeyrekArtisi = oncekiYilAyniCeyrekDegisimiHesapla(hasilatRow, birOncekiBilancoDonemi)
         kriter3GecmeDurumu = (kriter3OncekiCeyrekArtisi < kriter1SatisGelirArtisi)
-        print("Kriter3: Onceki Ceyrek Satis Geliri Artisi:", "{:.2%}".format(kriter3OncekiCeyrekArtisi),"<","{:.2%}".format(kriter1SatisGelirArtisi), kriter3GecmeDurumu)
+        print("Kriter3: Onceki Ceyrek Satis Geliri Artisi:", "{:.2%}".format(kriter3OncekiCeyrekArtisi),"<?","{:.2%}".format(kriter1SatisGelirArtisi), kriter3GecmeDurumu)
 
 
     # 4.kriter hesabi
@@ -184,24 +184,24 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati):
                                                                                    birOncekiBilancoDonemi)
         kriter4GecmeDurumu = True
         print("Kriter4: Onceki Ceyrek Faaliyet Kari Artisi %100'ün Üzerinde, Karşılaştırma Yapılmayacak:", "{:.2%}".format(kriter4OncekiCeyrekFaaliyetKariArtisi),
-              "<", "{:.2%}".format(kriter2FaaliyetKariArtisi), kriter4GecmeDurumu)
+              "<?", "{:.2%}".format(kriter2FaaliyetKariArtisi), kriter4GecmeDurumu)
 
 
     else:
         kriter4OncekiCeyrekFaaliyetKariArtisi = oncekiYilAyniCeyrekDegisimiHesapla(faaliyetKariRow, birOncekiBilancoDonemi)
         kriter4GecmeDurumu = (kriter4OncekiCeyrekFaaliyetKariArtisi < kriter2FaaliyetKariArtisi)
         print("Kriter4: Onceki Yila Gore Faaliyet Kari Artisi:", "{:.2%}".format(kriter4OncekiCeyrekFaaliyetKariArtisi),
-          "<" , "{:.2%}".format(kriter2FaaliyetKariArtisi) , kriter4GecmeDurumu)
+          "<?" , "{:.2%}".format(kriter2FaaliyetKariArtisi) , kriter4GecmeDurumu)
 
     # Gercek Deger Hesapla
     print("----------------Gercek Deger Hesabi-----------------------------------------------------------------")
 
     sermaye = getBilancoDegeri("Ödenmiş Sermaye", bilancoDonemiColumn)
-    print("Sermaye:", sermaye)
+    print("Sermaye:", "{:,.0f}".format(sermaye).replace(",","."), "TL")
 
     anaOrtaklikPayi = getBilancoDegeri("Ana Ortaklık Payları", bilancoDonemiColumn) / getBilancoDegeri(
         "DÖNEM KARI (ZARARI)", bilancoDonemiColumn)
-    print("Ana Ortaklık Payı:", anaOrtaklikPayi)
+    print("Ana Ortaklık Payı:", "{:.2f}".format(anaOrtaklikPayi))
 
     sonCeyrekSatisArtisYuzdesi = oncekiYilAyniCeyrekDegisimiHesapla(hasilatRow, bilancoDonemi)
     birOncekiCeyrekSatisArtisYuzdesi = oncekiYilAyniCeyrekDegisimiHesapla(hasilatRow, birOncekiBilancoDonemi)
@@ -212,11 +212,11 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati):
     bilancoDonemiSatis = ceyrekDegeriHesapla(hasilatRow, bilancoDonemiColumn)
 
     sonDortCeyrekSatisToplami = ucOncekiBilancoDonemiSatis + ikiOncekiBilancoDonemiSatis + birOncekiBilancoDonemiSatis + bilancoDonemiSatis
-    print("Son 4 ceyrek satış toplamı:", sonDortCeyrekSatisToplami)
+    print("Son 4 ceyrek satış toplamı:", "{:,.0f}".format(sonDortCeyrekSatisToplami).replace(",","."), "TL")
 
     onumuzdekiDortCeyrekSatisTahmini = (
                 (((sonCeyrekSatisArtisYuzdesi + birOncekiCeyrekSatisArtisYuzdesi) / 2) + 1) * sonDortCeyrekSatisToplami)
-    print("Önümüzdeki 4 çeyrek satış tahmini:", onumuzdekiDortCeyrekSatisTahmini)
+    print("Önümüzdeki 4 çeyrek satış tahmini:", "{:,.0f}".format(onumuzdekiDortCeyrekSatisTahmini).replace(",","."), "TL")
 
     ucOncekibilancoDonemiFaaliyetKari = ceyrekDegeriHesapla(faaliyetKariRow, ucOncekibilancoDonemiColumn)
     ikiOncekiBilancoDonemiFaaliyetKari = ceyrekDegeriHesapla(faaliyetKariRow, ikiOncekibilancoDonemiColumn)
@@ -229,36 +229,36 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati):
           "{:.2%}".format(onumuzdekiDortCeyrekFaaliyetKarMarjiTahmini))
 
     faaliyetKariTahmini1 = onumuzdekiDortCeyrekSatisTahmini * onumuzdekiDortCeyrekFaaliyetKarMarjiTahmini
-    print("Faaliyet Kar Tahmini1:", faaliyetKariTahmini1)
+    print("Faaliyet Kar Tahmini1:", "{:,.0f}".format(faaliyetKariTahmini1).replace(",","."), "TL")
 
     faaliyetKariTahmini2 = ((birOncekiBilancoDonemiFaaliyetKari + bilancoDonemiFaaliyetKari) * 2 * 0.3) + (
                 bilancoDonemiFaaliyetKari * 4 * 0.5) + \
                            ((
                                         ucOncekibilancoDonemiFaaliyetKari + ikiOncekiBilancoDonemiFaaliyetKari + birOncekiBilancoDonemiFaaliyetKari + bilancoDonemiFaaliyetKari) * 0.2)
-    print("Faaliyet Kar Tahmini2:", faaliyetKariTahmini2)
+    print("Faaliyet Kar Tahmini2:", "{:,.0f}".format(faaliyetKariTahmini2).replace(",","."), "TL")
 
     ortalamaFaaliyetKariTahmini = (faaliyetKariTahmini1 + faaliyetKariTahmini2) / 2
-    print("Ortalama Faaliyet Kari Tahmini:", ortalamaFaaliyetKariTahmini)
+    print("Ortalama Faaliyet Kari Tahmini:", "{:,.0f}".format(ortalamaFaaliyetKariTahmini).replace(",","."), "TL")
 
     hisseBasinaOrtalamaKarTahmini = (ortalamaFaaliyetKariTahmini * anaOrtaklikPayi) / sermaye
-    print("Hisse başına ortalama kar tahmini:", format(hisseBasinaOrtalamaKarTahmini, ".2f"))
+    print("Hisse başına ortalama kar tahmini:", format(hisseBasinaOrtalamaKarTahmini, ".2f") ,"TL")
 
     likidasyonDegeri = likidasyonDegeriHesapla(bilancoDonemi)
-    print("Likidasyon değeri:", likidasyonDegeri)
+    print("Likidasyon değeri:", "{:,.0f}".format(likidasyonDegeri).replace(",","."), "TL")
 
     borclar = int(getBilancoDegeri("TOPLAM YÜKÜMLÜLÜKLER", bilancoDonemiColumn))
-    print("Borçlar:", format(borclar, ",").replace(',', '.'))
+    print("Borçlar:", "{:,.0f}".format(borclar).replace(",","."), "TL")
 
     bilancoEtkisi = (likidasyonDegeri - borclar) / sermaye * anaOrtaklikPayi
-    print("Bilanço Etkisi:", format(bilancoEtkisi, ".2f"))
+    print("Bilanço Etkisi:", format(bilancoEtkisi, ".2f"), "TL")
 
     gercekDeger = (hisseBasinaOrtalamaKarTahmini * 7) + bilancoEtkisi
-    print("Gerçek hisse değeri:", format(gercekDeger, ".2f"))
+    print("Gerçek hisse değeri:", format(gercekDeger, ".2f"), "TL")
 
     targetBuy = gercekDeger * 0.66
-    print("Target buy:", format(targetBuy, ".2f"))
+    print("Target buy:", format(targetBuy, ".2f"), "TL")
 
-    print("Bilanço tarihindeki hisse fiyatı:", format(varHisseFiyati, ".2f"))
+    print("Bilanço tarihindeki hisse fiyatı:", format(varHisseFiyati, ".2f"), "TL")
 
     gercekFiyataUzaklik = varHisseFiyati / targetBuy
     print("Gerçek fiyata uzaklık:", "{:.2%}".format(gercekFiyataUzaklik))
@@ -276,7 +276,7 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati):
 
     netProEstDegeri = ((
                                    ortalamaFaaliyetKariTahmini / sonDortDonemFaaliyetKariToplami) * sonDortDonemNetKar) * anaOrtaklikPayi
-    print("NetPro Est Değeri:", netProEstDegeri)
+    print("NetPro Est Değeri:", "{:,.0f}".format(netProEstDegeri).replace(",","."), "TL")
 
     piyasaDegeri = (bilancoEtkisi * sermaye * -1) + (hisseFiyati * sermaye)
 
