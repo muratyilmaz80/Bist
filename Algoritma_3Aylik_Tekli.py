@@ -2,13 +2,18 @@ import xlrd
 import xlwt
 from xlutils.copy import copy
 import os.path
+from ExcelRowClass import ExcelRowClass
 
-varBilancoDosyasi = ("D:\\bist\\bilancolar\\DEVA.xlsx")
+from Rapor_Olustur import exportReportExcel
+
+varBilancoDosyasi = ("D:\\bist\\bilancolar\\TTRAK.xlsx")
 varBilancoDonemi = 202006
 varBondYield = 0.1022
-varHisseFiyati = 14.40
+varHisseFiyati = 101.40
+varReportFile = "D:\\bist\\Report_2020_06_3Ayliklar.xls"
 
-reportFile = "D:\\bist\\Report_2020_06_3Ayliklar.xls"
+
+
 
 def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati):
     def birOncekiBilancoDoneminiHesapla(dnm):
@@ -292,93 +297,41 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati):
     forwardPeKriteriGecmeDurumu = (forwardPeKriteri < 4)
     print("Forward PE Kriteri:", format(forwardPeKriteri, ".2f"), forwardPeKriteriGecmeDurumu)
 
-    def exportReportExcel(hisse, b):
-
-        def createTopRow():
-            bookSheetWrite.write(0, 0, "Hisse Adı")
-            bookSheetWrite.write(0, 1, "Son Çeyrek Hasılat")
-            bookSheetWrite.write(0, 2, "Önceki Yıl Aynı Çeyrek Hasılat")
-            bookSheetWrite.write(0, 3, "Hasılat Artışı")
-            bookSheetWrite.write(0, 4, "Bir Önceki Çeyrek Hasılat Artışı")
-            bookSheetWrite.write(0, 5, "Kriter1")
-            bookSheetWrite.write(0, 6, "Kriter3")
-            bookSheetWrite.write(0, 7, "Son Çeyrek Faaliyet Karı")
-            bookSheetWrite.write(0, 8, "Önceki Yıl Aynı Çeyrek Faaliyet Karı")
-            bookSheetWrite.write(0, 9, "Faaliyet Karı Artışı")
-            bookSheetWrite.write(0, 10, "Bir Önceki Çeyrek Faaliyet Karı Artışı")
-            bookSheetWrite.write(0, 11, "Kriter2")
-            bookSheetWrite.write(0, 12, "Kriter4")
-            bookSheetWrite.write(0, 13, "Sermaye")
-            bookSheetWrite.write(0, 14, "Ana Ortaklık Payı")
-            bookSheetWrite.write(0, 15, "Son 4 Çeyrek Satış Toplamı")
-            bookSheetWrite.write(0, 16, "Önümüzdeki 4 Çeyrek Satış Tahmini")
-            bookSheetWrite.write(0, 17, "Önümüzdeki 4 Çeyrek Faaliyet Kar Marjı Tahmini")
-            bookSheetWrite.write(0, 18, "Faaliyet Kar Tahmini 1")
-            bookSheetWrite.write(0, 19, "Faaliyet Kar Tahmini 2")
-            bookSheetWrite.write(0, 20, "Ortalama Faaliyet Kar Tahmini")
-            bookSheetWrite.write(0, 21, "Hisse Başına Kar Tahmini")
-            bookSheetWrite.write(0, 22, "Bilanço Etkisi")
-            bookSheetWrite.write(0, 23, "Bilanço Tarihi Hisse Fiyatı")
-            bookSheetWrite.write(0, 24, "Gerçek Hisse Değeri")
-            bookSheetWrite.write(0, 25, "Target Buy")
-            bookSheetWrite.write(0, 26, "Gerçek Fiyata Uzaklık")
-            bookSheetWrite.write(0, 27, "NET Pro")
-            bookSheetWrite.write(0, 28, "Forward PE")
-
-        def reportResults(rowNumber):
-
-            bookSheetWrite.write(rowNumber, 0, hisse)
-            bookSheetWrite.write(rowNumber, 1, ceyrekDegeriHesapla(hasilatRow, bilancoDonemiColumn))
-            bookSheetWrite.write(rowNumber, 2, ceyrekDegeriHesapla(hasilatRow, dortOncekibilancoDonemiColumn))
-            bookSheetWrite.write(rowNumber, 3, kriter1SatisGelirArtisi)
-            bookSheetWrite.write(rowNumber, 4, kriter3OncekiCeyrekArtisi)
-            bookSheetWrite.write(rowNumber, 5, kriter1GecmeDurumu)
-            bookSheetWrite.write(rowNumber, 6, kriter3GecmeDurumu)
-            bookSheetWrite.write(rowNumber, 7, ceyrekDegeriHesapla(faaliyetKariRow, bilancoDonemiColumn))
-            bookSheetWrite.write(rowNumber, 8, ceyrekDegeriHesapla(faaliyetKariRow, dortOncekibilancoDonemiColumn))
-            bookSheetWrite.write(rowNumber, 9, kriter2FaaliyetKariArtisi)
-            bookSheetWrite.write(rowNumber, 10, kriter4OncekiCeyrekFaaliyetKariArtisi)
-            bookSheetWrite.write(rowNumber, 11, kriter2GecmeDurumu)
-            bookSheetWrite.write(rowNumber, 12, kriter4GecmeDurumu)
-            bookSheetWrite.write(rowNumber, 13, sermaye)
-            bookSheetWrite.write(rowNumber, 14, anaOrtaklikPayi)
-            bookSheetWrite.write(rowNumber, 15, sonDortCeyrekSatisToplami)
-            bookSheetWrite.write(rowNumber, 16, onumuzdekiDortCeyrekSatisTahmini)
-            bookSheetWrite.write(rowNumber, 17, onumuzdekiDortCeyrekFaaliyetKarMarjiTahmini)
-            bookSheetWrite.write(rowNumber, 18, faaliyetKariTahmini1)
-            bookSheetWrite.write(rowNumber, 19, faaliyetKariTahmini2)
-            bookSheetWrite.write(rowNumber, 20, ortalamaFaaliyetKariTahmini)
-            bookSheetWrite.write(rowNumber, 21, hisseBasinaOrtalamaKarTahmini)
-            bookSheetWrite.write(rowNumber, 22, bilancoEtkisi)
-            bookSheetWrite.write(rowNumber, 23, varHisseFiyati)
-            bookSheetWrite.write(rowNumber, 24, gercekDeger)
-            bookSheetWrite.write(rowNumber, 25, targetBuy)
-            bookSheetWrite.write(rowNumber, 26, gercekFiyataUzaklik)
-            bookSheetWrite.write(rowNumber, 27, netProKriteri)
-            bookSheetWrite.write(rowNumber, 28, forwardPeKriteri)
-
-        if os.path.isfile(reportFile):
-            print("Rapor dosyası var, güncellenecek:", reportFile)
-            bookRead = xlrd.open_workbook(reportFile, formatting_info=True)
-            sheetRead = bookRead.sheet_by_index(0)
-            rowNumber = sheetRead.nrows
-            bookWrite = copy(bookRead)
-            bookSheetWrite = bookWrite.get_sheet(0)
-            reportResults(rowNumber)
-            bookWrite.save(reportFile)
-
-        else:
-            print("Rapor dosyası yeni oluşturulacak: ", reportFile)
-            bookWrite = xlwt.Workbook()
-            bookSheetWrite = bookWrite.add_sheet(str(varBilancoDonemi))
-            createTopRow()
-            reportResults(1)
-            bookWrite.save(reportFile)
-
     hisseAdiTemp = varBilancoDosyasi[19:]
     hisseAdi = hisseAdiTemp[:-5]
     print (hisseAdi)
-    exportReportExcel(hisseAdi, reportFile)
 
+    excelRow = ExcelRowClass()
+
+    excelRow.sonCeyrekHasilat = ceyrekDegeriHesapla(hasilatRow, bilancoDonemiColumn)
+    excelRow.oncekiYilAyniCeyrekHasilat = ceyrekDegeriHesapla(hasilatRow, dortOncekibilancoDonemiColumn)
+    excelRow.hasilatArtisi = kriter1SatisGelirArtisi
+    excelRow.birOncekiCeyrekHasilatArtisi = kriter3OncekiCeyrekArtisi
+    excelRow.kriter1 = kriter1GecmeDurumu
+    excelRow.kriter3 = kriter3GecmeDurumu
+    excelRow.sonCeyrekFaaliyetKari = ceyrekDegeriHesapla(faaliyetKariRow, bilancoDonemiColumn)
+    excelRow.oncekiYilAyniCeyrekFaaliyetKari = ceyrekDegeriHesapla(faaliyetKariRow, dortOncekibilancoDonemiColumn)
+    excelRow.faaliyetKarArtisi = kriter2FaaliyetKariArtisi
+    excelRow.birOncekiCeyrekFaaliyetKarArtisi = kriter4OncekiCeyrekFaaliyetKariArtisi
+    excelRow.kriter2 = kriter2GecmeDurumu
+    excelRow.kriter4 = kriter4GecmeDurumu
+    excelRow.sermaye = sermaye
+    excelRow.anaOrtaklikPayi = anaOrtaklikPayi
+    excelRow.son4CeyrekSatisToplami = sonDortCeyrekSatisToplami
+    excelRow.onumuzdeki4CeyrekSatisTahmini = onumuzdekiDortCeyrekSatisTahmini
+    excelRow.onumuzdeki4CeyrekFaaliyetKarMarjiTahmini = onumuzdekiDortCeyrekFaaliyetKarMarjiTahmini
+    excelRow.faaliyetKarTahmini1 = faaliyetKariTahmini1
+    excelRow.faaliyetKarTahmini2 = faaliyetKariTahmini2
+    excelRow.ortalamaFaaliyetKarTahmini = ortalamaFaaliyetKariTahmini
+    excelRow.hisseBasinaKarTahmini = hisseBasinaOrtalamaKarTahmini
+    excelRow.bilancoEtkisi = bilancoEtkisi
+    excelRow.bilancoTarihiHisseFiyati = varHisseFiyati
+    excelRow.gercekHisseDegeri = gercekDeger
+    excelRow.targetBuy = targetBuy
+    excelRow.gercekFiyataUzaklik = gercekFiyataUzaklik
+    excelRow.netPro = netProKriteri
+    excelRow.forwardPe = forwardPeKriteri
+
+    exportReportExcel(hisseAdi, varReportFile, varBilancoDonemi, excelRow)
 
 runAlgoritma(varBilancoDosyasi, varBilancoDonemi, varBondYield, varHisseFiyati)
