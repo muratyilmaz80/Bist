@@ -259,7 +259,7 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati):
 
     print("Bilanço tarihindeki hisse fiyatı:", format(varHisseFiyati, ".2f"))
 
-    gercekFiyataUzaklik = varHisseFiyati / targetBuy
+    gercekFiyataUzaklik = hisseFiyati / targetBuy
     print("Gerçek fiyata uzaklık:", "{:.2%}".format(gercekFiyataUzaklik))
 
     # Netpro Hesapla
