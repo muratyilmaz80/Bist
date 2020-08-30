@@ -5,10 +5,10 @@ import os.path
 from ExcelRowClass import ExcelRowClass
 from Rapor_Olustur import exportReportExcel
 
-varBilancoDosyasi = ("D:\\bist\\bilancolar\\ULKER.xlsx")
+varBilancoDosyasi = ("D:\\bist\\bilancolar\\ARENA.xlsx")
 varBilancoDonemi = 202006
-varBondYield = 0.1022
-varHisseFiyati = 21.84
+varBondYield = 0.1347
+varHisseFiyati = 26.38
 varReportFile = "D:\\bist\\Report_2020_06_3Ayliklar.xls"
 
 
@@ -155,6 +155,11 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati):
         kriter2GecmeDurumu = False
         print("Kriter2: Faaliyet Kari Artisi:", kriter2GecmeDurumu, "Son Ceyrek Faaliyet Kari Negatif")
 
+    elif ((ceyrekDegeriHesapla(faaliyetKariRow, bilancoDonemiColumn) > 0) and (oncekiYilAyniCeyrekDegisimiHesapla(faaliyetKariRow, bilancoDonemi))<0 ):
+        kriter2FaaliyetKariArtisi = 0
+        kriter2GecmeDurumu = True
+        print("Kriter2: Faaliyet Kari Artisi:", kriter2GecmeDurumu, "Son Ceyrek Faaliyet Kari Negatiften Pozitife Geçmiş")
+
     else:
         kriter2FaaliyetKariArtisi = oncekiYilAyniCeyrekDegisimiHesapla(faaliyetKariRow, bilancoDonemi)
         kriter2GecmeDurumu = (kriter2FaaliyetKariArtisi > 0.15)
@@ -219,6 +224,8 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati):
     onumuzdekiDortCeyrekSatisTahmini = (
                 (((sonCeyrekSatisArtisYuzdesi + birOncekiCeyrekSatisArtisYuzdesi) / 2) + 1) * sonDortCeyrekSatisToplami)
     print("Önümüzdeki 4 çeyrek satış tahmini:", "{:,.0f}".format(onumuzdekiDortCeyrekSatisTahmini).replace(",","."), "TL")
+
+    #onumuzdekiDortCeyrekSatisTahmini = 5000000000
 
     ucOncekibilancoDonemiFaaliyetKari = ceyrekDegeriHesapla(faaliyetKariRow, ucOncekibilancoDonemiColumn)
     ikiOncekiBilancoDonemiFaaliyetKari = ceyrekDegeriHesapla(faaliyetKariRow, ikiOncekibilancoDonemiColumn)
@@ -285,6 +292,9 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati):
     netProKriteri = (netProEstDegeri / piyasaDegeri) / bondYield
     netProKriteriGecmeDurumu = (netProKriteri > 2)
     print("NetPro Kriteri:", format(netProKriteri, ".2f"), netProKriteriGecmeDurumu)
+
+    minNetProIcınHisseFiyati  = (netProEstDegeri / (1.9 * bondYield) - (bilancoEtkisi * sermaye * -1))/sermaye
+    print("NetPro 1.9 Olmasi Icin Hisse Degeri:", format(minNetProIcınHisseFiyati, ".2f"), )
 
     # Forward PE Hesapla
     print("----------------Forward PE Kriteri-----------------------------------------------------------------")

@@ -149,10 +149,23 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati):
         kriter2GecmeDurumu = False
         print("Kriter2: Faaliyet Kari Artisi:", kriter2GecmeDurumu, "Son Ceyrek Faaliyet Kari Negatif")
 
+    elif ceyrekDegeriHesapla(faaliyetKariRow, bilancoDonemiColumn) < 0:
+        kriter2FaaliyetKariArtisi = oncekiYilAyniCeyrekDegisimiHesapla(faaliyetKariRow, bilancoDonemi)
+        kriter2GecmeDurumu = False
+        print("Kriter2: Faaliyet Kari Artisi:", kriter2GecmeDurumu, "Son Ceyrek Faaliyet Kari Negatif")
+
+    elif ((ceyrekDegeriHesapla(faaliyetKariRow, bilancoDonemiColumn) > 0) and (
+    oncekiYilAyniCeyrekDegisimiHesapla(faaliyetKariRow, bilancoDonemi)) < 0):
+        kriter2FaaliyetKariArtisi = 0
+        kriter2GecmeDurumu = True
+        print("Kriter2: Faaliyet Kari Artisi:", kriter2GecmeDurumu,
+              "Son Ceyrek Faaliyet Kari Negatiften Pozitife Geçmiş")
+
     else:
         kriter2FaaliyetKariArtisi = oncekiYilAyniCeyrekDegisimiHesapla(faaliyetKariRow, bilancoDonemi)
         kriter2GecmeDurumu = (kriter2FaaliyetKariArtisi > 0.15)
-        print("Kriter2: Faaliyet Kari Artisi:", "{:.2%}".format(kriter2FaaliyetKariArtisi), kriter2GecmeDurumu)
+        print("Kriter2: Faaliyet Kari Artisi:", "{:.2%}".format(kriter2FaaliyetKariArtisi), ">? 15%",
+              kriter2GecmeDurumu)
 
     # 3.kriter hesabı
     print("---------------------------------------------------------------------------------")

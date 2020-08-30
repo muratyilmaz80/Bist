@@ -7,10 +7,10 @@ from Rapor_Olustur import exportReportExcel
 
 from Algoritma_old_1 import faaliyetKariRow
 
-varBilancoDosyasi = ("D:\\bist\\bilancolar\\SEYKM.xlsx")
+varBilancoDosyasi = ("D:\\bist\\bilancolar\\NRHOL.xlsx")
 varBilancoDonemi = 202006
-varBondYield = 0.1022
-varHisseFiyati = 9.20
+varBondYield = 0.1337
+varHisseFiyati = 20
 
 varReportFile = "D:\\bist\\Report_2020_06_6Ayliklar.xls"
 
@@ -151,6 +151,12 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati):
         kriter2FaaliyetKariArtisi = oncekiYilAyniAltiAyDegisimiHesapla(faaliyetKariRow, bilancoDonemi)
         kriter2GecmeDurumu = False
         print("Kriter2: Faaliyet Kari Artisi:", kriter2GecmeDurumu, "Son Ceyrek Faaliyet Kari Negatif")
+
+    elif ((altiAyDegeriHesapla(faaliyetKariRow, bilancoDonemiColumn) > 0) and (oncekiYilAyniAltiAyDegisimiHesapla(faaliyetKariRow, bilancoDonemi))<0 ):
+        kriter2FaaliyetKariArtisi = 0
+        kriter2GecmeDurumu = True
+        print("Kriter2: Faaliyet Kari Artisi:", kriter2GecmeDurumu, "Son Ceyrek Faaliyet Kari Negatiften Pozitife Geçmiş")
+
 
     else:
         kriter2FaaliyetKariArtisi = oncekiYilAyniAltiAyDegisimiHesapla(faaliyetKariRow, bilancoDonemi)
