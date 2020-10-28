@@ -5,11 +5,14 @@ import os.path
 from ExcelRowClass import ExcelRowClass
 from Rapor_Olustur import exportReportExcel
 
-varBilancoDosyasi = ("D:\\bist\\bilancolar\\ARENA.xlsx")
-varBilancoDonemi = 202006
-varBondYield = 0.1347
-varHisseFiyati = 26.38
-varReportFile = "D:\\bist\\Report_2020_06_3Ayliklar.xls"
+varBilancoDosyasi = ("//Users//myilmaz//Documents//bist//bilancolar//SEYKM.xlsx")
+
+# AKSUE BNTAS DAGI DOBUR EGSER JANTS TIRE
+
+varBilancoDonemi = 202009
+varBondYield = 0.1448
+varHisseFiyati = 12.72
+varReportFile = "//Users//myilmaz//Documents//bist//Report_2020_09_3Ayliklar_Mac.xls"
 
 
 def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati):
@@ -79,7 +82,8 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati):
 
     hasilatRow = getBilancoTitleRow("Hasılat")
     faaliyetKariRow = getBilancoTitleRow("ESAS FAALİYET KARI (ZARARI)");
-    netKarRow = getBilancoTitleRow("Net Dönem Karı veya Zararı");
+    # netKarRow = getBilancoTitleRow("Net Dönem Karı veya Zararı");
+    netKarRow = getBilancoTitleRow("DÖNEM KARI (ZARARI)");
 
     def ceyrekDegeriHesapla(r, c):
         quarter = (sheet.cell_value(0, c)) % (100)
@@ -281,13 +285,25 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati):
     ikiOncekiBilancoDonemiNetKari = ceyrekDegeriHesapla(netKarRow, ikiOncekibilancoDonemiColumn)
     birOncekiBilancoDonemiNetKari = ceyrekDegeriHesapla(netKarRow, birOncekibilancoDonemiColumn)
     bilancoDonemiNetKari = ceyrekDegeriHesapla(netKarRow, bilancoDonemiColumn)
+
+    print ("Bilanco Donem Net Kar:", bilancoDonemiNetKari)
+    print("birOncekiBilancoDonemiNetKari:", birOncekiBilancoDonemiNetKari)
+    print("ikiOncekiBilancoDonemiNetKari:", ikiOncekiBilancoDonemiNetKari)
+    print("ucOncekibilancoDonemiNetKari:", ucOncekibilancoDonemiNetKari)
+
     sonDortDonemNetKar = bilancoDonemiNetKari + birOncekiBilancoDonemiNetKari + ikiOncekiBilancoDonemiNetKari + ucOncekibilancoDonemiNetKari
+
+    print ("Son 4 Dönem Net Kar:", sonDortDonemNetKar)
+    print ("Son 4 Dönem Faaliyet Kari Toplami:", sonDortDonemFaaliyetKariToplami)
 
     netProEstDegeri = ((
                                    ortalamaFaaliyetKariTahmini / sonDortDonemFaaliyetKariToplami) * sonDortDonemNetKar) * anaOrtaklikPayi
     print("NetPro Est Değeri:", "{:,.0f}".format(netProEstDegeri).replace(",","."), "TL")
 
     piyasaDegeri = (bilancoEtkisi * sermaye * -1) + (hisseFiyati * sermaye)
+
+    print("Piyasa Değeri:", piyasaDegeri)
+    print("BondYield:", bondYield)
 
     netProKriteri = (netProEstDegeri / piyasaDegeri) / bondYield
     netProKriteriGecmeDurumu = (netProKriteri > 2)
@@ -304,7 +320,7 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati):
     forwardPeKriteriGecmeDurumu = (forwardPeKriteri < 4)
     print("Forward PE Kriteri:", format(forwardPeKriteri, ".2f"), forwardPeKriteriGecmeDurumu)
 
-    hisseAdiTemp = varBilancoDosyasi[19:]
+    hisseAdiTemp = varBilancoDosyasi[47:]
     hisseAdi = hisseAdiTemp[:-5]
     print (hisseAdi)
 

@@ -94,7 +94,7 @@ def fnc(pg):
 
             print("=========================")
 
-            fileName = "D:\\bist\\bilancolar\\" + stockCode + ".xlsx"
+            fileName = "//Users//myilmaz//Documents//bist//bilancolar//" + stockCode + ".xlsx"
 
             if os.path.isfile(fileName):
                 archiveDf = pd.read_excel(fileName, index_col=0)
@@ -118,4 +118,4 @@ def fncMultiple(s):
 
 #fnc("https://www.kap.org.tr/tr/Bildirim/846388")
 
-fncMultiple("870242-870244-870448")
+fncMultiple("884731")
