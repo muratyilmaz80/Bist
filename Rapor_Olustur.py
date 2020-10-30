@@ -2,8 +2,6 @@ import xlrd
 import xlwt
 from xlutils.copy import copy
 import os.path
-import ExcelRowClass
-
 
 def exportReportExcel(hisse,file,bilancoDonemi,ExcelRowClass):
 
