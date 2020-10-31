@@ -5,13 +5,13 @@ import os.path
 from ExcelRowClass import ExcelRowClass
 from Rapor_Olustur import exportReportExcel
 
-varBilancoDosyasi = ("//Users//myilmaz//Documents//bist//bilancolar//PRZMA.xlsx")
+varBilancoDosyasi = ("//Users//myilmaz//Documents//bist//bilancolar//TKNSA.xlsx")
 
 # AKSUE BNTAS DAGI DOBUR EGSER JANTS TIRE
 
 varBilancoDonemi = 202009
-varBondYield = 0.1448
-varHisseFiyati = 6.45
+varBondYield = 0.1499
+varHisseFiyati = 8.21
 varReportFile = "//Users//myilmaz//Documents//bist//Report_2020_09_3Ayliklar_Mac.xls"
 
 
