@@ -68,15 +68,13 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati, reportFi
     besOncekibilancoDonemiColumn = donemColumnFind(besOncekiBilancoDonemi)
     altiOncekibilancoDonemiColumn = donemColumnFind(altiOncekiBilancoDonemi)
     yediOncekibilancoDonemiColumn = donemColumnFind(yediOncekiBilancoDonemi)
-    sekizOncekibilancoDonemiColumn = donemColumnFind(sekizOncekiBilancoDonemi)
-
 
     def getBilancoDegeri(label, column):
         for rowi in range(sheet.nrows):
             cell = sheet.cell(rowi, 0)
             if cell.value == label:
                 if sheet.cell_value(rowi, column)=="":
-                    print ("Bilanço alanı boş!")
+                    print (label + " :Bilanço alanı boş!")
                     return 0
                 else:
                     return sheet.cell_value(rowi, column)
@@ -96,6 +94,7 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati, reportFi
     faaliyetKariRow = getBilancoTitleRow("ESAS FAALİYET KARI (ZARARI)");
     # netKarRow = getBilancoTitleRow("Net Dönem Karı veya Zararı");
     netKarRow = getBilancoTitleRow("DÖNEM KARI (ZARARI)");
+    brutKarRow = getBilancoTitleRow("BRÜT KAR (ZARAR)");
 
     def ceyrekDegeriHesapla(r, c):
         quarter = (sheet.cell_value(0, c)) % (100)
@@ -142,7 +141,7 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati, reportFi
 
     # Cari Dönem Satış(Hasılat) Gelirleri
     print("")
-    print("--------------------SATIŞ(HASILAT) GELİRLERİ---------------------------")
+    print("--------------------HASILAT(SATIŞ) GELİRLERİ---------------------------")
     print("")
 
     bilancoDonemiHasilat = ceyrekDegeriHesapla(hasilatRow,bilancoDonemiColumn)
@@ -181,21 +180,21 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati, reportFi
     print(satisTablosu)
 
     # Cari Dönem Saış Geliri Artış Kriteri
-    cariDonemSatisGelirArtisi = oncekiYilAyniCeyrekDegisimiHesapla(hasilatRow, bilancoDonemi)
-    cariDonemSatisGelirArtisiGecmeDurumu = (cariDonemSatisGelirArtisi > 0.1)
-    print("Cari Dönem Satış Geliri Artışı %10'dan Büyük Mü:", "{:.2%}".format(cariDonemSatisGelirArtisi), ">? 10%", cariDonemSatisGelirArtisiGecmeDurumu)
+    cariDonemHasilatGelirArtisi = oncekiYilAyniCeyrekDegisimiHesapla(hasilatRow, bilancoDonemi)
+    cariDonemHasilatGelirArtisiGecmeDurumu = (cariDonemHasilatGelirArtisi > 0.1)
+    print("Cari Dönem Satış Geliri Artışı %10'dan Büyük Mü:", "{:.2%}".format(cariDonemHasilatGelirArtisi), ">? 10%", cariDonemHasilatGelirArtisiGecmeDurumu)
 
-    # Önceki Dönem Saış Geliri Artış Kriteri
-    oncekiDonemSatisGelirArtisi = oncekiYilAyniCeyrekDegisimiHesapla(hasilatRow, birOncekiBilancoDonemi)
+    # Önceki Dönem Hasılat Geliri Artış Kriteri
+    oncekiDonemHasilatGelirArtisi = oncekiYilAyniCeyrekDegisimiHesapla(hasilatRow, birOncekiBilancoDonemi)
 
-    if (cariDonemSatisGelirArtisi >= 1):
+    if (cariDonemHasilatGelirArtisi >= 1):
         print ("Cari Dönem Satış Gelir Artışı %100 Üzerinde, Karşılaştırma Yapılmayacak.")
-        oncekiDonemSatisGelirArtisiGecmeDurumu = True
-        print ("Önceki Dönem Satış Gelir Artışı Geçme Durumu:", oncekiDonemSatisGelirArtisiGecmeDurumu)
+        oncekiDonemHasilatGelirArtisiGecmeDurumu = True
+        print ("Önceki Dönem Satış Gelir Artışı Geçme Durumu:", oncekiDonemHasilatGelirArtisiGecmeDurumu)
 
     else:
-        oncekiDonemSatisGelirArtisiGecmeDurumu = (oncekiDonemSatisGelirArtisi<cariDonemSatisGelirArtisi)
-        print("Önceki Dönem Satış Gelir Artışı Cari Dönemden Düşük Mü:", "{:.2%}".format(oncekiDonemSatisGelirArtisi),"<?","{:.2%}".format(cariDonemSatisGelirArtisi), oncekiDonemSatisGelirArtisiGecmeDurumu)
+        oncekiDonemHasilatGelirArtisiGecmeDurumu = (oncekiDonemHasilatGelirArtisi<cariDonemHasilatGelirArtisi)
+        print("Önceki Dönem Satış Gelir Artışı Cari Dönemden Düşük Mü:", "{:.2%}".format(oncekiDonemHasilatGelirArtisi),"<?","{:.2%}".format(cariDonemHasilatGelirArtisi), oncekiDonemHasilatGelirArtisiGecmeDurumu)
 
 
     # Faaliyet Karı Gelirleri
@@ -276,38 +275,150 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati, reportFi
 
 
 
+    # Net Kar Hesabı
+    print("")
+    print("-------------------NET KAR (DÖNEM KARI/ZARARI)--------------------------")
+    print("")
+
+    bilancoDonemiNetKar = ceyrekDegeriHesapla(netKarRow, bilancoDonemiColumn)
+    birOncekiBilancoDonemiNetKar = ceyrekDegeriHesapla(netKarRow, birOncekibilancoDonemiColumn)
+    ikiOncekiBilancoDonemiNetKar = ceyrekDegeriHesapla(netKarRow, ikiOncekibilancoDonemiColumn)
+    ucOncekiBilancoDonemiNetKar = ceyrekDegeriHesapla(netKarRow, ucOncekibilancoDonemiColumn)
+    dortOncekiBilancoDonemiNetKar = ceyrekDegeriHesapla(netKarRow, dortOncekibilancoDonemiColumn)
+    besOncekiBilancoDonemiNetKar = ceyrekDegeriHesapla(netKarRow, besOncekibilancoDonemiColumn)
+    altiOncekiBilancoDonemiNetKar = ceyrekDegeriHesapla(netKarRow, altiOncekibilancoDonemiColumn)
+    yediOncekiBilancoDonemiNetKar = ceyrekDegeriHesapla(netKarRow, yediOncekibilancoDonemiColumn)
+
+    bilancoDonemiNetKarPrint = "{:,.0f}".format(bilancoDonemiNetKar).replace(",", ".")
+    dortOncekiBilancoDonemiNetKarPrint = "{:,.0f}".format(dortOncekiBilancoDonemiNetKar).replace(",", ".")
+    bilancoDonemiNetKarDegisimiPrint = "{:.2%}".format(oncekiYilAyniCeyrekDegisimiHesapla(netKarRow, bilancoDonemi))
+
+    birOncekiBilancoDonemiNetKarPrint = "{:,.0f}".format(birOncekiBilancoDonemiNetKar).replace(",", ".")
+    besOncekiBilancoDonemiNetKarPrint = "{:,.0f}".format(besOncekiBilancoDonemiNetKar).replace(",", ".")
+    birOncekiBilancoDonemiNetKarDegisimiPrint = "{:.2%}".format(
+        oncekiYilAyniCeyrekDegisimiHesapla(netKarRow, birOncekiBilancoDonemi))
+
+    ikiOncekiBilancoDonemiNetKarPrint = "{:,.0f}".format(ikiOncekiBilancoDonemiNetKar).replace(",", ".")
+    altiOncekiBilancoDonemiNetKarPrint = "{:,.0f}".format(altiOncekiBilancoDonemiNetKar).replace(",", ".")
+    ikiOncekiBilancoDonemiNetKarDegisimiPrint = "{:.2%}".format(
+        oncekiYilAyniCeyrekDegisimiHesapla(netKarRow, ikiOncekiBilancoDonemi))
+
+    ucOncekiBilancoDonemiNetKarPrint = "{:,.0f}".format(ucOncekiBilancoDonemiNetKar).replace(",", ".")
+    yediOncekiBilancoDonemiNetKarPrint = "{:,.0f}".format(yediOncekiBilancoDonemiNetKar).replace(",",".")
+    ucOncekiBilancoDonemiNetKarDegisimiPrint = "{:.2%}".format(
+        oncekiYilAyniCeyrekDegisimiHesapla(netKarRow, ucOncekiBilancoDonemi))
+
+    netKarTablosu = PrettyTable()
+    netKarTablosu.field_names = ["ÇEYREK", "NET KAR", "ÖNCEKİ YIL", "ÖNCEKİ YIL NET KAR",
+                                       "YÜZDE DEĞİŞİM"]
+    netKarTablosu.align["NET KAR"] = "r"
+    netKarTablosu.align["ÖNCEKİ YIL NET KAR"] = "r"
+    netKarTablosu.add_row([bilancoDonemi, bilancoDonemiNetKarPrint, dortOncekiBilancoDonemi,
+                                 dortOncekiBilancoDonemiNetKarPrint, bilancoDonemiNetKarDegisimiPrint])
+    netKarTablosu.add_row(
+        [birOncekiBilancoDonemi, birOncekiBilancoDonemiNetKarPrint, besOncekiBilancoDonemi,
+         besOncekiBilancoDonemiNetKarPrint, birOncekiBilancoDonemiNetKarDegisimiPrint])
+    netKarTablosu.add_row(
+        [ikiOncekiBilancoDonemi, ikiOncekiBilancoDonemiNetKarPrint, altiOncekiBilancoDonemi,
+         altiOncekiBilancoDonemiNetKarPrint, ikiOncekiBilancoDonemiNetKarDegisimiPrint])
+    netKarTablosu.add_row(
+        [ucOncekiBilancoDonemi, ucOncekiBilancoDonemiNetKarPrint, yediOncekiBilancoDonemi,
+         yediOncekiBilancoDonemiNetKarPrint, ucOncekiBilancoDonemiNetKarDegisimiPrint])
+    print(netKarTablosu)
 
 
 
 
 
 
-    # Gercek Deger Hesapla
-    print("----------------Gercek Deger Hesabi-----------------------------------------------------------------")
+
+
+
+    # Brüt Kar Hesabı
+    print("")
+    print("-------------------BRÜT KAR (BRÜT KAR/ZARAR)--------------------------")
+    print("")
+
+    bilancoDonemiBrutKar = ceyrekDegeriHesapla(brutKarRow, bilancoDonemiColumn)
+    birOncekiBilancoDonemiBrutKar = ceyrekDegeriHesapla(brutKarRow, birOncekibilancoDonemiColumn)
+    ikiOncekiBilancoDonemiBrutKar = ceyrekDegeriHesapla(brutKarRow, ikiOncekibilancoDonemiColumn)
+    ucOncekiBilancoDonemiBrutKar = ceyrekDegeriHesapla(brutKarRow, ucOncekibilancoDonemiColumn)
+    dortOncekiBilancoDonemiBrutKar = ceyrekDegeriHesapla(brutKarRow, dortOncekibilancoDonemiColumn)
+    besOncekiBilancoDonemiBrutKar = ceyrekDegeriHesapla(brutKarRow, besOncekibilancoDonemiColumn)
+    altiOncekiBilancoDonemiBrutKar = ceyrekDegeriHesapla(brutKarRow, altiOncekibilancoDonemiColumn)
+    yediOncekiBilancoDonemiBrutKar = ceyrekDegeriHesapla(brutKarRow, yediOncekibilancoDonemiColumn)
+
+    bilancoDonemiBrutKarPrint = "{:,.0f}".format(bilancoDonemiBrutKar).replace(",", ".")
+    dortOncekiBilancoDonemiBrutKarPrint = "{:,.0f}".format(dortOncekiBilancoDonemiBrutKar).replace(",", ".")
+    bilancoDonemiBrutKarDegisimiPrint = "{:.2%}".format(oncekiYilAyniCeyrekDegisimiHesapla(brutKarRow, bilancoDonemi))
+
+    birOncekiBilancoDonemiBrutKarPrint = "{:,.0f}".format(birOncekiBilancoDonemiBrutKar).replace(",", ".")
+    besOncekiBilancoDonemiBrutKarPrint = "{:,.0f}".format(besOncekiBilancoDonemiBrutKar).replace(",", ".")
+    birOncekiBilancoDonemiBrutKarDegisimiPrint = "{:.2%}".format(
+        oncekiYilAyniCeyrekDegisimiHesapla(brutKarRow, birOncekiBilancoDonemi))
+
+    ikiOncekiBilancoDonemiBrutKarPrint = "{:,.0f}".format(ikiOncekiBilancoDonemiBrutKar).replace(",", ".")
+    altiOncekiBilancoDonemiBrutKarPrint = "{:,.0f}".format(altiOncekiBilancoDonemiBrutKar).replace(",", ".")
+    ikiOncekiBilancoDonemiBrutKarDegisimiPrint = "{:.2%}".format(
+        oncekiYilAyniCeyrekDegisimiHesapla(brutKarRow, ikiOncekiBilancoDonemi))
+
+    ucOncekiBilancoDonemiBrutKarPrint = "{:,.0f}".format(ucOncekiBilancoDonemiBrutKar).replace(",", ".")
+    yediOncekiBilancoDonemiBrutKarPrint = "{:,.0f}".format(yediOncekiBilancoDonemiBrutKar).replace(",", ".")
+    ucOncekiBilancoDonemiBrutKarDegisimiPrint = "{:.2%}".format(
+        oncekiYilAyniCeyrekDegisimiHesapla(brutKarRow, ucOncekiBilancoDonemi))
+
+    brutKarTablosu = PrettyTable()
+    brutKarTablosu.field_names = ["ÇEYREK", "BRÜT KAR", "ÖNCEKİ YIL", "ÖNCEKİ YIL BRÜT KAR", "YÜZDE DEĞİŞİM"]
+    brutKarTablosu.align["BRÜT KAR"] = "r"
+    brutKarTablosu.align["ÖNCEKİ YIL BRÜT KAR"] = "r"
+    brutKarTablosu.add_row([bilancoDonemi, bilancoDonemiBrutKarPrint, dortOncekiBilancoDonemi,
+                            dortOncekiBilancoDonemiBrutKarPrint, bilancoDonemiBrutKarDegisimiPrint])
+    brutKarTablosu.add_row(
+        [birOncekiBilancoDonemi, birOncekiBilancoDonemiBrutKarPrint, besOncekiBilancoDonemi,
+         besOncekiBilancoDonemiBrutKarPrint, birOncekiBilancoDonemiBrutKarDegisimiPrint])
+    brutKarTablosu.add_row(
+        [ikiOncekiBilancoDonemi, ikiOncekiBilancoDonemiBrutKarPrint, altiOncekiBilancoDonemi,
+         altiOncekiBilancoDonemiBrutKarPrint, ikiOncekiBilancoDonemiBrutKarDegisimiPrint])
+    brutKarTablosu.add_row(
+        [ucOncekiBilancoDonemi, ucOncekiBilancoDonemiBrutKarPrint, yediOncekiBilancoDonemi,
+         yediOncekiBilancoDonemiBrutKarPrint, ucOncekiBilancoDonemiBrutKarDegisimiPrint])
+    print(brutKarTablosu)
+
+
+
+
+
+    # Gerçek Deger Hesaplama
+    print("")
+    print("")
+    print("----------------GERÇEK DEĞER HESABI--------------------------------------------")
 
     sermaye = getBilancoDegeri("Ödenmiş Sermaye", bilancoDonemiColumn)
     print("Sermaye:", "{:,.0f}".format(sermaye).replace(",","."), "TL")
 
     anaOrtaklikPayi = getBilancoDegeri("Ana Ortaklık Payları", bilancoDonemiColumn) / getBilancoDegeri(
         "DÖNEM KARI (ZARARI)", bilancoDonemiColumn)
-    print("Ana Ortaklık Payı:", "{:.2f}".format(anaOrtaklikPayi))
+    print("Ana Ortaklık Payı:", "{:.3f}".format(anaOrtaklikPayi))
 
     sonCeyrekSatisArtisYuzdesi = oncekiYilAyniCeyrekDegisimiHesapla(hasilatRow, bilancoDonemi)
     birOncekiCeyrekSatisArtisYuzdesi = oncekiYilAyniCeyrekDegisimiHesapla(hasilatRow, birOncekiBilancoDonemi)
 
-    ucOncekiBilancoDonemiSatis = ceyrekDegeriHesapla(hasilatRow, ucOncekibilancoDonemiColumn)
-    ikiOncekiBilancoDonemiSatis = ceyrekDegeriHesapla(hasilatRow, ikiOncekibilancoDonemiColumn)
-    birOncekiBilancoDonemiSatis = ceyrekDegeriHesapla(hasilatRow, birOncekibilancoDonemiColumn)
-    bilancoDonemiSatis = ceyrekDegeriHesapla(hasilatRow, bilancoDonemiColumn)
+    #ucOncekiBilancoDonemiSatis = ceyrekDegeriHesapla(hasilatRow, ucOncekibilancoDonemiColumn)
+    #ikiOncekiBilancoDonemiSatis = ceyrekDegeriHesapla(hasilatRow, ikiOncekibilancoDonemiColumn)
+    #birOncekiBilancoDonemiSatis = ceyrekDegeriHesapla(hasilatRow, birOncekibilancoDonemiColumn)
+    #bilancoDonemiSatis = ceyrekDegeriHesapla(hasilatRow, bilancoDonemiColumn)
 
-    sonDortCeyrekSatisToplami = ucOncekiBilancoDonemiSatis + ikiOncekiBilancoDonemiSatis + birOncekiBilancoDonemiSatis + bilancoDonemiSatis
-    print("Son 4 ceyrek satış toplamı:", "{:,.0f}".format(sonDortCeyrekSatisToplami).replace(",","."), "TL")
+    #sonDortCeyrekSatisToplami = ucOncekiBilancoDonemiSatis + ikiOncekiBilancoDonemiSatis + birOncekiBilancoDonemiSatis + bilancoDonemiSatis
 
-    onumuzdekiDortCeyrekSatisTahmini = (
-                (((sonCeyrekSatisArtisYuzdesi + birOncekiCeyrekSatisArtisYuzdesi) / 2) + 1) * sonDortCeyrekSatisToplami)
-    print("Önümüzdeki 4 çeyrek satış tahmini:", "{:,.0f}".format(onumuzdekiDortCeyrekSatisTahmini).replace(",","."), "TL")
+    sonDortCeyrekHasilatToplami = ucOncekiBilancoDonemiHasilat + ikiOncekiBilancoDonemiHasilat + birOncekiBilancoDonemiHasilat + bilancoDonemiHasilat
 
-    #onumuzdekiDortCeyrekSatisTahmini = 5000000000
+    print("Son 4 Çeyrek Hasılat Toplamı:", "{:,.0f}".format(sonDortCeyrekHasilatToplami).replace(",","."), "TL")
+
+    onumuzdekiDortCeyrekHasilatTahmini = (
+                (((sonCeyrekSatisArtisYuzdesi + birOncekiCeyrekSatisArtisYuzdesi) / 2) + 1) * sonDortCeyrekHasilatToplami)
+    print("Önümüzdeki 4 Çeyrek Hasılat Tahmini:", "{:,.0f}".format(onumuzdekiDortCeyrekHasilatTahmini).replace(",","."), "TL")
+
+    #onumuzdekiDortCeyrekHasilatTahmini = 5000000000
 
     ucOncekibilancoDonemiFaaliyetKari = ceyrekDegeriHesapla(faaliyetKariRow, ucOncekibilancoDonemiColumn)
     ikiOncekiBilancoDonemiFaaliyetKari = ceyrekDegeriHesapla(faaliyetKariRow, ikiOncekibilancoDonemiColumn)
@@ -315,11 +426,11 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati, reportFi
     bilancoDonemiFaaliyetKari = ceyrekDegeriHesapla(faaliyetKariRow, bilancoDonemiColumn)
 
     onumuzdekiDortCeyrekFaaliyetKarMarjiTahmini = (birOncekiBilancoDonemiFaaliyetKari + bilancoDonemiFaaliyetKari) / (
-                bilancoDonemiSatis + birOncekiBilancoDonemiSatis)
+                bilancoDonemiHasilat + birOncekiBilancoDonemiHasilat)
     print("Önümüzdeki 4 çeyrek faaliyet kar marjı tahmini:",
           "{:.2%}".format(onumuzdekiDortCeyrekFaaliyetKarMarjiTahmini))
 
-    faaliyetKariTahmini1 = onumuzdekiDortCeyrekSatisTahmini * onumuzdekiDortCeyrekFaaliyetKarMarjiTahmini
+    faaliyetKariTahmini1 = onumuzdekiDortCeyrekHasilatTahmini * onumuzdekiDortCeyrekFaaliyetKarMarjiTahmini
     print("Faaliyet Kar Tahmini1:", "{:,.0f}".format(faaliyetKariTahmini1).replace(",","."), "TL")
 
     faaliyetKariTahmini2 = ((birOncekiBilancoDonemiFaaliyetKari + bilancoDonemiFaaliyetKari) * 2 * 0.3) + (
@@ -352,9 +463,15 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati, reportFi
     print("Bilanço tarihindeki hisse fiyatı:", format(hisseFiyati, ".2f"), "TL")
 
     gercekFiyataUzaklik = hisseFiyati / targetBuy
-    print("Gerçek fiyata uzaklık:", "{:.2%}".format(gercekFiyataUzaklik))
+    print("Gerçek fiyata uzaklık oranı:", "{:.2%}".format(gercekFiyataUzaklik))
+
+    gercekFiyataUzaklikTl = hisseFiyati - targetBuy
+    print("Gerçek fiyata uzaklık TL:", format(gercekFiyataUzaklikTl, ".2f"))
 
     # Netpro Hesapla
+    print("")
+    print("")
+    print("")
     print("----------------NetPro Kriteri-----------------------------------------------------------------")
 
     sonDortDonemFaaliyetKariToplami = bilancoDonemiFaaliyetKari + birOncekiBilancoDonemiFaaliyetKari + ikiOncekiBilancoDonemiFaaliyetKari + ucOncekibilancoDonemiFaaliyetKari
@@ -364,39 +481,123 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati, reportFi
     birOncekiBilancoDonemiNetKari = ceyrekDegeriHesapla(netKarRow, birOncekibilancoDonemiColumn)
     bilancoDonemiNetKari = ceyrekDegeriHesapla(netKarRow, bilancoDonemiColumn)
 
-    print ("Bilanco Donem Net Kar:", bilancoDonemiNetKari)
-    print("birOncekiBilancoDonemiNetKari:", birOncekiBilancoDonemiNetKari)
-    print("ikiOncekiBilancoDonemiNetKari:", ikiOncekiBilancoDonemiNetKari)
-    print("ucOncekibilancoDonemiNetKari:", ucOncekibilancoDonemiNetKari)
+    sonDortDonemNetKarToplami = bilancoDonemiNetKari + birOncekiBilancoDonemiNetKari + ikiOncekiBilancoDonemiNetKari + ucOncekibilancoDonemiNetKari
 
-    sonDortDonemNetKar = bilancoDonemiNetKari + birOncekiBilancoDonemiNetKari + ikiOncekiBilancoDonemiNetKari + ucOncekibilancoDonemiNetKari
+    print ("Son 4 Dönem Net Kar Toplamı:", "{:,.0f}".format(sonDortDonemNetKarToplami).replace(",", "."), "TL")
+    print ("Son 4 Dönem Faaliyet Karı Toplamı:", "{:,.0f}".format(sonDortDonemFaaliyetKariToplami).replace(",", "."), "TL")
 
-    print ("Son 4 Dönem Net Kar:", sonDortDonemNetKar)
-    print ("Son 4 Dönem Faaliyet Kari Toplami:", sonDortDonemFaaliyetKariToplami)
 
-    netProEstDegeri = ((
-                                   ortalamaFaaliyetKariTahmini / sonDortDonemFaaliyetKariToplami) * sonDortDonemNetKar) * anaOrtaklikPayi
+    fkOrani = hisseFiyati/((sonDortDonemNetKarToplami*anaOrtaklikPayi)/(sermaye))
+    print("F/K Oranı:", "{:,.2f}".format(fkOrani))
+
+    hbkOrani = sonDortDonemNetKarToplami/(sermaye)
+    print ("HBK Oranı:", "{:,.2f}".format(hbkOrani))
+
+    netProEstDegeri = ((ortalamaFaaliyetKariTahmini / sonDortDonemFaaliyetKariToplami) * sonDortDonemNetKarToplami) * anaOrtaklikPayi
     print("NetPro Est Değeri:", "{:,.0f}".format(netProEstDegeri).replace(",","."), "TL")
 
     piyasaDegeri = (bilancoEtkisi * sermaye * -1) + (hisseFiyati * sermaye)
 
-    print("Piyasa Değeri:", piyasaDegeri)
-    print("BondYield:", bondYield)
+    print("Piyasa Değeri:", "{:,.0f}".format(piyasaDegeri).replace(",","."), "TL")
+    print("BondYield:", "{:.2%}".format(bondYield))
 
     netProKriteri = (netProEstDegeri / piyasaDegeri) / bondYield
     netProKriteriGecmeDurumu = (netProKriteri > 2)
-    print("NetPro Kriteri:", format(netProKriteri, ".2f"), netProKriteriGecmeDurumu)
+    print("NetPro Kriteri (2'den Büyük Olmalı):", format(netProKriteri, ".2f"), netProKriteriGecmeDurumu)
 
     minNetProIcinHisseFiyati  = (netProEstDegeri / (1.9 * bondYield) - (bilancoEtkisi * sermaye * -1))/sermaye
-    print("NetPro 1.9 Olmasi Icin Hisse Degeri:", format(minNetProIcinHisseFiyati, ".2f"), )
+    print("NetPro 1.9 Olmasi Icin Hisse Fiyatı:", format(minNetProIcinHisseFiyati, ".2f"), )
+
+
 
     # Forward PE Hesapla
-    print("----------------Forward PE Kriteri-----------------------------------------------------------------")
+    print("")
+    print("")
+    print("----------------FORWARD PE HESAPLAMA--------------------------------------------------------")
 
     forwardPeKriteri = (piyasaDegeri) / netProEstDegeri
 
     forwardPeKriteriGecmeDurumu = (forwardPeKriteri < 4)
-    print("Forward PE Kriteri:", format(forwardPeKriteri, ".2f"), forwardPeKriteriGecmeDurumu)
+    print("Forward PE Kriteri (4'ten Küçük Olmalı):", format(forwardPeKriteri, ".2f"), forwardPeKriteriGecmeDurumu)
+
+
+
+
+
+    # Ek Hesaplama ve Tablolar
+    print("")
+    print("-------------------EK HESAPLAMA ve TABLOLAR--------------------------")
+    print("")
+
+    bilancoDonemiBrutKarMarji = bilancoDonemiBrutKar/bilancoDonemiHasilat;
+    print("Bilanço Dönemi Brüt Kar Marjı:", bilancoDonemiBrutKarMarji)
+
+    bilancoDonemiFaaliyetKarMarji = bilancoDonemiFaaliyetKari/bilancoDonemiHasilat;
+    print("Bilanço Dönemi Faaliyet Kar Marjı:", bilancoDonemiFaaliyetKarMarji)
+
+    bilancoDonemiNetKarMarji = bilancoDonemiNetKari/bilancoDonemiHasilat;
+    print("Bilanço Dönemi Net Kar Marjı:", bilancoDonemiNetKarMarji)
+
+    bilancoDonemiOzsermayeKarliligi = bilancoDonemiNetKari/getBilancoDegeri("TOPLAM ÖZKAYNAKLAR", bilancoDonemiColumn)
+    print("Bilanço Dönemi Özsermaye Karlılığı:", bilancoDonemiOzsermayeKarliligi)
+
+
+    # bilancoDonemiBrutKar = ceyrekDegeriHesapla(brutKarRow, bilancoDonemiColumn)
+    # birOncekiBilancoDonemiBrutKar = ceyrekDegeriHesapla(brutKarRow, birOncekibilancoDonemiColumn)
+    # ikiOncekiBilancoDonemiBrutKar = ceyrekDegeriHesapla(brutKarRow, ikiOncekibilancoDonemiColumn)
+    # ucOncekiBilancoDonemiBrutKar = ceyrekDegeriHesapla(brutKarRow, ucOncekibilancoDonemiColumn)
+    # dortOncekiBilancoDonemiBrutKar = ceyrekDegeriHesapla(brutKarRow, dortOncekibilancoDonemiColumn)
+    # besOncekiBilancoDonemiBrutKar = ceyrekDegeriHesapla(brutKarRow, besOncekibilancoDonemiColumn)
+    # altiOncekiBilancoDonemiBrutKar = ceyrekDegeriHesapla(brutKarRow, altiOncekibilancoDonemiColumn)
+    # yediOncekiBilancoDonemiBrutKar = ceyrekDegeriHesapla(brutKarRow, yediOncekibilancoDonemiColumn)
+    #
+    # bilancoDonemiBrutKarPrint = "{:,.0f}".format(bilancoDonemiBrutKar).replace(",", ".")
+    # dortOncekiBilancoDonemiBrutKarPrint = "{:,.0f}".format(dortOncekiBilancoDonemiBrutKar).replace(",", ".")
+    # bilancoDonemiBrutKarDegisimiPrint = "{:.2%}".format(oncekiYilAyniCeyrekDegisimiHesapla(brutKarRow, bilancoDonemi))
+    #
+    # birOncekiBilancoDonemiBrutKarPrint = "{:,.0f}".format(birOncekiBilancoDonemiBrutKar).replace(",", ".")
+    # besOncekiBilancoDonemiBrutKarPrint = "{:,.0f}".format(besOncekiBilancoDonemiBrutKar).replace(",", ".")
+    # birOncekiBilancoDonemiBrutKarDegisimiPrint = "{:.2%}".format(
+    #     oncekiYilAyniCeyrekDegisimiHesapla(brutKarRow, birOncekiBilancoDonemi))
+    #
+    # ikiOncekiBilancoDonemiBrutKarPrint = "{:,.0f}".format(ikiOncekiBilancoDonemiBrutKar).replace(",", ".")
+    # altiOncekiBilancoDonemiBrutKarPrint = "{:,.0f}".format(altiOncekiBilancoDonemiBrutKar).replace(",", ".")
+    # ikiOncekiBilancoDonemiBrutKarDegisimiPrint = "{:.2%}".format(
+    #     oncekiYilAyniCeyrekDegisimiHesapla(brutKarRow, ikiOncekiBilancoDonemi))
+    #
+    # ucOncekiBilancoDonemiBrutKarPrint = "{:,.0f}".format(ucOncekiBilancoDonemiBrutKar).replace(",", ".")
+    # yediOncekiBilancoDonemiBrutKarPrint = "{:,.0f}".format(yediOncekiBilancoDonemiBrutKar).replace(",", ".")
+    # ucOncekiBilancoDonemiBrutKarDegisimiPrint = "{:.2%}".format(
+    #     oncekiYilAyniCeyrekDegisimiHesapla(brutKarRow, ucOncekiBilancoDonemi))
+    #
+    # brutKarTablosu = PrettyTable()
+    # brutKarTablosu.field_names = ["ÇEYREK", "BRÜT KAR", "ÖNCEKİ YIL", "ÖNCEKİ YIL BRÜT KAR", "YÜZDE DEĞİŞİM"]
+    # brutKarTablosu.align["BRÜT KAR"] = "r"
+    # brutKarTablosu.align["ÖNCEKİ YIL BRÜT KAR"] = "r"
+    # brutKarTablosu.add_row([bilancoDonemi, bilancoDonemiBrutKarPrint, dortOncekiBilancoDonemi,
+    #                         dortOncekiBilancoDonemiBrutKarPrint, bilancoDonemiBrutKarDegisimiPrint])
+    # brutKarTablosu.add_row(
+    #     [birOncekiBilancoDonemi, birOncekiBilancoDonemiBrutKarPrint, besOncekiBilancoDonemi,
+    #      besOncekiBilancoDonemiBrutKarPrint, birOncekiBilancoDonemiBrutKarDegisimiPrint])
+    # brutKarTablosu.add_row(
+    #     [ikiOncekiBilancoDonemi, ikiOncekiBilancoDonemiBrutKarPrint, altiOncekiBilancoDonemi,
+    #      altiOncekiBilancoDonemiBrutKarPrint, ikiOncekiBilancoDonemiBrutKarDegisimiPrint])
+    # brutKarTablosu.add_row(
+    #     [ucOncekiBilancoDonemi, ucOncekiBilancoDonemiBrutKarPrint, yediOncekiBilancoDonemi,
+    #      yediOncekiBilancoDonemiBrutKarPrint, ucOncekiBilancoDonemiBrutKarDegisimiPrint])
+    # print(brutKarTablosu)
+    #
+    #
+
+
+
+
+
+
+
+    print("")
+    print("")
+    print("----------------RAPOR DOSYASI OLUŞTURMA/GÜNCELLEME-------------------------------------")
 
     print (hisseAdi)
 
@@ -404,10 +605,10 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati, reportFi
 
     excelRow.sonCeyrekHasilat = ceyrekDegeriHesapla(hasilatRow, bilancoDonemiColumn)
     excelRow.oncekiYilAyniCeyrekHasilat = ceyrekDegeriHesapla(hasilatRow, dortOncekibilancoDonemiColumn)
-    excelRow.hasilatArtisi = cariDonemSatisGelirArtisi
-    excelRow.birOncekiCeyrekHasilatArtisi = oncekiDonemSatisGelirArtisi
-    excelRow.kriter1 = cariDonemSatisGelirArtisiGecmeDurumu
-    excelRow.kriter3 = oncekiDonemSatisGelirArtisiGecmeDurumu
+    excelRow.hasilatArtisi = cariDonemHasilatGelirArtisi
+    excelRow.birOncekiCeyrekHasilatArtisi = oncekiDonemHasilatGelirArtisi
+    excelRow.kriter1 = cariDonemHasilatGelirArtisiGecmeDurumu
+    excelRow.kriter3 = oncekiDonemHasilatGelirArtisiGecmeDurumu
     excelRow.sonCeyrekFaaliyetKari = ceyrekDegeriHesapla(faaliyetKariRow, bilancoDonemiColumn)
     excelRow.oncekiYilAyniCeyrekFaaliyetKari = ceyrekDegeriHesapla(faaliyetKariRow, dortOncekibilancoDonemiColumn)
     excelRow.faaliyetKarArtisi = cariDonemFaaliyetKariArtisi
@@ -416,8 +617,8 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati, reportFi
     excelRow.kriter4 = oncekiCeyrekFaaliyetKarArtisiGecmeDurumu
     excelRow.sermaye = sermaye
     excelRow.anaOrtaklikPayi = anaOrtaklikPayi
-    excelRow.son4CeyrekSatisToplami = sonDortCeyrekSatisToplami
-    excelRow.onumuzdeki4CeyrekSatisTahmini = onumuzdekiDortCeyrekSatisTahmini
+    excelRow.son4CeyrekSatisToplami = sonDortCeyrekHasilatToplami
+    excelRow.onumuzdeki4CeyrekSatisTahmini = onumuzdekiDortCeyrekHasilatTahmini
     excelRow.onumuzdeki4CeyrekFaaliyetKarMarjiTahmini = onumuzdekiDortCeyrekFaaliyetKarMarjiTahmini
     excelRow.faaliyetKarTahmini1 = faaliyetKariTahmini1
     excelRow.faaliyetKarTahmini2 = faaliyetKariTahmini2

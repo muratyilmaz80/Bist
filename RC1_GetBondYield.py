@@ -10,4 +10,4 @@ def returnBondYield():
     faizOraniText = list.text
     faizOraniText2 = faizOraniText.replace(",", ".")
     faizOraniFloat = float(faizOraniText2)
-    return (faizOraniFloat)
+    return (faizOraniFloat/100)
