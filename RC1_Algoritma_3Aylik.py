@@ -96,12 +96,19 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati, reportFi
     netKarRow = getBilancoTitleRow("DÖNEM KARI (ZARARI)");
     brutKarRow = getBilancoTitleRow("BRÜT KAR (ZARAR)");
 
+    # TODO: Bir önceki çeyrek bilançosunun olmasını garanti edecek şekilde düzenle
+
     def ceyrekDegeriHesapla(r, c):
         quarter = (sheet.cell_value(0, c)) % (100)
         if (quarter == 3):
             return sheet.cell_value(r, c)
         else:
-            return (sheet.cell_value(r, c) - sheet.cell_value(r, (c - 1)))
+            if (sheet.cell_value(0,c)-sheet.cell_value(0,(c-1)) == 3):
+                return (sheet.cell_value(r, c) - sheet.cell_value(r, (c - 1)))
+            else:
+                print ("EKSİK BİLANÇO VAR!")
+                return -1
+
 
     def oncekiYilAyniCeyrekDegisimiHesapla(row, donem):
         logging.debug("fonksiyon: oncekiYilAyniCeyrekDegisimiHesapla")
@@ -249,7 +256,7 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati, reportFi
         cariDonemFaaliyetKariArtisiGecmeDurumu = False
         print("Cari Dönem Faaliyet Kari Artisi:", cariDonemFaaliyetKariArtisiGecmeDurumu, "Son Ceyrek Faaliyet Kari Negatif")
 
-    elif ((ceyrekDegeriHesapla(faaliyetKariRow, bilancoDonemiColumn) > 0) and (oncekiYilAyniCeyrekDegisimiHesapla(faaliyetKariRow, bilancoDonemi)) < 0):
+    elif ((ceyrekDegeriHesapla(faaliyetKariRow, bilancoDonemiColumn) > 0) and (ceyrekDegeriHesapla(faaliyetKariRow, dortOncekibilancoDonemiColumn)) < 0):
         cariDonemFaaliyetKariArtisi = 0
         cariDonemFaaliyetKariArtisiGecmeDurumu = True
         print("Cari Dönem Faaliyet Kari Artisi:", cariDonemFaaliyetKariArtisiGecmeDurumu, "Son Çeyrek Faaliyet Karı Negatiften Pozitife Geçmiş")

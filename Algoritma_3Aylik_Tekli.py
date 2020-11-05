@@ -5,13 +5,11 @@ import os.path
 from ExcelRowClass import ExcelRowClass
 from Rapor_Olustur import exportReportExcel
 
-varBilancoDosyasi = ("//Users//myilmaz//Documents//bist//bilancolar//TKNSA.xlsx")
-
-# AKSUE BNTAS DAGI DOBUR EGSER JANTS TIRE
+varBilancoDosyasi = ("//Users//myilmaz//Documents//bist//bilancolar//KFEIN.xlsx")
 
 varBilancoDonemi = 202009
-varBondYield = 0.1499
-varHisseFiyati = 8.21
+varBondYield = 0.1532
+varHisseFiyati = 17.25
 varReportFile = "//Users//myilmaz//Documents//bist//Report_2020_09_3Ayliklar_Mac.xls"
 
 
@@ -86,12 +84,28 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati):
     # netKarRow = getBilancoTitleRow("Net Dönem Karı veya Zararı");
     netKarRow = getBilancoTitleRow("DÖNEM KARI (ZARARI)");
 
+
+    # def ceyrekDegeriHesapla(r, c):
+    #     quarter = (sheet.cell_value(0, c)) % (100)
+    #     if (quarter == 3):
+    #         return sheet.cell_value(r, c)
+    #     else:
+    #         return (sheet.cell_value(r, c) - sheet.cell_value(r, (c - 1)))
+    #
+    #
+
+
     def ceyrekDegeriHesapla(r, c):
         quarter = (sheet.cell_value(0, c)) % (100)
         if (quarter == 3):
             return sheet.cell_value(r, c)
         else:
-            return (sheet.cell_value(r, c) - sheet.cell_value(r, (c - 1)))
+            if (sheet.cell_value(0,c)-sheet.cell_value(0,(c-1)) == 3):
+                return (sheet.cell_value(r, c) - sheet.cell_value(r, (c - 1)))
+            else:
+                print ("EKSİK BİLANÇO VAR!")
+                return -1
+
 
     def oncekiYilAyniCeyrekDegisimiHesapla(row, donem):
         donemColumn = donemColumnFind(donem)
@@ -160,7 +174,9 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati):
         kriter2GecmeDurumu = False
         print("Kriter2: Faaliyet Kari Artisi:", kriter2GecmeDurumu, "Son Ceyrek Faaliyet Kari Negatif")
 
-    elif ((ceyrekDegeriHesapla(faaliyetKariRow, bilancoDonemiColumn) > 0) and (oncekiYilAyniCeyrekDegisimiHesapla(faaliyetKariRow, bilancoDonemi))<0 ):
+    elif ((ceyrekDegeriHesapla(faaliyetKariRow, bilancoDonemiColumn) > 0) and (ceyrekDegeriHesapla(faaliyetKariRow, dortOncekibilancoDonemiColumn))<0 ):
+        print ("DEBUG1:", ceyrekDegeriHesapla(faaliyetKariRow, bilancoDonemiColumn))
+        print ("DEBUG2:", oncekiYilAyniCeyrekDegisimiHesapla(faaliyetKariRow, bilancoDonemi))
         kriter2FaaliyetKariArtisi = 0
         kriter2GecmeDurumu = True
         print("Kriter2: Faaliyet Kari Artisi:", kriter2GecmeDurumu, "Son Ceyrek Faaliyet Kari Negatiften Pozitife Geçmiş")
