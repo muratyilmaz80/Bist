@@ -7,7 +7,7 @@ from RC1_Algoritma_3Aylik import runAlgoritma
 from RC1_GetBondYield import returnBondYield
 from RC1_GetGuncelHisseDegeri import returnGuncelHisseDegeri
 
-varHisseAdi = "ZOREN"
+varHisseAdi = "ECILC"
 
 varBilancoDosyasi = "//Users//myilmaz//Documents//bist//bilancolar//" + varHisseAdi + ".xlsx"
 
