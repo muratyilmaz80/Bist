@@ -7,7 +7,7 @@ from RC1_Algoritma_3Aylik import runAlgoritma
 from RC1_GetBondYield import returnBondYield
 from RC1_GetGuncelHisseDegeri import returnGuncelHisseDegeri
 
-varHisseAdi = "ECILC"
+varHisseAdi = "ESEN"
 
 varBilancoDosyasi = "//Users//myilmaz//Documents//bist//bilancolar//" + varHisseAdi + ".xlsx"
 
@@ -24,3 +24,6 @@ runAlgoritma(varBilancoDosyasi, varBilancoDonemi, varBondYield, varHisseFiyati, 
 #     varBilancoDosyasi = directory + "//" + filename
 #     print (varBilancoDosyasi)
 #     runAlgoritma(varBilancoDosyasi, varBilancoDonemi, varBondYield, varHisseFiyati, varReportFile)
+
+
+

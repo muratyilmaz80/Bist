@@ -2,7 +2,7 @@ import xlrd
 import xlwt
 from xlutils.copy import copy
 import os.path
-import Dolar_Hesaplama
+import RC1_BilancoOrtalamaDolarDegeri
 
 varBilancoDosyasi = ("D:\\bist\\bilancolar\\DEVA.xlsx")
 varBilancoDonemi = 202003
@@ -87,9 +87,9 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi):
         donemColumn = donemColumnFind(donem)
         oncekiYilAyniDonemColumn = donemColumnFind(donem - 100)
         ceyrekDegeriTl = ceyrekDegeriHesapla(row, donemColumn)
-        ceyrekDegeriDolar = ceyrekDegeriTl/Dolar_Hesaplama.ucAylikBilancoDonemiOrtalamaDolarDegeriBul(donem)
+        ceyrekDegeriDolar = ceyrekDegeriTl / RC1_BilancoOrtalamaDolarDegeri.ucAylikBilancoDonemiOrtalamaDolarDegeriBul(donem)
         oncekiCeyrekDegeriTl = ceyrekDegeriHesapla(row, oncekiYilAyniDonemColumn)
-        oncekiCeyrekDegeriDolar = oncekiCeyrekDegeriTl/Dolar_Hesaplama.ucAylikBilancoDonemiOrtalamaDolarDegeriBul(donem - 100)
+        oncekiCeyrekDegeriDolar = oncekiCeyrekDegeriTl / RC1_BilancoOrtalamaDolarDegeri.ucAylikBilancoDonemiOrtalamaDolarDegeriBul(donem - 100)
         degisimSonucu = ceyrekDegeriDolar / oncekiCeyrekDegeriDolar - 1
         print(int(sheet.cell_value(0, donemColumn)), sheet.cell_value(row, 0), "{:,.0f}".format(ceyrekDegeriTl).replace(",","."), "TL, ",
              "{:,.0f}".format(ceyrekDegeriDolar).replace(",","."), "$")
