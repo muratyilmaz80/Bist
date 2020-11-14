@@ -87,9 +87,9 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi):
         donemColumn = donemColumnFind(donem)
         oncekiYilAyniDonemColumn = donemColumnFind(donem - 100)
         ceyrekDegeriTl = ceyrekDegeriHesapla(row, donemColumn)
-        ceyrekDegeriDolar = ceyrekDegeriTl / RC1_BilancoOrtalamaDolarDegeri.ucAylikBilancoDonemiOrtalamaDolarDegeriBul(donem)
+        ceyrekDegeriDolar = ceyrekDegeriTl / RC1_BilancoOrtalamaDolarDegeri.ucAylikBilancoDonemiOrtalamaDolarDegeriHesapla(donem)
         oncekiCeyrekDegeriTl = ceyrekDegeriHesapla(row, oncekiYilAyniDonemColumn)
-        oncekiCeyrekDegeriDolar = oncekiCeyrekDegeriTl / RC1_BilancoOrtalamaDolarDegeri.ucAylikBilancoDonemiOrtalamaDolarDegeriBul(donem - 100)
+        oncekiCeyrekDegeriDolar = oncekiCeyrekDegeriTl / RC1_BilancoOrtalamaDolarDegeri.ucAylikBilancoDonemiOrtalamaDolarDegeriHesapla(donem - 100)
         degisimSonucu = ceyrekDegeriDolar / oncekiCeyrekDegeriDolar - 1
         print(int(sheet.cell_value(0, donemColumn)), sheet.cell_value(row, 0), "{:,.0f}".format(ceyrekDegeriTl).replace(",","."), "TL, ",
              "{:,.0f}".format(ceyrekDegeriDolar).replace(",","."), "$")

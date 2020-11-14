@@ -8,6 +8,8 @@ from datetime import datetime
 
 #dolarKurlariFile = "//Users//myilmaz//Documents//bist//Dolar_Kurlari.xlsx"
 
+veriTabaniFile = "//Users//myilmaz//Documents//bist//VeriTabani.xls"
+
 dovizKurlari = DovizKurlari()
 
 # def tarihtekiDolarDegeriniBul(tarih):
@@ -41,7 +43,7 @@ def tarihtekiDolarDegeriniBulOnline(tarih):
     return dolarDegeri
 
 
-def ucAylikBilancoDonemiOrtalamaDolarDegeriBul(bilancoDonemi):
+def ucAylikBilancoDonemiOrtalamaDolarDegeriHesapla(bilancoDonemi):
     bitisYil = int(bilancoDonemi / 100)
     bitisAy = int(bilancoDonemi % 100)
     baslangicYil = bitisYil
@@ -55,6 +57,7 @@ def ucAylikBilancoDonemiOrtalamaDolarDegeriBul(bilancoDonemi):
     if (bitisAy <10 ):
         bitisAyString = "0" + str(bitisAy)
 
+    delta = timedelta(days=1)
     baslangicTarihi = "01." + baslangicAyString + "." + str(baslangicYil)
     bitisTarihi = "30." + bitisAyString + "." + str(bitisYil)
     print ("Başlangıç Tarihi:", baslangicTarihi)
@@ -63,8 +66,82 @@ def ucAylikBilancoDonemiOrtalamaDolarDegeriBul(bilancoDonemi):
     bitisTarihiDolarDegeri = float (tarihtekiDolarDegeriniBulOnline(bitisTarihi))
     print("Başlangıç Tarihi Dolar Değeri:", baslangicTarihiDolarDegeri)
     print("Bitiş Tarihi Dolar Değeri:", bitisTarihiDolarDegeri)
-    bilancoDonemiOrtalamaDolarDegeri = (baslangicTarihiDolarDegeri + bitisTarihiDolarDegeri) / 2
-    print(bilancoDonemi, "Bilanço Dönemi Ortalama Dolar Değeri:", "{:.3}".format(bilancoDonemiOrtalamaDolarDegeri), "TL")
-    return bilancoDonemiOrtalamaDolarDegeri
 
-ucAylikBilancoDonemiOrtalamaDolarDegeriBul(202006)
+    toplamDeger = 0
+    elemanSayisi = 0
+
+    start_date = datetime.strptime(baslangicTarihi, "%d.%m.%Y").date()
+    end_date = datetime.strptime(bitisTarihi, "%d.%m.%Y").date()
+
+    for i in range((end_date - start_date).days):
+        tempDate = start_date + i * delta
+
+        if (dovizKurlari.Arsiv_tarih(tempDate.strftime("%d.%m.%Y"), "USD", "ForexBuying"))!="Tatil Gunu":
+            tempDeger = dovizKurlari.Arsiv_tarih(tempDate.strftime("%d.%m.%Y"), "USD", "ForexBuying")
+            print(tempDate, tempDeger)
+            toplamDeger = toplamDeger + float(tempDeger)
+            elemanSayisi = elemanSayisi + 1
+    return toplamDeger/elemanSayisi
+
+
+
+
+
+
+def ucAylikBilancoDonemiOrtalamaDolarDegeriBul(bilancoDonemi):
+    ortalamaDolarDegeri = 0
+
+    if os.path.isfile(veriTabaniFile):
+        print("Veri tabanı dosyası var:", veriTabaniFile)
+        bookRead = xlrd.open_workbook(veriTabaniFile)
+        sheetRead = bookRead.sheet_by_index(0)
+        rowNumber = sheetRead.nrows
+
+        for rowi in range(sheetRead.nrows):
+            cell = sheetRead.cell(rowi, 0)
+            if cell.value == bilancoDonemi:
+                ortalamaDolarDegeri = sheetRead.cell_value(rowi, 1)
+                return ortalamaDolarDegeri
+
+        if (ortalamaDolarDegeri == 0):
+            ortalamaDolarDegeri = ucAylikBilancoDonemiOrtalamaDolarDegeriHesapla(bilancoDonemi)
+            bookWrite = copy(bookRead)
+            bookSheetWrite = bookWrite.get_sheet(0)
+            bookSheetWrite.write(rowNumber, 0, bilancoDonemi)
+            bookSheetWrite.write(rowNumber, 1, ortalamaDolarDegeri)
+            bookWrite.save(veriTabaniFile)
+            return ortalamaDolarDegeri
+
+    else:
+        print("Veritabanı dosyası yeni oluşturulacak: ", veriTabaniFile)
+        # bookWrite = xlwt.Workbook()
+        # bookSheetWrite = bookWrite.add_sheet(str(bilancoDonemi))
+        # createTopRow()
+        # reportResults(1)
+        # bookWrite.save(file)
+
+
+print (ucAylikBilancoDonemiOrtalamaDolarDegeriBul(202009))
+
+
+
+
+
+
+
+
+    # wb = xlrd.open_workbook(veriTabaniFile)
+    # sheet = wb.sheet_by_name()sheet_by_index(0)
+    #
+    #
+    #
+    # for rowi in range(sheet.nrows):
+    #     cell = sheet.cell(rowi, 0)
+    #     if cell.value == tarih:
+    #         while sheet.cell_value(rowi, 1) == "":
+    #             #print(sheet.cell_value(rowi,0) , "tatil gününe denk geliyor, bir sonraki tarihe bakılıyor...")
+    #             rowi = rowi + 1
+    #         #print (sheet.cell_value(rowi,0), "tarihindeki dolar değeri:")
+    #         return sheet.cell_value(rowi,1)
+    # print("Verilen Tarihteki Dolar Değeri Bulunamadı!", tarih)
+    # return 0
