@@ -71,7 +71,7 @@ def ucAylikBilancoDonemiOrtalamaDolarDegeriHesapla(bilancoDonemi):
     elemanSayisi = 0
 
     start_date = datetime.strptime(baslangicTarihi, "%d.%m.%Y").date()
-    end_date = datetime.strptime(bitisTarihi, "%d.%m.%Y").date()
+    end_date = datetime.strptime(bitisTarihi, "%d.%m.%Y").date() + delta
 
     for i in range((end_date - start_date).days):
         tempDate = start_date + i * delta
@@ -94,19 +94,21 @@ def ucAylikBilancoDonemiOrtalamaDolarDegeriBul(bilancoDonemi):
     if os.path.isfile(veriTabaniFile):
         print("Veri tabanı dosyası var:", veriTabaniFile)
         bookRead = xlrd.open_workbook(veriTabaniFile)
-        sheetRead = bookRead.sheet_by_index(0)
+        sheetRead = bookRead.sheet_by_name("OrtDolarDegeri")
         rowNumber = sheetRead.nrows
 
         for rowi in range(sheetRead.nrows):
             cell = sheetRead.cell(rowi, 0)
             if cell.value == bilancoDonemi:
+                print ("Veritabanında bilanço dönemi ortalama dolar bilgisi mevcut.")
                 ortalamaDolarDegeri = sheetRead.cell_value(rowi, 1)
                 return ortalamaDolarDegeri
 
         if (ortalamaDolarDegeri == 0):
+            print ("Bilanço dönemi için dolar bilgisi hesaplanacak.")
             ortalamaDolarDegeri = ucAylikBilancoDonemiOrtalamaDolarDegeriHesapla(bilancoDonemi)
             bookWrite = copy(bookRead)
-            bookSheetWrite = bookWrite.get_sheet(0)
+            bookSheetWrite = bookWrite.get_sheet("OrtDolarDegeri")
             bookSheetWrite.write(rowNumber, 0, bilancoDonemi)
             bookSheetWrite.write(rowNumber, 1, ortalamaDolarDegeri)
             bookWrite.save(veriTabaniFile)
@@ -114,17 +116,17 @@ def ucAylikBilancoDonemiOrtalamaDolarDegeriBul(bilancoDonemi):
 
     else:
         print("Veritabanı dosyası yeni oluşturulacak: ", veriTabaniFile)
-        # bookWrite = xlwt.Workbook()
-        # bookSheetWrite = bookWrite.add_sheet(str(bilancoDonemi))
-        # createTopRow()
-        # reportResults(1)
-        # bookWrite.save(file)
+        print("Bilanço dönemi için dolar bilgisi hesaplanacak.")
+        ortalamaDolarDegeri = ucAylikBilancoDonemiOrtalamaDolarDegeriHesapla(bilancoDonemi)
+        bookWrite = xlwt.Workbook()
+        bookSheetWrite = bookWrite.add_sheet("OrtDolarDegeri")
+        bookSheetWrite.write(0, 0, bilancoDonemi)
+        bookSheetWrite.write(0, 1, ortalamaDolarDegeri)
+        bookWrite.save(veriTabaniFile)
+        return ortalamaDolarDegeri
 
 
-print (ucAylikBilancoDonemiOrtalamaDolarDegeriBul(202009))
-
-
-
+print ("Bilanço Dönemi ortalama dolar kuru:", "{:,.3f}".format(ucAylikBilancoDonemiOrtalamaDolarDegeriBul(201906)))
 
 
 
