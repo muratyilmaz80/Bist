@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-from RC1_GetDolarDegeri import DovizKurlari
+from RC1_GetDolarDegeriOnline import DovizKurlari
 # ornek isimli nesne yaratiliyor.
 ornek = DovizKurlari()
 print ("Bugunun Kurlar : ")
