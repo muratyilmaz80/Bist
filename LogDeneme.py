@@ -49,12 +49,8 @@ my_logger.addHandler(stdout_handler)
 for i in range (1,4):
    my_logger.debug("This is line " + str(i))
 
+#printx = "Bilanço Dönemi Faaliyet Kari Artisi: " + "{:.2%}".format(1.234567) + " >? 15% " + str(True)
 
-dolarSatisTablosu = PrettyTable()
-dolarSatisTablosu.field_names = ["ÇEYREK", "SATIŞ (USD)", "ÖNCEKİ YIL", "ÖNCEKİ YIL SATIŞ (USD)", "YÜZDE DEĞİŞİM"]
-dolarSatisTablosu.align["SATIŞ (USD)"] = "r"
-dolarSatisTablosu.align["ÖNCEKİ YIL SATIŞ (USD)"] = "r"
-dolarSatisTablosu.align["YÜZDE DEĞİŞİM"] = "r"
-dolarSatisTablosu.add_row([2020, 1.000, 1.000, 1.000, 1.00])
+#my_logger.info(printx)
 
-my_logger.debug(dolarSatisTablosu)
+my_logger.info("Bilanço Dönemi Özsermaye Karlılığı: %s", "{:.2%}".format(0.087678))

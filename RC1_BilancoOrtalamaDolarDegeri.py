@@ -5,9 +5,6 @@ import os.path
 from datetime import datetime, timedelta
 from RC1_GetDolarDegeriOnline import DovizKurlari
 from datetime import datetime
-import logging
-
-logging.basicConfig(level=logging.INFO, format='%(levelname)s - %(message)s')
 
 veriTabaniFile = "//Users//myilmaz//Documents//bist//VeriTabani.xls"
 
@@ -108,7 +105,7 @@ def ucAylikBilancoDonemiOrtalamaDolarDegeriBul(bilancoDonemi):
     ortalamaDolarDegeri = 0
 
     if os.path.isfile(veriTabaniFile):
-        logging.debug("Veri tabanı dosyası var: %s", veriTabaniFile)
+        # logging.debug("Veri tabanı dosyası var: %s", veriTabaniFile)
         bookRead = xlrd.open_workbook(veriTabaniFile, formatting_info=True)
         sheetRead = bookRead.sheet_by_name("OrtDolarDegeri")
         rowNumber = sheetRead.nrows
@@ -116,7 +113,7 @@ def ucAylikBilancoDonemiOrtalamaDolarDegeriBul(bilancoDonemi):
         for rowi in range(sheetRead.nrows):
             cell = sheetRead.cell(rowi, 0)
             if cell.value == bilancoDonemi:
-                logging.debug ("Veritabanında bilanço dönemi ortalama dolar bilgisi mevcut.")
+                # logging.debug ("Veritabanında bilanço dönemi ortalama dolar bilgisi mevcut.")
                 ortalamaDolarDegeri = sheetRead.cell_value(rowi, 1)
                 return ortalamaDolarDegeri
 

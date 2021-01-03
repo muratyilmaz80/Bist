@@ -7,12 +7,22 @@ import sys
 from RC1_BilancoOrtalamaDolarDegeri import ucAylikBilancoDonemiOrtalamaDolarDegeriBul
 
 
-def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati, reportFile):
+def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati, reportFile, logLevel):
 
     hisseAdiTemp = bilancoDosyasi[47:]
     hisseAdi = hisseAdiTemp[:-5]
 
-    print ("--------------------------------", hisseAdi, "--------------------------------")
+    my_logger = logging.getLogger()
+    my_logger.setLevel(logLevel)
+    output_file_handler = logging.FileHandler("//Users//myilmaz//Documents//bist//log//" + hisseAdi + ".txt")
+    output_file_handler.level = logging.INFO
+    # output_file_handler.setFormatter(logging.Formatter("%(asctime)s — %(name)s — %(levelname)s — %(message)s"))
+    stdout_handler = logging.StreamHandler(sys.stdout)
+    # stdout_handler.setFormatter(logging.Formatter("%(asctime)s — %(name)s — %(levelname)s — %(message)s"))
+    my_logger.addHandler(output_file_handler)
+    my_logger.addHandler(stdout_handler)
+
+    my_logger.info ("-------------------------------- %s ------------------------", hisseAdi)
 
     def birOncekiBilancoDoneminiHesapla(dnm):
         yil = int(dnm / 100)
@@ -23,31 +33,31 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati, reportFi
         else:
             return yil * 100 + (ceyrek - 3)
 
-    logging.debug("Bilanco Donemi: %d", bilancoDonemi)
+    my_logger.debug("Bilanco Donemi: %d", bilancoDonemi)
 
     birOncekiBilancoDonemi = birOncekiBilancoDoneminiHesapla(bilancoDonemi)
-    logging.debug("Bir Onceki Bilanco Donemi: %d", birOncekiBilancoDonemi)
+    my_logger.debug("Bir Onceki Bilanco Donemi: %d", birOncekiBilancoDonemi)
 
     ikiOncekiBilancoDonemi = birOncekiBilancoDoneminiHesapla(birOncekiBilancoDonemi)
-    logging.debug("Iki Onceki Bilanco Donemi: %d", ikiOncekiBilancoDonemi)
+    my_logger.debug("Iki Onceki Bilanco Donemi: %d", ikiOncekiBilancoDonemi)
 
     ucOncekiBilancoDonemi = birOncekiBilancoDoneminiHesapla(ikiOncekiBilancoDonemi)
-    logging.debug("Uc Onceki Bilanco Donemi: %d", ucOncekiBilancoDonemi)
+    my_logger.debug("Uc Onceki Bilanco Donemi: %d", ucOncekiBilancoDonemi)
 
     dortOncekiBilancoDonemi = birOncekiBilancoDoneminiHesapla(ucOncekiBilancoDonemi)
-    logging.debug("Dort Onceki Bilanco Donemi: %d", dortOncekiBilancoDonemi)
+    my_logger.debug("Dort Onceki Bilanco Donemi: %d", dortOncekiBilancoDonemi)
 
     besOncekiBilancoDonemi = birOncekiBilancoDoneminiHesapla(dortOncekiBilancoDonemi)
-    logging.debug("Bes Onceki Bilanco Donemi: %d", besOncekiBilancoDonemi)
+    my_logger.debug("Bes Onceki Bilanco Donemi: %d", besOncekiBilancoDonemi)
 
     altiOncekiBilancoDonemi = birOncekiBilancoDoneminiHesapla(besOncekiBilancoDonemi)
-    logging.debug("Alti Onceki Bilanco Donemi: %d", altiOncekiBilancoDonemi)
+    my_logger.debug("Alti Onceki Bilanco Donemi: %d", altiOncekiBilancoDonemi)
 
     yediOncekiBilancoDonemi = birOncekiBilancoDoneminiHesapla(altiOncekiBilancoDonemi)
-    logging.debug("Yedi Onceki Bilanco Donemi: %d", yediOncekiBilancoDonemi)
+    my_logger.debug("Yedi Onceki Bilanco Donemi: %d", yediOncekiBilancoDonemi)
 
     sekizOncekiBilancoDonemi = birOncekiBilancoDoneminiHesapla(yediOncekiBilancoDonemi)
-    logging.debug("Sekiz Onceki Bilanco Donemi: %d", sekizOncekiBilancoDonemi)
+    my_logger.debug("Sekiz Onceki Bilanco Donemi: %d", sekizOncekiBilancoDonemi)
 
     wb = xlrd.open_workbook(bilancoDosyasi)
     sheet = wb.sheet_by_index(0)
@@ -57,7 +67,7 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati, reportFi
             cell = sheet.cell(0, columni)
             if cell.value == col:
                 return columni
-        print("Uygun Ceyrek Bulunamadi!!!")
+        my_logger.info("Uygun Ceyrek Bulunamadi!!!")
         return -1
 
     bilancoDonemiColumn = donemColumnFind(bilancoDonemi)
@@ -74,11 +84,11 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati, reportFi
             cell = sheet.cell(rowi, 0)
             if cell.value == label:
                 if sheet.cell_value(rowi, column)=="":
-                    print (label + " :Bilanço alanı boş!")
+                    my_logger.info (label + " :Bilanço alanı boş!")
                     return 0
                 else:
                     return sheet.cell_value(rowi, column)
-        print("Uygun bilanco degeri bulunamadi:", label)
+        my_logger.info("Uygun bilanco degeri bulunamadi:", label)
         return 0
 
 
@@ -87,7 +97,7 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati, reportFi
             cell = sheet.cell(rowi, 0)
             if cell.value == title:
                 return rowi
-        print("Uygun baslik bulunamadi!")
+        my_logger.info("Uygun baslik bulunamadi!")
         return -1
 
     hasilatRow = getBilancoTitleRow("Hasılat")
@@ -106,26 +116,24 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati, reportFi
             if (sheet.cell_value(0,c)-sheet.cell_value(0,(c-1)) == 3):
                 return (sheet.cell_value(r, c) - sheet.cell_value(r, (c - 1)))
             else:
-                print ("EKSİK BİLANÇO VAR!")
+                my_logger.info("EKSİK BİLANÇO VAR!")
                 return -1
 
 
     def oncekiYilAyniCeyrekDegisimiHesapla(row, donem):
-        logging.debug("fonksiyon: oncekiYilAyniCeyrekDegisimiHesapla")
+        my_logger.debug("fonksiyon: oncekiYilAyniCeyrekDegisimiHesapla")
         donemColumn = donemColumnFind(donem)
-        logging.debug ("DonemColumn: %s", donemColumn)
+        my_logger.debug ("DonemColumn: %s", donemColumn)
         oncekiYilAyniDonemColumn = donemColumnFind(donem - 100)
-        logging.debug("Onceki Yıl Aynı DonemColumn: %s", oncekiYilAyniDonemColumn)
-        logging.debug("Row: %d Column: %d",row ,donemColumn)
+        my_logger.debug("Onceki Yıl Aynı DonemColumn: %s", oncekiYilAyniDonemColumn)
+        my_logger.debug("Row: %d Column: %d",row ,donemColumn)
         ceyrekDegeri = ceyrekDegeriHesapla(row, donemColumn)
-        logging.debug("Çeyrek Değeri: %d", ceyrekDegeri)
+        my_logger.debug("Çeyrek Değeri: %d", ceyrekDegeri)
         oncekiCeyrekDegeri = ceyrekDegeriHesapla(row, oncekiYilAyniDonemColumn)
-        logging.debug ("Önceki Çeyrek Değeri: %d", oncekiCeyrekDegeri)
+        my_logger.debug ("Önceki Çeyrek Değeri: %d", oncekiCeyrekDegeri)
         degisimSonucu = ceyrekDegeri / oncekiCeyrekDegeri - 1
-        logging.debug("%d %s %d", sheet.cell_value(0, donemColumn), sheet.cell_value(row, 0), ceyrekDegeri)
-        logging.debug("%d %s %d" ,sheet.cell_value(0, oncekiYilAyniDonemColumn), sheet.cell_value(row, 0), oncekiCeyrekDegeri)
-        #print(int(sheet.cell_value(0, donemColumn)), sheet.cell_value(row, 0), "{:,.0f}".format(ceyrekDegeri).replace(",","."), "TL")
-        #print(int(sheet.cell_value(0, oncekiYilAyniDonemColumn)), sheet.cell_value(row, 0), "{:,.0f}".format(oncekiCeyrekDegeri).replace(",","."), "TL")
+        my_logger.debug("%d %s %d", sheet.cell_value(0, donemColumn), sheet.cell_value(row, 0), ceyrekDegeri)
+        my_logger.debug("%d %s %d" ,sheet.cell_value(0, oncekiYilAyniDonemColumn), sheet.cell_value(row, 0), oncekiCeyrekDegeri)
         return degisimSonucu
 
     def likidasyonDegeriHesapla(ceyrek):
@@ -140,16 +148,17 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati, reportFi
                                                                             bilancoDonemiColumn)
         maddiDuranVarliklar = getBilancoDegeri("Maddi Duran Varlıklar", bilancoDonemiColumn)
 
-
         likidasyonDegeri = nakit + (alacaklar * 0.7) + (stoklar * 0.5) + (digerVarliklar * 0.7) + (
                     finansalVarliklar * 0.7) + (maddiDuranVarliklar * 0.2)
 
         return likidasyonDegeri
 
+
     # Bilanço Dönemi Satış(Hasılat) Gelirleri
-    print("")
-    print("--------------------HASILAT(SATIŞ) GELİRLERİ---------------------------")
-    print("")
+    my_logger.info("")
+    my_logger.info("")
+    my_logger.info("--------------------HASILAT(SATIŞ) GELİRLERİ---------------------------")
+    my_logger.info("")
 
     bilancoDonemiHasilat = ceyrekDegeriHesapla(hasilatRow,bilancoDonemiColumn)
     birOncekiBilancoDonemiHasilat = ceyrekDegeriHesapla(hasilatRow,birOncekibilancoDonemiColumn)
@@ -187,30 +196,33 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati, reportFi
     satisTablosu.add_row([birOncekiBilancoDonemi, birOncekiBilancoDonemiHasilatPrint, besOncekiBilancoDonemi, besOncekiBilancoDonemiHasilatPrint, birOncekiBilancoDonemiHasilatDegisimiPrint])
     satisTablosu.add_row([ikiOncekiBilancoDonemi, ikiOncekiBilancoDonemiHasilatPrint, altiOncekiBilancoDonemi, altiOncekiBilancoDonemiHasilatPrint, ikiOncekiBilancoDonemiHasilatDegisimiPrint])
     satisTablosu.add_row([ucOncekiBilancoDonemi, ucOncekiBilancoDonemiHasilatPrint, yediOncekiBilancoDonemi,yediOncekiBilancoDonemiHasilatPrint, ucOncekiBilancoDonemiHasilatDegisimiPrint])
-    print(satisTablosu)
+    my_logger.info(satisTablosu)
 
     # Bilanço Dönemi Saış Geliri Artış Kriteri
     bilancoDonemiHasilatGelirArtisi = oncekiYilAyniCeyrekDegisimiHesapla(hasilatRow, bilancoDonemi)
     bilancoDonemiHasilatGelirArtisiGecmeDurumu = (bilancoDonemiHasilatGelirArtisi > 0.1)
-    print("Bilanço Dönemi Satış Geliri Artışı %10'dan Büyük Mü:", "{:.2%}".format(bilancoDonemiHasilatGelirArtisi), ">? 10%", bilancoDonemiHasilatGelirArtisiGecmeDurumu)
+    printText = "Bilanço Dönemi Satış Geliri Artışı 10%'dan Büyük Mü: " + "{:.2%}".format(bilancoDonemiHasilatGelirArtisi) + " >? 10% " + " " + str(bilancoDonemiHasilatGelirArtisiGecmeDurumu)
+    my_logger.info(printText)
 
     # Önceki Dönem Hasılat Geliri Artış Kriteri
     oncekiDonemHasilatGelirArtisi = oncekiYilAyniCeyrekDegisimiHesapla(hasilatRow, birOncekiBilancoDonemi)
 
     if (bilancoDonemiHasilatGelirArtisi >= 1):
-        print ("Bilanço Dönemi Satış Gelir Artışı %100 Üzerinde, Karşılaştırma Yapılmayacak.")
+        my_logger.info ("Bilanço Dönemi Satış Gelir Artışı %100 Üzerinde, Karşılaştırma Yapılmayacak.")
         oncekiDonemHasilatGelirArtisiGecmeDurumu = True
-        print ("Önceki Dönem Satış Gelir Artışı Geçme Durumu:", oncekiDonemHasilatGelirArtisiGecmeDurumu)
+        my_logger.info ("Önceki Dönem Satış Gelir Artışı Geçme Durumu:", oncekiDonemHasilatGelirArtisiGecmeDurumu)
 
     else:
         oncekiDonemHasilatGelirArtisiGecmeDurumu = (oncekiDonemHasilatGelirArtisi<bilancoDonemiHasilatGelirArtisi)
-        print("Önceki Dönem Satış Gelir Artışı Bilanço Döneminden Düşük Mü:", "{:.2%}".format(oncekiDonemHasilatGelirArtisi),"<?","{:.2%}".format(bilancoDonemiHasilatGelirArtisi), oncekiDonemHasilatGelirArtisiGecmeDurumu)
+        printText = "Önceki Dönem Satış Gelir Artışı Bilanço Döneminden Düşük Mü: " + "{:.2%}".format(oncekiDonemHasilatGelirArtisi) + " <? " + "{:.2%}".format(bilancoDonemiHasilatGelirArtisi) + " " + str(oncekiDonemHasilatGelirArtisiGecmeDurumu)
+        my_logger.info(printText)
 
 
     # Faaliyet Karı Gelirleri
-    print("")
-    print("--------------------------FAALİYET KARI---------------------------------")
-    print("")
+    my_logger.info("")
+    my_logger.info("")
+    my_logger.info("--------------------------FAALİYET KARI---------------------------------")
+    my_logger.info("")
 
     bilancoDonemiFaaliyetKari = ceyrekDegeriHesapla(faaliyetKariRow,bilancoDonemiColumn)
     birOncekiBilancoDonemiFaaliyetKari = ceyrekDegeriHesapla(faaliyetKariRow,birOncekibilancoDonemiColumn)
@@ -250,50 +262,53 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati, reportFi
     faaliyetKariTablosu.add_row([birOncekiBilancoDonemi, birOncekiBilancoDonemiFaaliyetKariPrint, besOncekiBilancoDonemi, besOncekiBilancoDonemiFaaliyetKariPrint, birOncekiBilancoDonemiFaaliyetKariDegisimiPrint])
     faaliyetKariTablosu.add_row([ikiOncekiBilancoDonemi, ikiOncekiBilancoDonemiFaaliyetKariPrint, altiOncekiBilancoDonemi, altiOncekiBilancoDonemiFaaliyetKariPrint, ikiOncekiBilancoDonemiFaaliyetKariDegisimiPrint])
     faaliyetKariTablosu.add_row([ucOncekiBilancoDonemi, ucOncekiBilancoDonemiFaaliyetKariPrint, yediOncekiBilancoDonemi,yediOncekiBilancoDonemiFaaliyetKariPrint, ucOncekiBilancoDonemiFaaliyetKariDegisimiPrint])
-    print(faaliyetKariTablosu)
+    my_logger.info(faaliyetKariTablosu)
 
 
     # Bilanço Dönemi Faaliyet Kar Artış Kriteri
     if ceyrekDegeriHesapla(netKarRow, bilancoDonemiColumn) < 0:
         bilancoDonemiFaaliyetKariArtisi = oncekiYilAyniCeyrekDegisimiHesapla(faaliyetKariRow, bilancoDonemi)
         bilancoDonemiFaaliyetKariArtisiGecmeDurumu = False
-        print("Bilanço Dönemi Faaliyet Kari Artisi:", bilancoDonemiFaaliyetKariArtisiGecmeDurumu, "Son Çeyrek Net Kar Negatif")
+        my_logger.info("Bilanço Dönemi Faaliyet Karı Artışı: %s Son Çeyrek Net Kar Negatif", str(bilancoDonemiFaaliyetKariArtisiGecmeDurumu))
 
     elif ceyrekDegeriHesapla(faaliyetKariRow, bilancoDonemiColumn) < 0:
         bilancoDonemiFaaliyetKariArtisi = oncekiYilAyniCeyrekDegisimiHesapla(faaliyetKariRow, bilancoDonemi)
         bilancoDonemiFaaliyetKariArtisiGecmeDurumu = False
-        print("Bilanço Dönemi Faaliyet Kari Artisi:", bilancoDonemiFaaliyetKariArtisiGecmeDurumu, "Son Ceyrek Faaliyet Kari Negatif")
+        my_logger.info("Bilanço Dönemi Faaliyet Karı Artışı: %s Son Ceyrek Faaliyet Kari Negatif", str(bilancoDonemiFaaliyetKariArtisiGecmeDurumu))
 
     elif ((ceyrekDegeriHesapla(faaliyetKariRow, bilancoDonemiColumn) > 0) and (ceyrekDegeriHesapla(faaliyetKariRow, dortOncekibilancoDonemiColumn)) < 0):
         bilancoDonemiFaaliyetKariArtisi = 0
         bilancoDonemiFaaliyetKariArtisiGecmeDurumu = True
-        print("Bilanço Dönemi Faaliyet Kari Artisi:", bilancoDonemiFaaliyetKariArtisiGecmeDurumu, "Son Çeyrek Faaliyet Karı Negatiften Pozitife Geçmiş")
+        my_logger.info("Bilanço Dönemi Faaliyet Karı Artışı: %s Son Çeyrek Faaliyet Karı Negatiften Pozitife Geçmiş", str(bilancoDonemiFaaliyetKariArtisiGecmeDurumu))
 
     else:
         bilancoDonemiFaaliyetKariArtisi = oncekiYilAyniCeyrekDegisimiHesapla(faaliyetKariRow, bilancoDonemi)
         bilancoDonemiFaaliyetKariArtisiGecmeDurumu = (bilancoDonemiFaaliyetKariArtisi > 0.15)
-        print("Bilanço Dönemi Faaliyet Kari Artisi:", "{:.2%}".format(bilancoDonemiFaaliyetKariArtisi), ">? 15%", bilancoDonemiFaaliyetKariArtisiGecmeDurumu)
+        printText = "Bilanço Dönemi Faaliyet Karı Artışı:" + "{:.2%}".format(bilancoDonemiFaaliyetKariArtisi) + " >? 15% " + str(bilancoDonemiFaaliyetKariArtisiGecmeDurumu)
+        my_logger.info(printText)
 
     # Önceki Dönem Faaliyet Kar Artış Kriteri
 
     if bilancoDonemiFaaliyetKariArtisi >= 1:
         oncekiCeyrekFaaliyetKariArtisi = oncekiYilAyniCeyrekDegisimiHesapla(faaliyetKariRow, birOncekiBilancoDonemi)
         oncekiCeyrekFaaliyetKarArtisiGecmeDurumu = True
-        print("Önceki Dönem Faaliyet Kar Artışı: "
-              "Bilanço Dönemi Faaliyet Karı Artışı %100'ün Üzerinde, Karşılaştırma Yapılmayacak:", "{:.2%}".format(bilancoDonemiFaaliyetKariArtisi), oncekiCeyrekFaaliyetKarArtisiGecmeDurumu)
+        printText = "Önceki Dönem Faaliyet Kar Artışı: Bilanço Dönemi Faaliyet Karı Artışı 100%'ün Üzerinde, Karşılaştırma Yapılmayacak: " + "{:.2%}".format(bilancoDonemiFaaliyetKariArtisi) + " " + str(oncekiCeyrekFaaliyetKarArtisiGecmeDurumu)
+        my_logger.info(printText)
 
     else:
         oncekiCeyrekFaaliyetKariArtisi = oncekiYilAyniCeyrekDegisimiHesapla(faaliyetKariRow, birOncekiBilancoDonemi)
         oncekiCeyrekFaaliyetKarArtisiGecmeDurumu = (oncekiCeyrekFaaliyetKariArtisi < bilancoDonemiFaaliyetKariArtisi)
-        print("Önceki Dönem Faaliyet Kar Artışı:", "{:.2%}".format(oncekiCeyrekFaaliyetKariArtisi),
+        my_logger.info("Önceki Dönem Faaliyet Kar Artışı:", "{:.2%}".format(oncekiCeyrekFaaliyetKariArtisi),
           "<?" , "{:.2%}".format(bilancoDonemiFaaliyetKariArtisi) , oncekiCeyrekFaaliyetKarArtisiGecmeDurumu)
 
 
 
     # Net Kar Hesabı
-    print("")
-    print("-------------------NET KAR (DÖNEM KARI/ZARARI)--------------------------")
-    print("")
+    my_logger.info("")
+    my_logger.info("")
+    my_logger.info("")
+    my_logger.info("-------------------NET KAR (DÖNEM KARI/ZARARI)--------------------------")
+    my_logger.info("")
 
     bilancoDonemiNetKar = ceyrekDegeriHesapla(netKarRow, bilancoDonemiColumn)
     birOncekiBilancoDonemiNetKar = ceyrekDegeriHesapla(netKarRow, birOncekibilancoDonemiColumn)
@@ -337,16 +352,16 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati, reportFi
     netKarTablosu.add_row(
         [ucOncekiBilancoDonemi, ucOncekiBilancoDonemiNetKarPrint, yediOncekiBilancoDonemi,
          yediOncekiBilancoDonemiNetKarPrint, ucOncekiBilancoDonemiNetKarDegisimiPrint])
-    print(netKarTablosu)
-
-
+    my_logger.info(netKarTablosu)
 
 
 
     # Brüt Kar Hesabı
-    print("")
-    print("-------------------BRÜT KAR (BRÜT KAR/ZARAR)--------------------------")
-    print("")
+    my_logger.info("")
+    my_logger.info("")
+    my_logger.info("")
+    my_logger.info("-------------------BRÜT KAR (BRÜT KAR/ZARAR)--------------------------")
+    my_logger.info("")
 
     bilancoDonemiBrutKar = ceyrekDegeriHesapla(brutKarRow, bilancoDonemiColumn)
     birOncekiBilancoDonemiBrutKar = ceyrekDegeriHesapla(brutKarRow, birOncekibilancoDonemiColumn)
@@ -389,34 +404,32 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati, reportFi
     brutKarTablosu.add_row(
         [ucOncekiBilancoDonemi, ucOncekiBilancoDonemiBrutKarPrint, yediOncekiBilancoDonemi,
          yediOncekiBilancoDonemiBrutKarPrint, ucOncekiBilancoDonemiBrutKarDegisimiPrint])
-    print(brutKarTablosu)
-
-
+    my_logger.info(brutKarTablosu)
 
 
 
     # Gerçek Deger Hesaplama
-    print("")
-    print("")
-    print("----------------GERÇEK DEĞER HESABI--------------------------------------------")
+    my_logger.info("")
+    my_logger.info("")
+    my_logger.info("----------------GERÇEK DEĞER HESABI--------------------------------------------")
 
     sermaye = getBilancoDegeri("Ödenmiş Sermaye", bilancoDonemiColumn)
-    print("Sermaye:", "{:,.0f}".format(sermaye).replace(",","."), "TL")
+    my_logger.info("Sermaye: %s TL", "{:,.0f}".format(sermaye).replace(",","."))
 
     anaOrtaklikPayi = getBilancoDegeri("Ana Ortaklık Payları", bilancoDonemiColumn) / getBilancoDegeri(
         "DÖNEM KARI (ZARARI)", bilancoDonemiColumn)
-    print("Ana Ortaklık Payı:", "{:.3f}".format(anaOrtaklikPayi))
+    my_logger.info("Ana Ortaklık Payı: %s", "{:.3f}".format(anaOrtaklikPayi))
 
     sonCeyrekSatisArtisYuzdesi = oncekiYilAyniCeyrekDegisimiHesapla(hasilatRow, bilancoDonemi)
     birOncekiCeyrekSatisArtisYuzdesi = oncekiYilAyniCeyrekDegisimiHesapla(hasilatRow, birOncekiBilancoDonemi)
 
     sonDortCeyrekHasilatToplami = ucOncekiBilancoDonemiHasilat + ikiOncekiBilancoDonemiHasilat + birOncekiBilancoDonemiHasilat + bilancoDonemiHasilat
 
-    print("Son 4 Çeyrek Hasılat Toplamı:", "{:,.0f}".format(sonDortCeyrekHasilatToplami).replace(",","."), "TL")
+    my_logger.info("Son 4 Çeyrek Hasılat Toplamı: %s TL", "{:,.0f}".format(sonDortCeyrekHasilatToplami).replace(",","."))
 
     onumuzdekiDortCeyrekHasilatTahmini = (
                 (((sonCeyrekSatisArtisYuzdesi + birOncekiCeyrekSatisArtisYuzdesi) / 2) + 1) * sonDortCeyrekHasilatToplami)
-    print("Önümüzdeki 4 Çeyrek Hasılat Tahmini:", "{:,.0f}".format(onumuzdekiDortCeyrekHasilatTahmini).replace(",","."), "TL")
+    my_logger.info("Önümüzdeki 4 Çeyrek Hasılat Tahmini: %s TL", "{:,.0f}".format(onumuzdekiDortCeyrekHasilatTahmini).replace(",","."))
 
     # HASILAT TAHMININI MANUEL DEGISTIRMEK ICIN
     #onumuzdekiDortCeyrekHasilatTahmini = 5000000000
@@ -428,52 +441,52 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati, reportFi
 
     onumuzdekiDortCeyrekFaaliyetKarMarjiTahmini = (birOncekiBilancoDonemiFaaliyetKari + bilancoDonemiFaaliyetKari) / (
                 bilancoDonemiHasilat + birOncekiBilancoDonemiHasilat)
-    print("Önümüzdeki 4 çeyrek faaliyet kar marjı tahmini:",
-          "{:.2%}".format(onumuzdekiDortCeyrekFaaliyetKarMarjiTahmini))
+    my_logger.info("Önümüzdeki 4 Çeyrek Faaliyet Kar Marjı Tahmini: %s TL", "{:.2%}".format(onumuzdekiDortCeyrekFaaliyetKarMarjiTahmini))
 
     faaliyetKariTahmini1 = onumuzdekiDortCeyrekHasilatTahmini * onumuzdekiDortCeyrekFaaliyetKarMarjiTahmini
-    print("Faaliyet Kar Tahmini1:", "{:,.0f}".format(faaliyetKariTahmini1).replace(",","."), "TL")
+    my_logger.info("Faaliyet Kar Tahmini1: %s TL", "{:,.0f}".format(faaliyetKariTahmini1).replace(",","."))
 
     faaliyetKariTahmini2 = ((birOncekiBilancoDonemiFaaliyetKari + bilancoDonemiFaaliyetKari) * 2 * 0.3) + (
                 bilancoDonemiFaaliyetKari * 4 * 0.5) + \
                            ((
                                         ucOncekibilancoDonemiFaaliyetKari + ikiOncekiBilancoDonemiFaaliyetKari + birOncekiBilancoDonemiFaaliyetKari + bilancoDonemiFaaliyetKari) * 0.2)
-    print("Faaliyet Kar Tahmini2:", "{:,.0f}".format(faaliyetKariTahmini2).replace(",","."), "TL")
+    my_logger.info("Faaliyet Kar Tahmini2: %s TL", "{:,.0f}".format(faaliyetKariTahmini2).replace(",","."))
 
     ortalamaFaaliyetKariTahmini = (faaliyetKariTahmini1 + faaliyetKariTahmini2) / 2
-    print("Ortalama Faaliyet Kari Tahmini:", "{:,.0f}".format(ortalamaFaaliyetKariTahmini).replace(",","."), "TL")
+    my_logger.info("Ortalama Faaliyet Kari Tahmini: %s TL", "{:,.0f}".format(ortalamaFaaliyetKariTahmini).replace(",","."))
 
     hisseBasinaOrtalamaKarTahmini = (ortalamaFaaliyetKariTahmini * anaOrtaklikPayi) / sermaye
-    print("Hisse başına ortalama kar tahmini:", format(hisseBasinaOrtalamaKarTahmini, ".2f") ,"TL")
+    my_logger.info("Hisse Başına Ortalama Kar Tahmini: %s TL", format(hisseBasinaOrtalamaKarTahmini, ".2f"))
 
     likidasyonDegeri = likidasyonDegeriHesapla(bilancoDonemi)
-    print("Likidasyon değeri:", "{:,.0f}".format(likidasyonDegeri).replace(",","."), "TL")
+    my_logger.info("Likidasyon Değeri: %s TL", "{:,.0f}".format(likidasyonDegeri).replace(",","."))
 
     borclar = int(getBilancoDegeri("TOPLAM YÜKÜMLÜLÜKLER", bilancoDonemiColumn))
-    print("Borçlar:", "{:,.0f}".format(borclar).replace(",","."), "TL")
+    my_logger.info("Borçlar: %s TL", "{:,.0f}".format(borclar).replace(",","."))
 
     bilancoEtkisi = (likidasyonDegeri - borclar) / sermaye * anaOrtaklikPayi
-    print("Bilanço Etkisi:", format(bilancoEtkisi, ".2f"), "TL")
+    my_logger.info("Bilanço Etkisi: %s TL", format(bilancoEtkisi, ".2f"))
 
     gercekDeger = (hisseBasinaOrtalamaKarTahmini * 7) + bilancoEtkisi
-    print("Gerçek hisse değeri:", format(gercekDeger, ".2f"), "TL")
+    my_logger.info("Gerçek Hisse Değeri: %s TL", format(gercekDeger, ".2f"))
 
     targetBuy = gercekDeger * 0.66
-    print("Target buy:", format(targetBuy, ".2f"), "TL")
+    my_logger.info("Target Buy: %s TL", format(targetBuy, ".2f"))
 
-    print("Bilanço tarihindeki hisse fiyatı:", format(hisseFiyati, ".2f"), "TL")
+    my_logger.info("Bilanço Tarihindeki Hisse Fiyatı: %s TL", format(hisseFiyati, ".2f"))
 
     gercekFiyataUzaklik = hisseFiyati / targetBuy
-    print("Gerçek fiyata uzaklık oranı:", "{:.2%}".format(gercekFiyataUzaklik))
+    my_logger.info("Gerçek Fiyata Uzaklık Oranı: %s", "{:.2%}".format(gercekFiyataUzaklik))
 
     gercekFiyataUzaklikTl = hisseFiyati - targetBuy
-    print("Gerçek fiyata uzaklık TL:", format(gercekFiyataUzaklikTl, ".2f"))
+    my_logger.info("Gerçek Fiyata Uzaklık %s TL:", format(gercekFiyataUzaklikTl, ".2f"))
+
 
     # Netpro Hesapla
-    print("")
-    print("")
-    print("")
-    print("----------------NetPro Kriteri-----------------------------------------------------------------")
+    my_logger.info("")
+    my_logger.info("")
+    my_logger.info("")
+    my_logger.info("----------------NETPRO KRİTERİ-----------------------------------------------------------------")
 
     sonDortDonemFaaliyetKariToplami = bilancoDonemiFaaliyetKari + birOncekiBilancoDonemiFaaliyetKari + ikiOncekiBilancoDonemiFaaliyetKari + ucOncekibilancoDonemiFaaliyetKari
 
@@ -484,104 +497,104 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati, reportFi
 
     sonDortDonemNetKarToplami = bilancoDonemiNetKari + birOncekiBilancoDonemiNetKari + ikiOncekiBilancoDonemiNetKari + ucOncekibilancoDonemiNetKari
 
-    print ("Son 4 Dönem Net Kar Toplamı:", "{:,.0f}".format(sonDortDonemNetKarToplami).replace(",", "."), "TL")
-    print ("Son 4 Dönem Faaliyet Karı Toplamı:", "{:,.0f}".format(sonDortDonemFaaliyetKariToplami).replace(",", "."), "TL")
-
+    my_logger.info ("Son 4 Dönem Net Kar Toplamı: %s TL", "{:,.0f}".format(sonDortDonemNetKarToplami).replace(",", "."))
+    my_logger.info ("Son 4 Dönem Faaliyet Karı Toplamı: %s TL", "{:,.0f}".format(sonDortDonemFaaliyetKariToplami).replace(",", "."))
 
     fkOrani = hisseFiyati/((sonDortDonemNetKarToplami*anaOrtaklikPayi)/(sermaye))
-    print("F/K Oranı:", "{:,.2f}".format(fkOrani))
+    my_logger.info("F/K Oranı: %s", "{:,.2f}".format(fkOrani))
 
     hbkOrani = sonDortDonemNetKarToplami/(sermaye)
-    print ("HBK Oranı:", "{:,.2f}".format(hbkOrani))
+    my_logger.info ("HBK Oranı: %s", "{:,.2f}".format(hbkOrani))
 
     netProEstDegeri = ((ortalamaFaaliyetKariTahmini / sonDortDonemFaaliyetKariToplami) * sonDortDonemNetKarToplami) * anaOrtaklikPayi
-    print("NetPro Est Değeri:", "{:,.0f}".format(netProEstDegeri).replace(",","."), "TL")
+    my_logger.info("NetPro Est Değeri: %s TL", "{:,.0f}".format(netProEstDegeri).replace(",","."))
 
     piyasaDegeri = (bilancoEtkisi * sermaye * -1) + (hisseFiyati * sermaye)
 
-    print("Piyasa Değeri:", "{:,.0f}".format(piyasaDegeri).replace(",","."), "TL")
-    print("BondYield:", "{:.2%}".format(bondYield))
+    my_logger.info("Piyasa Değeri: %s TL", "{:,.0f}".format(piyasaDegeri).replace(",","."))
+    my_logger.info("BondYield: %s", "{:.2%}".format(bondYield))
 
     netProKriteri = (netProEstDegeri / piyasaDegeri) / bondYield
     netProKriteriGecmeDurumu = (netProKriteri > 2)
-    print("NetPro Kriteri (2'den Büyük Olmalı):", format(netProKriteri, ".2f"), netProKriteriGecmeDurumu)
+    my_logger.info("NetPro Kriteri (2'den Büyük Olmalı): %s %s", format(netProKriteri, ".2f"), str(netProKriteriGecmeDurumu))
 
     minNetProIcinHisseFiyati  = (netProEstDegeri / (1.9 * bondYield) - (bilancoEtkisi * sermaye * -1))/sermaye
-    print("NetPro 1.9 Olmasi Icin Hisse Fiyatı:", format(minNetProIcinHisseFiyati, ".2f"), )
+    my_logger.info("NetPro 1.9 Olması İçin Olması Gereken Hisse Fiyatı: %s", format(minNetProIcinHisseFiyati, ".2f"))
 
 
 
     # Forward PE Hesapla
-    print("")
-    print("")
-    print("----------------FORWARD PE HESAPLAMA--------------------------------------------------------")
+    my_logger.info("")
+    my_logger.info("")
+    my_logger.info("----------------FORWARD PE HESAPLAMA--------------------------------------------------------")
 
     forwardPeKriteri = (piyasaDegeri) / netProEstDegeri
 
     forwardPeKriteriGecmeDurumu = (forwardPeKriteri < 4)
-    print("Forward PE Kriteri (4'ten Küçük Olmalı):", format(forwardPeKriteri, ".2f"), forwardPeKriteriGecmeDurumu)
-
-
+    printText = "Forward PE Kriteri (4'ten Küçük Olmalı): " + format(forwardPeKriteri, ".2f") + " " + str(forwardPeKriteriGecmeDurumu)
+    my_logger.info(printText)
 
 
 
     # Ek Hesaplama ve Tablolar
-    print("")
-    print("-------------------EK HESAPLAMA ve TABLOLAR--------------------------")
-    print("")
+    my_logger.info("")
+    my_logger.info("")
+    my_logger.info("")
+    my_logger.info("-------------------EK HESAPLAMA ve TABLOLAR--------------------------")
+    my_logger.info("")
 
     bilancoDonemiBrutKarMarji = bilancoDonemiBrutKar/bilancoDonemiHasilat;
-    print("Bilanço Dönemi Brüt Kar Marjı:", bilancoDonemiBrutKarMarji)
+    my_logger.info("Bilanço Dönemi Brüt Kar Marjı: %s", "{:.2%}".format(bilancoDonemiBrutKarMarji))
 
     bilancoDonemiFaaliyetKarMarji = bilancoDonemiFaaliyetKari/bilancoDonemiHasilat;
-    print("Bilanço Dönemi Faaliyet Kar Marjı:", bilancoDonemiFaaliyetKarMarji)
+    my_logger.info("Bilanço Dönemi Faaliyet Kar Marjı: %s", "{:.2%}".format(bilancoDonemiFaaliyetKarMarji))
 
     bilancoDonemiNetKarMarji = bilancoDonemiNetKari/bilancoDonemiHasilat;
-    print("Bilanço Dönemi Net Kar Marjı:", bilancoDonemiNetKarMarji)
+    my_logger.info("Bilanço Dönemi Net Kar Marjı: %s", "{:.2%}".format(bilancoDonemiNetKarMarji))
 
     bilancoDonemiOzsermayeKarliligi = bilancoDonemiNetKari/getBilancoDegeri("TOPLAM ÖZKAYNAKLAR", bilancoDonemiColumn)
-    print("Bilanço Dönemi Özsermaye Karlılığı:", bilancoDonemiOzsermayeKarliligi)
+    my_logger.info("Bilanço Dönemi Özsermaye Karlılığı: %s", "{:.2%}".format(bilancoDonemiOzsermayeKarliligi))
 
 
 
-
-    print("")
-    print("")
-    print("----------------BİLANÇO DOLAR HESABI-------------------------------------")
-    print("")
+    my_logger.info("")
+    my_logger.info("")
+    my_logger.info("")
+    my_logger.info("----------------BİLANÇO DOLAR HESABI-------------------------------------")
+    my_logger.info("")
     bilancoDonemiOrtalamaDolarKuru = ucAylikBilancoDonemiOrtalamaDolarDegeriBul(bilancoDonemi)
 
-    #print (bilancoDonemi, "Bilanço Dönemi Ortalama Dolar Kuru: ", "{:,.3f}".format(bilancoDonemiOrtalamaDolarKuru))
+    my_logger.debug ("%s Bilanço Dönemi Ortalama Dolar Kuru: %s TL" , bilancoDonemi , "{:,.2f}".format(bilancoDonemiOrtalamaDolarKuru))
 
     birOncekiBilancoDonemiOrtalamaDolarKuru = ucAylikBilancoDonemiOrtalamaDolarDegeriBul(birOncekiBilancoDonemi)
-    #print(birOncekiBilancoDonemi, "Bilanço Dönemi Ortalama Dolar Kuru: ", "{:,.3f}".format(birOncekiBilancoDonemiOrtalamaDolarKuru))
+    my_logger.debug ("%s Bilanço Dönemi Ortalama Dolar Kuru: %s TL" , birOncekiBilancoDonemi , "{:,.2f}".format(birOncekiBilancoDonemiOrtalamaDolarKuru))
 
     ikiOncekiBilancoDonemiOrtalamaDolarKuru = ucAylikBilancoDonemiOrtalamaDolarDegeriBul(ikiOncekiBilancoDonemi)
-    #print(ikiOncekiBilancoDonemi, "Bilanço Dönemi Ortalama Dolar Kuru: ","{:,.3f}".format(ikiOncekiBilancoDonemiOrtalamaDolarKuru))
+    my_logger.debug ("%s Bilanço Dönemi Ortalama Dolar Kuru: %s TL" , ikiOncekiBilancoDonemi ,"{:,.2f}".format(ikiOncekiBilancoDonemiOrtalamaDolarKuru))
 
     ucOncekiBilancoDonemiOrtalamaDolarKuru = ucAylikBilancoDonemiOrtalamaDolarDegeriBul(ucOncekiBilancoDonemi)
-    #print(ucOncekiBilancoDonemi, "Bilanço Dönemi Ortalama Dolar Kuru: ","{:,.3f}".format(ucOncekiBilancoDonemiOrtalamaDolarKuru))
+    my_logger.debug ("%s Bilanço Dönemi Ortalama Dolar Kuru: %s TL" , ucOncekiBilancoDonemi ,"{:,.2f}".format(ucOncekiBilancoDonemiOrtalamaDolarKuru))
 
     dortOncekiBilancoDonemiOrtalamaDolarKuru = ucAylikBilancoDonemiOrtalamaDolarDegeriBul(dortOncekiBilancoDonemi)
-    #print(dortOncekiBilancoDonemi, "Bilanço Dönemi Ortalama Dolar Kuru: ","{:,.3f}".format(dortOncekiBilancoDonemiOrtalamaDolarKuru))
+    my_logger.debug ("%s Bilanço Dönemi Ortalama Dolar Kuru: %s TL" , dortOncekiBilancoDonemi ,"{:,.2f}".format(dortOncekiBilancoDonemiOrtalamaDolarKuru))
 
     besOncekiBilancoDonemiOrtalamaDolarKuru = ucAylikBilancoDonemiOrtalamaDolarDegeriBul(besOncekiBilancoDonemi)
-    #print(besOncekiBilancoDonemi, "Bilanço Dönemi Ortalama Dolar Kuru: ","{:,.3f}".format(besOncekiBilancoDonemiOrtalamaDolarKuru))
+    my_logger.debug ("%s Bilanço Dönemi Ortalama Dolar Kuru: %s TL", besOncekiBilancoDonemi, "{:,.2f}".format(besOncekiBilancoDonemiOrtalamaDolarKuru))
 
     altiOncekiBilancoDonemiOrtalamaDolarKuru = ucAylikBilancoDonemiOrtalamaDolarDegeriBul(altiOncekiBilancoDonemi)
-    #print(altiOncekiBilancoDonemi, "Bilanço Dönemi Ortalama Dolar Kuru: ","{:,.3f}".format(altiOncekiBilancoDonemiOrtalamaDolarKuru))
+    my_logger.debug ("%s Bilanço Dönemi Ortalama Dolar Kuru: %s TL" , altiOncekiBilancoDonemi, "{:,.2f}".format(altiOncekiBilancoDonemiOrtalamaDolarKuru))
 
     yediOncekiBilancoDonemiOrtalamaDolarKuru = ucAylikBilancoDonemiOrtalamaDolarDegeriBul(yediOncekiBilancoDonemi)
-    #print(yediOncekiBilancoDonemi, "Bilanço Dönemi Ortalama Dolar Kuru: ","{:,.3f}".format(yediOncekiBilancoDonemiOrtalamaDolarKuru))
-
-
+    my_logger.debug ("%s Bilanço Dönemi Ortalama Dolar Kuru: %s TL", yediOncekiBilancoDonemi, "{:,.2f}".format(yediOncekiBilancoDonemiOrtalamaDolarKuru))
 
 
 
     # Bilanço Dönemi Satış(Hasılat) Gelirleri (DOLAR)
-    print("")
-    print("--------------------HASILAT(SATIŞ) GELİRLERİ (DOLAR)----------------------")
-    print("")
+    my_logger.info("")
+    my_logger.info("")
+    my_logger.info("")
+    my_logger.info("--------------------HASILAT(SATIŞ) GELİRLERİ (DOLAR)----------------------")
+    my_logger.info("")
 
     bilancoDonemiDolarHasilat = bilancoDonemiHasilat/bilancoDonemiOrtalamaDolarKuru
     birOncekiBilancoDonemiDolarHasilat = birOncekiBilancoDonemiHasilat/birOncekiBilancoDonemiOrtalamaDolarKuru
@@ -609,7 +622,7 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati, reportFi
     ucOncekiBilancoDonemiDolarHasilatPrint = "{:,.0f}".format(ucOncekiBilancoDonemiDolarHasilat).replace(",", ".")
     yediOncekiBilancoDonemiDolarHasilatPrint = "{:,.0f}".format(yediOncekiBilancoDonemiDolarHasilat).replace(",", ".")
     ucOncekiBilancoDonemiDolarHasilatDegisimiPrint = "{:.2%}".format(ucOncekiBilancoDonemiDolarHasilat/yediOncekiBilancoDonemiDolarHasilat-1)
-    #
+
     dolarSatisTablosu = PrettyTable()
     dolarSatisTablosu.field_names = ["ÇEYREK", "SATIŞ (USD)", "ÖNCEKİ YIL", "ÖNCEKİ YIL SATIŞ (USD)", "YÜZDE DEĞİŞİM"]
     dolarSatisTablosu.align["SATIŞ (USD)"] = "r"
@@ -619,113 +632,127 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati, reportFi
     dolarSatisTablosu.add_row([birOncekiBilancoDonemi, birOncekiBilancoDonemiDolarHasilatPrint, besOncekiBilancoDonemi, besOncekiBilancoDonemiDolarHasilatPrint, birOncekiBilancoDonemiDolarHasilatDegisimiPrint])
     dolarSatisTablosu.add_row([ikiOncekiBilancoDonemi, ikiOncekiBilancoDonemiDolarHasilatPrint, altiOncekiBilancoDonemi, altiOncekiBilancoDonemiDolarHasilatPrint, ikiOncekiBilancoDonemiDolarHasilatDegisimiPrint])
     dolarSatisTablosu.add_row([ucOncekiBilancoDonemi, ucOncekiBilancoDonemiDolarHasilatPrint, yediOncekiBilancoDonemi,yediOncekiBilancoDonemiDolarHasilatPrint, ucOncekiBilancoDonemiDolarHasilatDegisimiPrint])
-    print(dolarSatisTablosu)
+    my_logger.info (dolarSatisTablosu)
 
     # Bilanço Dönemi (DOLAR) Satış Geliri Artış Kriteri
     bilancoDonemiDolarHasilatGelirArtisi = bilancoDonemiDolarHasilat/oncekiYilAyniCeyrekDolarHasilat-1
     bilancoDonemiDolarHasilatGelirArtisiGecmeDurumu = (bilancoDonemiDolarHasilatGelirArtisi > 0.1)
-    print("Bilanço Dönemi (DOLAR) Satış Geliri Artışı %10'dan Büyük Mü:", "{:.2%}".format(bilancoDonemiDolarHasilatGelirArtisi), ">? 10%", bilancoDonemiDolarHasilatGelirArtisiGecmeDurumu)
+
+    printText = "Bilanço Dönemi (DOLAR) Satış Geliri Artışı 10%'dan Büyük Mü: " + "{:.2%}".format(bilancoDonemiDolarHasilatGelirArtisi) + " >? 10%" + " " + str(bilancoDonemiDolarHasilatGelirArtisiGecmeDurumu)
+    my_logger.info(printText)
+
+
 
     # Önceki Dönem (DOLAR) Hasılat Geliri Artış Kriteri
     oncekiDonemDolarHasilatGelirArtisi = birOncekiBilancoDonemiDolarHasilat/besOncekiBilancoDonemiDolarHasilat-1
     #
     if (bilancoDonemiDolarHasilatGelirArtisi >= 1):
-        print ("Bilanço Dönemi (DOLAR) Satış Gelir Artışı %100 Üzerinde, Karşılaştırma Yapılmayacak.")
+        printText = "Bilanço Dönemi (DOLAR) Satış Gelir Artışı %100 Üzerinde, Karşılaştırma Yapılmayacak."
+        my_logger.info (printText)
         oncekiBilancoDonemiDolarHasilatGelirArtisiGecmeDurumu = True
-        print ("Önceki Dönem (DOLAR) Satış Gelir Artışı Geçme Durumu:", oncekiBilancoDonemiDolarHasilatGelirArtisiGecmeDurumu)
+        printText = "Önceki Dönem (DOLAR) Satış Gelir Artışı Geçme Durumu: " + str(oncekiBilancoDonemiDolarHasilatGelirArtisiGecmeDurumu)
+        my_logger.info (printText)
 
     else:
         oncekiBilancoDonemiDolarHasilatGelirArtisiGecmeDurumu = (oncekiDonemDolarHasilatGelirArtisi<bilancoDonemiDolarHasilatGelirArtisi)
-        print("Önceki Dönem Satış Gelir Artışı Bilançp Döneminden Düşük Mü:", "{:.2%}".format(oncekiDonemDolarHasilatGelirArtisi),"<?","{:.2%}".format(bilancoDonemiDolarHasilatGelirArtisi), oncekiBilancoDonemiDolarHasilatGelirArtisiGecmeDurumu)
+        printText = "Önceki Dönem (DOLAR) Satış Gelir Artışı Bilanço Döneminden Düşük Mü: " + "{:.2%}".format(oncekiDonemDolarHasilatGelirArtisi) + \
+                    " <? " + "{:.2%}".format(bilancoDonemiDolarHasilatGelirArtisi) + " " + str(oncekiBilancoDonemiDolarHasilatGelirArtisiGecmeDurumu)
+        my_logger.info(printText)
 
 
 
+    # Bilanço Dönemi Faaliyet Karı Gelirleri (DOLAR)
+    my_logger.info("")
+    my_logger.info("")
+    my_logger.info("")
+    my_logger.info("--------------------------FAALİYET KARI (DOLAR)-------------------------")
+    my_logger.info("")
 
-        # Faaliyet Karı Gelirleri (DOLAR)
-        print("")
-        print("--------------------------FAALİYET KARI (DOLAR)-------------------------")
-        print("")
+    bilancoDonemiDolarFaaliyetKari = bilancoDonemiFaaliyetKari/bilancoDonemiOrtalamaDolarKuru
+    birOncekiBilancoDonemiDolarFaaliyetKari = birOncekiBilancoDonemiFaaliyetKari/birOncekiBilancoDonemiOrtalamaDolarKuru
+    ikiOncekiBilancoDonemiDolarFaaliyetKari = ikiOncekiBilancoDonemiFaaliyetKari/ikiOncekiBilancoDonemiOrtalamaDolarKuru
+    ucOncekiBilancoDonemiDolarFaaliyetKari = ucOncekiBilancoDonemiFaaliyetKari/ucOncekiBilancoDonemiOrtalamaDolarKuru
+    dortOncekiBilancoDonemiDolarFaaliyetKari = dortOncekiBilancoDonemiFaaliyetKari/dortOncekiBilancoDonemiOrtalamaDolarKuru
+    besOncekiBilancoDonemiDolarFaaliyetKari = besOncekiBilancoDonemiFaaliyetKari/besOncekiBilancoDonemiOrtalamaDolarKuru
+    altiOncekiBilancoDonemiDolarFaaliyetKari = altiOncekiBilancoDonemiFaaliyetKari/altiOncekiBilancoDonemiOrtalamaDolarKuru
+    yediOncekiBilancoDonemiDolarFaaliyetKari = yediOncekiBilancoDonemiFaaliyetKari/yediOncekiBilancoDonemiOrtalamaDolarKuru
 
-        bilancoDonemiDolarFaaliyetKari = bilancoDonemiFaaliyetKari/bilancoDonemiOrtalamaDolarKuru
-        birOncekiBilancoDonemiDolarFaaliyetKari = birOncekiBilancoDonemiFaaliyetKari/birOncekiBilancoDonemiOrtalamaDolarKuru
-        ikiOncekiBilancoDonemiDolarFaaliyetKari = ikiOncekiBilancoDonemiFaaliyetKari/ikiOncekiBilancoDonemiOrtalamaDolarKuru
-        ucOncekiBilancoDonemiDolarFaaliyetKari = ucOncekiBilancoDonemiFaaliyetKari/ucOncekiBilancoDonemiOrtalamaDolarKuru
-        dortOncekiBilancoDonemiDolarFaaliyetKari = dortOncekiBilancoDonemiFaaliyetKari/dortOncekiBilancoDonemiOrtalamaDolarKuru
-        besOncekiBilancoDonemiDolarFaaliyetKari = besOncekiBilancoDonemiFaaliyetKari/besOncekiBilancoDonemiOrtalamaDolarKuru
-        altiOncekiBilancoDonemiDolarFaaliyetKari = altiOncekiBilancoDonemiFaaliyetKari/altiOncekiBilancoDonemiOrtalamaDolarKuru
-        yediOncekiBilancoDonemiDolarFaaliyetKari = yediOncekiBilancoDonemiFaaliyetKari/yediOncekiBilancoDonemiOrtalamaDolarKuru
+    bilancoDonemiDolarFaaliyetKariPrint = "{:,.0f}".format(bilancoDonemiDolarFaaliyetKari).replace(",", ".")
+    dortOncekiBilancoDonemiDolarFaaliyetKariPrint = "{:,.0f}".format(dortOncekiBilancoDonemiDolarFaaliyetKari).replace(",",".")
+    bilancoDonemiDolarFaaliyetKariDegisimi = bilancoDonemiDolarFaaliyetKari/dortOncekiBilancoDonemiDolarFaaliyetKari-1
+    bilancoDonemiDolarFaaliyetKariDegisimiPrint = "{:.2%}".format(bilancoDonemiDolarFaaliyetKariDegisimi)
 
-        bilancoDonemiDolarFaaliyetKariPrint = "{:,.0f}".format(bilancoDonemiDolarFaaliyetKari).replace(",", ".")
-        dortOncekiBilancoDonemiDolarFaaliyetKariPrint = "{:,.0f}".format(dortOncekiBilancoDonemiDolarFaaliyetKari).replace(",",".")
-        bilancoDonemiDolarFaaliyetKariDegisimi = bilancoDonemiDolarFaaliyetKari/dortOncekiBilancoDonemiDolarFaaliyetKari-1
-        bilancoDonemiDolarFaaliyetKariDegisimiPrint = "{:.2%}".format(bilancoDonemiDolarFaaliyetKariDegisimi)
+    birOncekiBilancoDonemiDolarFaaliyetKariPrint = "{:,.0f}".format(birOncekiBilancoDonemiDolarFaaliyetKari).replace(",", ".")
+    besOncekiBilancoDonemiDolarFaaliyetKariPrint = "{:,.0f}".format(besOncekiBilancoDonemiDolarFaaliyetKari).replace(",", ".")
+    birOncekiBilancoDonemiDolarFaaliyetKariDegisimi = birOncekiBilancoDonemiDolarFaaliyetKari/besOncekiBilancoDonemiDolarFaaliyetKari-1
+    birOncekiBilancoDonemiDolarFaaliyetKariDegisimiPrint = "{:.2%}".format(birOncekiBilancoDonemiDolarFaaliyetKariDegisimi)
 
-        birOncekiBilancoDonemiDolarFaaliyetKariPrint = "{:,.0f}".format(birOncekiBilancoDonemiDolarFaaliyetKari).replace(",", ".")
-        besOncekiBilancoDonemiDolarFaaliyetKariPrint = "{:,.0f}".format(besOncekiBilancoDonemiDolarFaaliyetKari).replace(",", ".")
-        birOncekiBilancoDonemiDolarFaaliyetKariDegisimi = birOncekiBilancoDonemiDolarFaaliyetKari/besOncekiBilancoDonemiDolarFaaliyetKari-1
-        birOncekiBilancoDonemiDolarFaaliyetKariDegisimiPrint = "{:.2%}".format(birOncekiBilancoDonemiDolarFaaliyetKariDegisimi)
+    ikiOncekiBilancoDonemiDolarFaaliyetKariPrint = "{:,.0f}".format(ikiOncekiBilancoDonemiDolarFaaliyetKari).replace(",", ".")
+    altiOncekiBilancoDonemiDolarFaaliyetKariPrint = "{:,.0f}".format(altiOncekiBilancoDonemiDolarFaaliyetKari).replace(",", ".")
+    ikiOncekiBilancoDonemiDolarFaaliyetKariDegisimiPrint = "{:.2%}".format(ikiOncekiBilancoDonemiDolarFaaliyetKari/altiOncekiBilancoDonemiDolarFaaliyetKari-1)
 
-        ikiOncekiBilancoDonemiDolarFaaliyetKariPrint = "{:,.0f}".format(ikiOncekiBilancoDonemiDolarFaaliyetKari).replace(",", ".")
-        altiOncekiBilancoDonemiDolarFaaliyetKariPrint = "{:,.0f}".format(altiOncekiBilancoDonemiDolarFaaliyetKari).replace(",", ".")
-        ikiOncekiBilancoDonemiDolarFaaliyetKariDegisimiPrint = "{:.2%}".format(ikiOncekiBilancoDonemiDolarFaaliyetKari/altiOncekiBilancoDonemiDolarFaaliyetKari-1)
+    ucOncekiBilancoDonemiDolarFaaliyetKariPrint = "{:,.0f}".format(ucOncekiBilancoDonemiDolarFaaliyetKari).replace(",", ".")
+    yediOncekiBilancoDonemiDolarFaaliyetKariPrint = "{:,.0f}".format(yediOncekiBilancoDonemiDolarFaaliyetKari).replace(",", ".")
+    ucOncekiBilancoDonemiDolarFaaliyetKariDegisimiPrint = "{:.2%}".format(ucOncekiBilancoDonemiDolarFaaliyetKari/yediOncekiBilancoDonemiDolarFaaliyetKari-1)
 
-        ucOncekiBilancoDonemiDolarFaaliyetKariPrint = "{:,.0f}".format(ucOncekiBilancoDonemiDolarFaaliyetKari).replace(",", ".")
-        yediOncekiBilancoDonemiDolarFaaliyetKariPrint = "{:,.0f}".format(yediOncekiBilancoDonemiDolarFaaliyetKari).replace(",", ".")
-        ucOncekiBilancoDonemiDolarFaaliyetKariDegisimiPrint = "{:.2%}".format(ucOncekiBilancoDonemiDolarFaaliyetKari/yediOncekiBilancoDonemiDolarFaaliyetKari-1)
+    dolarFaaliyetKariTablosu = PrettyTable()
+    dolarFaaliyetKariTablosu.field_names = ["ÇEYREK", "FAALİYET KARI (DOLAR)", "ÖNCEKİ YIL", "ÖNCEKİ YIL FAALİYET KARI (DOLAR)", "YÜZDE DEĞİŞİM"]
+    dolarFaaliyetKariTablosu.align["FAALİYET KARI (DOLAR)"] = "r"
+    dolarFaaliyetKariTablosu.align["ÖNCEKİ YIL FAALİYET KARI (DOLAR)"] = "r"
+    dolarFaaliyetKariTablosu.align["YÜZDE DEĞİŞİM"] = "r"
+    dolarFaaliyetKariTablosu.add_row([bilancoDonemi, bilancoDonemiDolarFaaliyetKariPrint, dortOncekiBilancoDonemi, dortOncekiBilancoDonemiDolarFaaliyetKariPrint, bilancoDonemiDolarFaaliyetKariDegisimiPrint])
+    dolarFaaliyetKariTablosu.add_row([birOncekiBilancoDonemi, birOncekiBilancoDonemiDolarFaaliyetKariPrint, besOncekiBilancoDonemi,besOncekiBilancoDonemiDolarFaaliyetKariPrint, birOncekiBilancoDonemiDolarFaaliyetKariDegisimiPrint])
+    dolarFaaliyetKariTablosu.add_row([ikiOncekiBilancoDonemi, ikiOncekiBilancoDonemiDolarFaaliyetKariPrint, altiOncekiBilancoDonemi, altiOncekiBilancoDonemiDolarFaaliyetKariPrint, ikiOncekiBilancoDonemiDolarFaaliyetKariDegisimiPrint])
+    dolarFaaliyetKariTablosu.add_row([ucOncekiBilancoDonemi, ucOncekiBilancoDonemiDolarFaaliyetKariPrint, yediOncekiBilancoDonemi, yediOncekiBilancoDonemiDolarFaaliyetKariPrint, ucOncekiBilancoDonemiDolarFaaliyetKariDegisimiPrint])
+    my_logger.info (dolarFaaliyetKariTablosu)
 
-        dolarFaaliyetKariTablosu = PrettyTable()
-        dolarFaaliyetKariTablosu.field_names = ["ÇEYREK", "FAALİYET KARI (DOLAR)", "ÖNCEKİ YIL", "ÖNCEKİ YIL FAALİYET KARI (DOLAR)", "YÜZDE DEĞİŞİM"]
-        dolarFaaliyetKariTablosu.align["FAALİYET KARI (DOLAR)"] = "r"
-        dolarFaaliyetKariTablosu.align["ÖNCEKİ YIL FAALİYET KARI (DOLAR)"] = "r"
-        dolarFaaliyetKariTablosu.align["YÜZDE DEĞİŞİM"] = "r"
-        dolarFaaliyetKariTablosu.add_row([bilancoDonemi, bilancoDonemiDolarFaaliyetKariPrint, dortOncekiBilancoDonemi, dortOncekiBilancoDonemiDolarFaaliyetKariPrint, bilancoDonemiDolarFaaliyetKariDegisimiPrint])
-        dolarFaaliyetKariTablosu.add_row([birOncekiBilancoDonemi, birOncekiBilancoDonemiDolarFaaliyetKariPrint, besOncekiBilancoDonemi,besOncekiBilancoDonemiDolarFaaliyetKariPrint, birOncekiBilancoDonemiDolarFaaliyetKariDegisimiPrint])
-        dolarFaaliyetKariTablosu.add_row([ikiOncekiBilancoDonemi, ikiOncekiBilancoDonemiDolarFaaliyetKariPrint, altiOncekiBilancoDonemi, altiOncekiBilancoDonemiDolarFaaliyetKariPrint, ikiOncekiBilancoDonemiDolarFaaliyetKariDegisimiPrint])
-        dolarFaaliyetKariTablosu.add_row([ucOncekiBilancoDonemi, ucOncekiBilancoDonemiDolarFaaliyetKariPrint, yediOncekiBilancoDonemi, yediOncekiBilancoDonemiDolarFaaliyetKariPrint, ucOncekiBilancoDonemiDolarFaaliyetKariDegisimiPrint])
-        print(dolarFaaliyetKariTablosu)
+    # Bilanço Dönem Faaliyet Kar Artış Kriteri (DOLAR)
+    if ceyrekDegeriHesapla(netKarRow, bilancoDonemiColumn) < 0:
+        bilancoDonemiDolarFaaliyetKariArtisiGecmeDurumu = False
+        printText = "Bilanço Dönemi (DOLAR) Faaliyet Karı Artışı: " + str(bilancoDonemiDolarFaaliyetKariArtisiGecmeDurumu) + " Son Çeyrek Net Kar Negatif"
+        my_logger.info (printText)
 
-        # Bilanço Dönem Faaliyet Kar Artış Kriteri (DOLAR)
-        if ceyrekDegeriHesapla(netKarRow, bilancoDonemiColumn) < 0:
-            bilancoDonemiDolarFaaliyetKariArtisiGecmeDurumu = False
-            print("Bilanço Dönemi Dolar Faaliyet Kari Artisi:", bilancoDonemiDolarFaaliyetKariArtisiGecmeDurumu, "Son Çeyrek Net Kar Negatif")
+    elif (bilancoDonemiDolarFaaliyetKari < 0):
+        bilancoDonemiDolarFaaliyetKariArtisi = bilancoDonemiDolarFaaliyetKari/dortOncekiBilancoDonemiDolarFaaliyetKari -1
+        bilancoDonemiDolarFaaliyetKariArtisiGecmeDurumu = False
+        printText = "Bilanço Dönemi (DOLAR) Faaliyet Karı Artışı: " + str(bilancoDonemiDolarFaaliyetKariArtisiGecmeDurumu) + " Son Ceyrek Dolar Faaliyet Kari Negatif"
+        my_logger.info (printText)
 
-        elif (bilancoDonemiDolarFaaliyetKari < 0):
-            bilancoDonemiDolarFaaliyetKariArtisi = bilancoDonemiDolarFaaliyetKari/dortOncekiBilancoDonemiDolarFaaliyetKari -1
-            bilancoDonemiDolarFaaliyetKariArtisiGecmeDurumu = False
-            print("Bilanço Dönemi Dolar Faaliyet Kari Artisi:", bilancoDonemiDolarFaaliyetKariArtisiGecmeDurumu, "Son Ceyrek Dolar Faaliyet Kari Negatif")
+    elif (bilancoDonemiDolarFaaliyetKari > 0) and (dortOncekiBilancoDonemiDolarFaaliyetKari < 0):
+        bilancoDonemiDolarFaaliyetKariArtisi = 0
+        bilancoDonemiDolarFaaliyetKariArtisiGecmeDurumu = True
+        printText = "Bilanço Dönemi (DOLAR) Faaliyet Karı Artışı: " + str(bilancoDonemiDolarFaaliyetKariArtisiGecmeDurumu) + " Son Çeyrek Dolar Faaliyet Karı Negatiften Pozitife Geçmiş"
+        my_logger.info (printText)
 
-        elif (bilancoDonemiDolarFaaliyetKari > 0) and (dortOncekiBilancoDonemiDolarFaaliyetKari < 0):
-            bilancoDonemiDolarFaaliyetKariArtisi = 0
-            bilancoDonemiDolarFaaliyetKariArtisiGecmeDurumu = True
-            print("Bilanço Dönemi Dolar Faaliyet Kari Artisi:", bilancoDonemiDolarFaaliyetKariArtisiGecmeDurumu, "Son Çeyrek Dolar Faaliyet Karı Negatiften Pozitife Geçmiş")
+    else:
+        bilancoDonemiDolarFaaliyetKariArtisi = bilancoDonemiDolarFaaliyetKari/dortOncekiBilancoDonemiDolarFaaliyetKari -1
+        bilancoDonemiDolarFaaliyetKariArtisiGecmeDurumu = (bilancoDonemiDolarFaaliyetKariArtisi > 0.15)
+        printText = "Bilanço Dönemi (DOLAR) Faaliyet Karı Artışı: " + "{:.2%}".format(bilancoDonemiDolarFaaliyetKariArtisi) + " >? 15% " + str(bilancoDonemiDolarFaaliyetKariArtisiGecmeDurumu)
+        my_logger.info(printText)
 
-        else:
-            bilancoDonemiDolarFaaliyetKariArtisi = bilancoDonemiDolarFaaliyetKari/dortOncekiBilancoDonemiDolarFaaliyetKari -1
-            bilancoDonemiDolarFaaliyetKariArtisiGecmeDurumu = (bilancoDonemiDolarFaaliyetKariArtisi > 0.15)
-            print("Bilanço Dönemi Dolar Faaliyet Kari Artisi:", "{:.2%}".format(bilancoDonemiDolarFaaliyetKariArtisi), ">? 15%",bilancoDonemiDolarFaaliyetKariArtisiGecmeDurumu)
+    # Önceki Dönem Faaliyet Kar Artış Kriteri (DOLAR)
 
-        # Önceki Dönem Faaliyet Kar Artış Kriteri (DOLAR)
-
-        if bilancoDonemiDolarFaaliyetKariArtisi >= 1:
-            birOncekiBilancoDonemiDolarFaaliyetKariArtisi = oncekiCeyrekFaaliyetKariArtisi/birOncekiBilancoDonemiOrtalamaDolarKuru
-            birOncekiBilancoDonemiDolarFaaliyetKarArtisiGecmeDurumu = True
-            print("Önceki Bilanço Dönemi Dolar Faaliyet Kar Artışı: "
-                  "Bilanço Dönemi Dolar Faaliyet Karı Artışı %100'ün Üzerinde, Karşılaştırma Yapılmayacak:",
-                  "{:.2%}".format(bilancoDonemiDolarFaaliyetKariArtisi), birOncekiBilancoDonemiDolarFaaliyetKarArtisiGecmeDurumu)
-
-        else:
-            birOncekiBilancoDonemiDolarFaaliyetKariArtisi = oncekiCeyrekFaaliyetKariArtisi/birOncekiBilancoDonemiOrtalamaDolarKuru
-            birOncekiBilancoDonemiDolarFaaliyetKarArtisiGecmeDurumu = (birOncekiBilancoDonemiDolarFaaliyetKariArtisi < bilancoDonemiDolarFaaliyetKariArtisi)
-            print("Önceki Bilanço Dönemi Dolar Faaliyet Kar Artışı:", "{:.2%}".format(birOncekiBilancoDonemiDolarFaaliyetKariArtisi),
-                  "<?", "{:.2%}".format(bilancoDonemiDolarFaaliyetKariArtisi), birOncekiBilancoDonemiDolarFaaliyetKarArtisiGecmeDurumu)
-
+    if bilancoDonemiDolarFaaliyetKariArtisi >= 1:
+        birOncekiBilancoDonemiDolarFaaliyetKariArtisi = oncekiCeyrekFaaliyetKariArtisi/birOncekiBilancoDonemiOrtalamaDolarKuru
+        birOncekiBilancoDonemiDolarFaaliyetKarArtisiGecmeDurumu = True
+        printText = "Önceki Bilanço Dönemi (DOLAR) Faaliyet Kar Artışı: Bilanço Dönemi Artış " + "{:.2%}".format(bilancoDonemiDolarFaaliyetKariArtisi) + \
+                    " > 100%, Karşılaştırma Yapılmayacak: " + str(birOncekiBilancoDonemiDolarFaaliyetKarArtisiGecmeDurumu)
+        my_logger.info(printText)
 
 
-    print("")
-    print("")
-    print("----------------RAPOR DOSYASI OLUŞTURMA/GÜNCELLEME-------------------------------------")
+    else:
+        birOncekiBilancoDonemiDolarFaaliyetKariArtisi = oncekiCeyrekFaaliyetKariArtisi/birOncekiBilancoDonemiOrtalamaDolarKuru
+        birOncekiBilancoDonemiDolarFaaliyetKarArtisiGecmeDurumu = (birOncekiBilancoDonemiDolarFaaliyetKariArtisi < bilancoDonemiDolarFaaliyetKariArtisi)
+        printText = "Önceki Bilanço Dönemi (DOLAR) Faaliyet Kar Artışı: " + "{:.2%}".format(birOncekiBilancoDonemiDolarFaaliyetKariArtisi) + \
+                    " <? ", "{:.2%}".format(bilancoDonemiDolarFaaliyetKariArtisi) + str(birOncekiBilancoDonemiDolarFaaliyetKarArtisiGecmeDurumu)
+        my_logger.info(printText)
 
-    print (hisseAdi)
+
+    my_logger.debug("")
+    my_logger.debug("")
+    my_logger.debug("----------------RAPOR DOSYASI OLUŞTURMA/GÜNCELLEME-------------------------------------")
+
+    my_logger.debug (hisseAdi)
 
     excelRow = ExcelRowClass()
 
@@ -778,3 +805,8 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati, reportFi
     excelRow.forwardPeKriteri = forwardPeKriteri
 
     exportReportExcel(hisseAdi, reportFile, bilancoDonemi, excelRow)
+
+    my_logger.info("")
+    my_logger.info("")
+    my_logger.info("")
+    my_logger.info ("-------------------------------- %s ------------------------", hisseAdi)
