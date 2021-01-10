@@ -7,14 +7,14 @@ import sys
 from RC1_BilancoOrtalamaDolarDegeri import ucAylikBilancoDonemiOrtalamaDolarDegeriBul
 
 
-def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati, reportFile, logLevel):
+def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati, reportFile, logPath, logLevel):
 
     hisseAdiTemp = bilancoDosyasi[47:]
     hisseAdi = hisseAdiTemp[:-5]
 
     my_logger = logging.getLogger()
     my_logger.setLevel(logLevel)
-    output_file_handler = logging.FileHandler("//Users//myilmaz//Documents//bist//log//" + hisseAdi + ".txt")
+    output_file_handler = logging.FileHandler(logPath + hisseAdi + ".txt")
     output_file_handler.level = logging.INFO
     # output_file_handler.setFormatter(logging.Formatter("%(asctime)s — %(name)s — %(levelname)s — %(message)s"))
     stdout_handler = logging.StreamHandler(sys.stdout)
@@ -88,7 +88,7 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati, reportFi
                     return 0
                 else:
                     return sheet.cell_value(rowi, column)
-        my_logger.info("Uygun bilanco degeri bulunamadi:", label)
+        my_logger.info("Uygun bilanco degeri bulunamadi: %s", label)
         return 0
 
 
@@ -210,7 +210,7 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati, reportFi
     if (bilancoDonemiHasilatGelirArtisi >= 1):
         my_logger.info ("Bilanço Dönemi Satış Gelir Artışı %100 Üzerinde, Karşılaştırma Yapılmayacak.")
         oncekiDonemHasilatGelirArtisiGecmeDurumu = True
-        my_logger.info ("Önceki Dönem Satış Gelir Artışı Geçme Durumu:", oncekiDonemHasilatGelirArtisiGecmeDurumu)
+        my_logger.info ("Önceki Dönem Satış Gelir Artışı Geçme Durumu: %s", oncekiDonemHasilatGelirArtisiGecmeDurumu)
 
     else:
         oncekiDonemHasilatGelirArtisiGecmeDurumu = (oncekiDonemHasilatGelirArtisi<bilancoDonemiHasilatGelirArtisi)
