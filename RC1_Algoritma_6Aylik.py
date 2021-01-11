@@ -250,8 +250,8 @@ def runAlgoritma6Aylik(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati, re
     else:
         oncekiDonemFaaliyetKariArtisi = oncekiYilAyniAltiAyDegisimiHesapla(faaliyetKariRow, birOncekiBilancoDonemi)
         oncekiDonemFaaliyetKarArtisiGecmeDurumu = (oncekiDonemFaaliyetKariArtisi < bilancoDonemiFaaliyetKariArtisi)
-        my_logger.info("Önceki Dönem Faaliyet Kar Artışı:", "{:.2%}".format(oncekiDonemFaaliyetKariArtisi),
-          "<?" , "{:.2%}".format(bilancoDonemiFaaliyetKariArtisi) , oncekiDonemFaaliyetKarArtisiGecmeDurumu)
+        printText = "Önceki Dönem Faaliyet Kar Artışı:" + "{:.2%}".format(oncekiDonemFaaliyetKariArtisi) + " < ? " + "{:.2%}".format(bilancoDonemiFaaliyetKariArtisi) + str(oncekiDonemFaaliyetKarArtisiGecmeDurumu)
+        my_logger.info(printText)
 
 
 
@@ -458,20 +458,20 @@ def runAlgoritma6Aylik(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati, re
     my_logger.info("-------------------EK HESAPLAMA ve TABLOLAR--------------------------")
     my_logger.info("")
 
-    bilancoDonemiBrutKarMarji = bilancoDonemiBrutKar/bilancoDonemiHasilat
+    if (bilancoDonemiHasilat != 0):
+        bilancoDonemiBrutKarMarji = bilancoDonemiBrutKar/bilancoDonemiHasilat
+        bilancoDonemiFaaliyetKarMarji = bilancoDonemiFaaliyetKari / bilancoDonemiHasilat
+        bilancoDonemiNetKarMarji = bilancoDonemiNetKari / bilancoDonemiHasilat
+    else:
+        bilancoDonemiBrutKarMarji = 0
+        bilancoDonemiFaaliyetKarMarji = 0
+        bilancoDonemiNetKarMarji = 0
+
     my_logger.info("Bilanço Dönemi Brüt Kar Marjı: %s", "{:.2%}".format(bilancoDonemiBrutKarMarji))
-
-    bilancoDonemiFaaliyetKarMarji = bilancoDonemiFaaliyetKari/bilancoDonemiHasilat
     my_logger.info("Bilanço Dönemi Faaliyet Kar Marjı: %s", "{:.2%}".format(bilancoDonemiFaaliyetKarMarji))
-
-    bilancoDonemiNetKarMarji = bilancoDonemiNetKari/bilancoDonemiHasilat
     my_logger.info("Bilanço Dönemi Net Kar Marjı: %s", "{:.2%}".format(bilancoDonemiNetKarMarji))
-
     bilancoDonemiOzsermayeKarliligi = bilancoDonemiNetKari/getBilancoDegeri("TOPLAM ÖZKAYNAKLAR", bilancoDonemiColumn)
     my_logger.info("Bilanço Dönemi Özsermaye Karlılığı: %s", "{:.2%}".format(bilancoDonemiOzsermayeKarliligi))
-
-
-
 
 
     my_logger.info("")
@@ -583,6 +583,7 @@ def runAlgoritma6Aylik(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati, re
 
     # Bilanço Dönem Faaliyet Kar Artış Kriteri (DOLAR)
     if altiAyDegeriHesapla(netKarRow, bilancoDonemiColumn) < 0:
+        bilancoDonemiDolarFaaliyetKariArtisi = bilancoDonemiDolarFaaliyetKari / ikiOncekiBilancoDonemiDolarFaaliyetKari - 1
         bilancoDonemiDolarFaaliyetKariArtisiGecmeDurumu = False
         printText = "Bilanço Dönemi (DOLAR) Faaliyet Karı Artışı: " + str(bilancoDonemiDolarFaaliyetKariArtisiGecmeDurumu) + " Son Dönem Net Kar Negatif"
         my_logger.info (printText)
@@ -684,3 +685,8 @@ def runAlgoritma6Aylik(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati, re
     my_logger.info("")
     my_logger.info("")
     my_logger.info ("-------------------------------- %s ------------------------", hisseAdi)
+
+    my_logger.removeHandler(output_file_handler)
+    my_logger.removeHandler(stdout_handler)
+
+
