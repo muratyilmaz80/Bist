@@ -639,18 +639,16 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati, reportFi
     my_logger.info (dolarSatisTablosu)
 
     # Bilanço Dönemi (DOLAR) Satış Geliri Artış Kriteri
-    bilancoDonemiDolarHasilatGelirArtisi = bilancoDonemiDolarHasilat/oncekiYilAyniCeyrekDolarHasilat-1
-    bilancoDonemiDolarHasilatGelirArtisiGecmeDurumu = (bilancoDonemiDolarHasilatGelirArtisi > 0.1)
+    bilancoDonemiDolarHasilatGelirArtisiGecmeDurumu = (bilancoDonemiDolarHasilatDegisimi > 0.1)
 
-    printText = "Bilanço Dönemi (DOLAR) Satış Geliri Artışı 10%'dan Büyük Mü: " + "{:.2%}".format(bilancoDonemiDolarHasilatGelirArtisi) + " >? 10%" + " " + str(bilancoDonemiDolarHasilatGelirArtisiGecmeDurumu)
+    printText = "Bilanço Dönemi (DOLAR) Satış Geliri Artışı 10%'dan Büyük Mü: " + "{:.2%}".format(bilancoDonemiDolarHasilatDegisimi) + " >? 10%" + " " + str(bilancoDonemiDolarHasilatGelirArtisiGecmeDurumu)
     my_logger.info(printText)
 
 
 
     # Önceki Dönem (DOLAR) Hasılat Geliri Artış Kriteri
-    oncekiDonemDolarHasilatGelirArtisi = birOncekiBilancoDonemiDolarHasilat/besOncekiBilancoDonemiDolarHasilat-1
     #
-    if (bilancoDonemiDolarHasilatGelirArtisi >= 1):
+    if (bilancoDonemiDolarHasilatDegisimi >= 1):
         printText = "Bilanço Dönemi (DOLAR) Satış Gelir Artışı %100 Üzerinde, Karşılaştırma Yapılmayacak."
         my_logger.info (printText)
         oncekiBilancoDonemiDolarHasilatGelirArtisiGecmeDurumu = True
@@ -658,9 +656,9 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati, reportFi
         my_logger.info (printText)
 
     else:
-        oncekiBilancoDonemiDolarHasilatGelirArtisiGecmeDurumu = (oncekiDonemDolarHasilatGelirArtisi<bilancoDonemiDolarHasilatGelirArtisi)
-        printText = "Önceki Dönem (DOLAR) Satış Gelir Artışı Bilanço Döneminden Düşük Mü: " + "{:.2%}".format(oncekiDonemDolarHasilatGelirArtisi) + \
-                    " <? " + "{:.2%}".format(bilancoDonemiDolarHasilatGelirArtisi) + " " + str(oncekiBilancoDonemiDolarHasilatGelirArtisiGecmeDurumu)
+        oncekiBilancoDonemiDolarHasilatGelirArtisiGecmeDurumu = (birOncekiBilancoDonemiDolarHasilatDegisimi<bilancoDonemiDolarHasilatDegisimi)
+        printText = "Önceki Dönem (DOLAR) Satış Gelir Artışı Bilanço Döneminden Düşük Mü: " + "{:.2%}".format(birOncekiBilancoDonemiDolarHasilatDegisimi) + \
+                    " <? " + "{:.2%}".format(bilancoDonemiDolarHasilatDegisimi) + " " + str(oncekiBilancoDonemiDolarHasilatGelirArtisiGecmeDurumu)
         my_logger.info(printText)
 
 
@@ -712,13 +710,11 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati, reportFi
 
     # Bilanço Dönem Faaliyet Kar Artış Kriteri (DOLAR)
     if ceyrekDegeriHesapla(netKarRow, bilancoDonemiColumn) < 0:
-        bilancoDonemiDolarFaaliyetKariArtisi = bilancoDonemiDolarFaaliyetKari/dortOncekiBilancoDonemiDolarFaaliyetKari -1
         bilancoDonemiDolarFaaliyetKariArtisiGecmeDurumu = False
         printText = "Bilanço Dönemi (DOLAR) Faaliyet Karı Artışı: " + str(bilancoDonemiDolarFaaliyetKariArtisiGecmeDurumu) + " Son Çeyrek Net Kar Negatif"
         my_logger.info (printText)
 
     elif (bilancoDonemiDolarFaaliyetKari < 0):
-        bilancoDonemiDolarFaaliyetKariArtisi = bilancoDonemiDolarFaaliyetKari/dortOncekiBilancoDonemiDolarFaaliyetKari -1
         bilancoDonemiDolarFaaliyetKariArtisiGecmeDurumu = False
         printText = "Bilanço Dönemi (DOLAR) Faaliyet Karı Artışı: " + str(bilancoDonemiDolarFaaliyetKariArtisiGecmeDurumu) + " Son Ceyrek Dolar Faaliyet Kari Negatif"
         my_logger.info (printText)
@@ -730,26 +726,23 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati, reportFi
         my_logger.info (printText)
 
     else:
-        bilancoDonemiDolarFaaliyetKariArtisi = bilancoDonemiDolarFaaliyetKari/dortOncekiBilancoDonemiDolarFaaliyetKari -1
-        bilancoDonemiDolarFaaliyetKariArtisiGecmeDurumu = (bilancoDonemiDolarFaaliyetKariArtisi > 0.15)
-        printText = "Bilanço Dönemi (DOLAR) Faaliyet Karı Artışı: " + "{:.2%}".format(bilancoDonemiDolarFaaliyetKariArtisi) + " >? 15% " + str(bilancoDonemiDolarFaaliyetKariArtisiGecmeDurumu)
+        bilancoDonemiDolarFaaliyetKariArtisiGecmeDurumu = (bilancoDonemiDolarFaaliyetKariDegisimi > 0.15)
+        printText = "Bilanço Dönemi (DOLAR) Faaliyet Karı Artışı: " + "{:.2%}".format(bilancoDonemiDolarFaaliyetKariDegisimi) + " >? 15% " + str(bilancoDonemiDolarFaaliyetKariArtisiGecmeDurumu)
         my_logger.info(printText)
 
     # Önceki Dönem Faaliyet Kar Artış Kriteri (DOLAR)
 
-    if bilancoDonemiDolarFaaliyetKariArtisi >= 1:
-        birOncekiBilancoDonemiDolarFaaliyetKariArtisi = oncekiCeyrekFaaliyetKariArtisi/birOncekiBilancoDonemiOrtalamaDolarKuru
+    if bilancoDonemiDolarFaaliyetKariDegisimi >= 1:
         birOncekiBilancoDonemiDolarFaaliyetKarArtisiGecmeDurumu = True
-        printText = "Önceki Bilanço Dönemi (DOLAR) Faaliyet Kar Artışı: Bilanço Dönemi Artış " + "{:.2%}".format(bilancoDonemiDolarFaaliyetKariArtisi) + \
+        printText = "Önceki Bilanço Dönemi (DOLAR) Faaliyet Kar Artışı: Bilanço Dönemi Artış " + "{:.2%}".format(bilancoDonemiDolarFaaliyetKariDegisimi) + \
                     " > 100%, Karşılaştırma Yapılmayacak: " + str(birOncekiBilancoDonemiDolarFaaliyetKarArtisiGecmeDurumu)
         my_logger.info(printText)
 
 
     else:
-        birOncekiBilancoDonemiDolarFaaliyetKariArtisi = oncekiCeyrekFaaliyetKariArtisi/birOncekiBilancoDonemiOrtalamaDolarKuru
-        birOncekiBilancoDonemiDolarFaaliyetKarArtisiGecmeDurumu = (birOncekiBilancoDonemiDolarFaaliyetKariArtisi < bilancoDonemiDolarFaaliyetKariArtisi)
-        printText = "Önceki Bilanço Dönemi (DOLAR) Faaliyet Kar Artışı: " + "{:.2%}".format(birOncekiBilancoDonemiDolarFaaliyetKariArtisi) + \
-                    " <? ", "{:.2%}".format(bilancoDonemiDolarFaaliyetKariArtisi) + str(birOncekiBilancoDonemiDolarFaaliyetKarArtisiGecmeDurumu)
+        birOncekiBilancoDonemiDolarFaaliyetKarArtisiGecmeDurumu = (birOncekiBilancoDonemiDolarFaaliyetKariDegisimi < bilancoDonemiDolarFaaliyetKariDegisimi)
+        printText = "Önceki Bilanço Dönemi (DOLAR) Faaliyet Kar Artışı: " + "{:.2%}".format(birOncekiBilancoDonemiDolarFaaliyetKariDegisimi) + \
+                    " <? " + "{:.2%}".format(bilancoDonemiDolarFaaliyetKariDegisimi) + " " + str(birOncekiBilancoDonemiDolarFaaliyetKarArtisiGecmeDurumu)
         my_logger.info(printText)
 
 

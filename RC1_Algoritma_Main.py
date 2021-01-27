@@ -6,16 +6,16 @@ from RC1_GetBondYield import returnBondYield
 from RC1_GetGuncelHisseDegeri import returnGuncelHisseDegeri
 
 
-varHisseAdi = "MEGAP"
+varHisseAdi = "ARCLK"
 
 varBilancoDosyasi = "//Users//myilmaz//Documents//bist//bilancolar//" + varHisseAdi + ".xlsx"
 
-varBilancoDonemi = 202006
+varBilancoDonemi = 202012
 varBondYield = returnBondYield()
 varHisseFiyati = returnGuncelHisseDegeri(varHisseAdi)
-varReportFile = "//Users//myilmaz//Documents//bist//RC1_Report_Yeni_Deneme_3Ay.xls"
+varReportFile = "//Users//myilmaz//Documents//bist//RC1_Report_202012_3Aylik.xls"
 varLogLevel = logging.DEBUG
-varLogPath = "//Users//myilmaz//Documents//bist//log//"
+varLogPath = "//Users//myilmaz//Documents//bist//log//2020_12//"
 
 
 
@@ -34,7 +34,7 @@ def runAlgoritmaMultiple(string):
 
 
 
-# runAlgoritma(varBilancoDosyasi, varBilancoDonemi, varBondYield, varHisseFiyati, varReportFile, varLogPath, varLogLevel)
+runAlgoritma(varBilancoDosyasi, varBilancoDonemi, varBondYield, varHisseFiyati, varReportFile, varLogPath, varLogLevel)
 
 # runAlgoritma6Aylik(varBilancoDosyasi, varBilancoDonemi, varBondYield, varHisseFiyati, varReportFile, varLogPath, varLogLevel)
 
