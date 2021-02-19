@@ -51,9 +51,10 @@ def exportReportExcel(hisse,file,bilancoDonemi,ExcelRowClass):
         bookSheetWrite.write(0, 41, "Gerçek Hisse Değeri")
         bookSheetWrite.write(0, 42, "Target Buy")
         bookSheetWrite.write(0, 43, "Gerçek Fiyata Uzaklık")
-        bookSheetWrite.write(0, 44, "NetPro")
-        bookSheetWrite.write(0, 45, "ForwardPE")
-
+        bookSheetWrite.write(0, 44, "F/K Oranı")
+        bookSheetWrite.write(0, 45, "HBK Oranı")
+        bookSheetWrite.write(0, 46, "NetPro")
+        bookSheetWrite.write(0, 47, "ForwardPE")
 
     def reportResults(rowNumber):
 
@@ -101,8 +102,10 @@ def exportReportExcel(hisse,file,bilancoDonemi,ExcelRowClass):
         bookSheetWrite.write(rowNumber, 41, ExcelRowClass.gercekHisseDegeri)
         bookSheetWrite.write(rowNumber, 42, ExcelRowClass.targetBuy)
         bookSheetWrite.write(rowNumber, 43, ExcelRowClass.gercekFiyataUzaklik)
-        bookSheetWrite.write(rowNumber, 44, ExcelRowClass.netProKriteri)
-        bookSheetWrite.write(rowNumber, 45, ExcelRowClass.forwardPeKriteri)
+        bookSheetWrite.write(rowNumber, 44, ExcelRowClass.fkOrani)
+        bookSheetWrite.write(rowNumber, 45, ExcelRowClass.hbkOrani)
+        bookSheetWrite.write(rowNumber, 46, ExcelRowClass.netProKriteri)
+        bookSheetWrite.write(rowNumber, 47, ExcelRowClass.forwardPeKriteri)
 
     if os.path.isfile(file):
         print("Rapor dosyası var, güncellenecek:", file)

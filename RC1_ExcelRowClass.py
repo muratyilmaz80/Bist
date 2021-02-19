@@ -45,5 +45,9 @@ class ExcelRowClass:
     gercekHisseDegeri = None
     targetBuy = None
     gercekFiyataUzaklik = None
+
+    fkOrani = None
+    hbkOrani = None
+
     netProKriteri = None
     forwardPeKriteri = None

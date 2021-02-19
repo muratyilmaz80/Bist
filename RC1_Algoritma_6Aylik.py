@@ -676,6 +676,8 @@ def runAlgoritma6Aylik(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati, re
     excelRow.gercekHisseDegeri = gercekDeger
     excelRow.targetBuy = targetBuy
     excelRow.gercekFiyataUzaklik = gercekFiyataUzaklik
+    excelRow.fkOrani = fkOrani
+    excelRow.hbkOrani = hbkOrani
     excelRow.netProKriteri = netProKriteri
     excelRow.forwardPeKriteri = forwardPeKriteri
 
@@ -688,5 +690,3 @@ def runAlgoritma6Aylik(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati, re
 
     my_logger.removeHandler(output_file_handler)
     my_logger.removeHandler(stdout_handler)
-
-

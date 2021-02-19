@@ -799,6 +799,9 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati, reportFi
     excelRow.gercekHisseDegeri = gercekDeger
     excelRow.targetBuy = targetBuy
     excelRow.gercekFiyataUzaklik = gercekFiyataUzaklik
+    excelRow.fkOrani = fkOrani
+    excelRow.hbkOrani = hbkOrani
+
     excelRow.netProKriteri = netProKriteri
     excelRow.forwardPeKriteri = forwardPeKriteri
 
