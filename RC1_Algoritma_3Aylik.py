@@ -429,10 +429,11 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati, reportFi
 
     onumuzdekiDortCeyrekHasilatTahmini = (
                 (((sonCeyrekSatisArtisYuzdesi + birOncekiCeyrekSatisArtisYuzdesi) / 2) + 1) * sonDortCeyrekHasilatToplami)
-    my_logger.info("Önümüzdeki 4 Çeyrek Hasılat Tahmini: %s TL", "{:,.0f}".format(onumuzdekiDortCeyrekHasilatTahmini).replace(",","."))
 
     # HASILAT TAHMININI MANUEL DEGISTIRMEK ICIN
-    #onumuzdekiDortCeyrekHasilatTahmini = 5000000000
+    # onumuzdekiDortCeyrekHasilatTahmini = 4000000000
+
+    my_logger.info("Önümüzdeki 4 Çeyrek Hasılat Tahmini: %s TL", "{:,.0f}".format(onumuzdekiDortCeyrekHasilatTahmini).replace(",","."))
 
     ucOncekibilancoDonemiFaaliyetKari = ceyrekDegeriHesapla(faaliyetKariRow, ucOncekibilancoDonemiColumn)
     ikiOncekiBilancoDonemiFaaliyetKari = ceyrekDegeriHesapla(faaliyetKariRow, ikiOncekibilancoDonemiColumn)
@@ -568,7 +569,7 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati, reportFi
     my_logger.info("")
     bilancoDonemiOrtalamaDolarKuru = ucAylikBilancoDonemiOrtalamaDolarDegeriBul(bilancoDonemi)
 
-    my_logger.debug ("%s Bilanço Dönemi Ortalama Dolar Kuru: %s TL" , bilancoDonemi , "{:,.2f}".format(bilancoDonemiOrtalamaDolarKuru))
+    my_logger.info ("%s Bilanço Dönemi Ortalama Dolar Kuru: %s TL" , bilancoDonemi , "{:,.2f}".format(bilancoDonemiOrtalamaDolarKuru))
 
     birOncekiBilancoDonemiOrtalamaDolarKuru = ucAylikBilancoDonemiOrtalamaDolarDegeriBul(birOncekiBilancoDonemi)
     my_logger.debug ("%s Bilanço Dönemi Ortalama Dolar Kuru: %s TL" , birOncekiBilancoDonemi , "{:,.2f}".format(birOncekiBilancoDonemiOrtalamaDolarKuru))
