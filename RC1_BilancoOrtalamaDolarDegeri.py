@@ -119,7 +119,7 @@ def ucAylikBilancoDonemiOrtalamaDolarDegeriBul(bilancoDonemi):
 
         if (ortalamaDolarDegeri == 0):
             print ("Bilanço dönemi için dolar bilgisi hesaplanacak.")
-            ortalamaDolarDegeri = ucAylikBilancoDonemiOrtalamaDolarDegeriHesapla(bilancoDonemi,"online")
+            ortalamaDolarDegeri = ucAylikBilancoDonemiOrtalamaDolarDegeriHesapla(bilancoDonemi,"veritabani")
             bookWrite = copy(bookRead)
             bookSheetWrite = bookWrite.get_sheet("OrtDolarDegeri")
             bookSheetWrite.write(rowNumber, 0, bilancoDonemi)
@@ -154,10 +154,9 @@ def altiAylikBilancoDonemiOrtalamaDolarDegeriBul(bilancoDonemi):
     return (temp1+temp2)/2
 
 
-#print ("Bilanço Dönemi ortalama dolar kuru:", "{:,.3f}".format(ucAylikBilancoDonemiOrtalamaDolarDegeriBul(202009)))
+print ("Bilanço Dönemi ortalama dolar kuru:", "{:,.3f}".format(ucAylikBilancoDonemiOrtalamaDolarDegeriBul(202209)))
 
 # print ("Bilanço Dönemi ortalama dolar kuru:", "{:,.3f}".format(altiAylikBilancoDonemiOrtalamaDolarDegeriBul(202012)))
 
 # print (tarihtekiDolarDegeriniBulVeriTabani("25.10.2010"))
-
 

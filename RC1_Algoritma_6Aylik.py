@@ -121,7 +121,7 @@ def runAlgoritma6Aylik(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati, re
         nakit = getBilancoDegeri("Nakit ve Nakit Benzerleri", bilancoDonemiColumn)
         alacaklar = getBilancoDegeri("Ticari Alacaklar", bilancoDonemiColumn) + getBilancoDegeri("Diğer Alacaklar",
                                                                                                  bilancoDonemiColumn) + getBilancoDegeri(
-            "Ticari Alacaklar1", bilancoDonemiColumn)
+            "Ticari Alacaklar1", bilancoDonemiColumn) + getBilancoDegeri("Diğer Alacaklar1",bilancoDonemiColumn)
         stoklar = getBilancoDegeri("Stoklar", bilancoDonemiColumn)
         digerVarliklar = getBilancoDegeri("Diğer Dönen Varlıklar", bilancoDonemiColumn)
         finansalVarliklar = getBilancoDegeri("Finansal Yatırımlar", bilancoDonemiColumn) + getBilancoDegeri(

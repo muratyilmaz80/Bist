@@ -6,17 +6,17 @@ from RC1_GetBondYield import returnBondYield
 from RC1_GetGuncelHisseDegeri import returnGuncelHisseDegeri
 
 
-varHisseAdi = "CEMTS"
+varHisseAdi ="BRSAN"
 
 varBilancoDosyasi = "//Users//myilmaz//Documents//bist//bilancolar//" + varHisseAdi + ".xlsx"
 
-varBilancoDonemi = 202106
+varBilancoDonemi = 202209
 varBondYield = returnBondYield()
 varHisseFiyati = returnGuncelHisseDegeri(varHisseAdi)
-varReportFile = "//Users//myilmaz//Documents//bist//Report_202106_3Aylik.xls"
-varReportFile6Aylik = "//Users//myilmaz//Documents//bist//Report_202106_6Aylik.xls"
+varReportFile = "//Users//myilmaz//Documents//bist//Report_202209_3Aylik.xls"
+varReportFile6Aylik = "//Users//myilmaz//Documents//bist//Report_202206_6Aylik.xls"
 varLogLevel = logging.DEBUG
-varLogPath = "//Users//myilmaz//Documents//bist//log//2021_06//"
+varLogPath = "//Users//myilmaz//Documents//bist//log//2022_09//"
 
 
 
@@ -38,7 +38,6 @@ def runAlgoritmaMultiple(string):
 runAlgoritma(varBilancoDosyasi, varBilancoDonemi, varBondYield, varHisseFiyati, varReportFile, varLogPath, varLogLevel)
 
 # runAlgoritma6Aylik(varBilancoDosyasi, varBilancoDonemi, varBondYield, varHisseFiyati, varReportFile6Aylik, varLogPath, varLogLevel)
-
 
 # runAlgoritmaMultiple("DOAS-EMNIS-ARCLK-KRDMD-VESBE-GOODY-PETKM-EREGL-TIRE-TTRAK-ISDMR-BUCIM-ENKAI-BRKSN")
 

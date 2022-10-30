@@ -1,7 +1,7 @@
 import xlrd
 
 varHisseAdi = "BFREN"
-varBilancoDosyasi = ("D:\\bist\\KAP\\Finansal_Rapor_Ilan_Tarihleri\\202003aylıkfinansalraportarihleri.xlsx")
+varBilancoDosyasi = ("//Users//myilmaz//Documents//bist//KAP//Finansal_Rapor_Ilan_Tarihleri//202003aylıkfinansalraportarihleri.xlsx")
 
 
 wb = xlrd.open_workbook(varBilancoDosyasi)

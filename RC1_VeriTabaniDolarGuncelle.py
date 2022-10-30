@@ -14,6 +14,7 @@ dovizKurlari = DovizKurlari()
 def buguneKadarDolarVerisiGuncelle():
     today = datetime.today()
     todayStr = today.date().strftime("%d.%m.%Y")
+    # todayStr = "26.01.2022"
     delta = timedelta(days=1)
     print ("Bugünün tarihi: ", todayStr)
     sheetName = "DolarKuru"
@@ -44,7 +45,7 @@ def buguneKadarDolarVerisiGuncelle():
 
         start_date = datetime.strptime(sonTarihStr, "%d.%m.%Y").date()
         end_date = datetime.strptime(todayStr, "%d.%m.%Y").date() + delta
-        # end_date = datetime.strptime("31.12.2000", "%d.%m.%Y").date() + delta
+        # end_date = datetime.strptime("21.04.2022", "%d.%m.%Y").date() + delta
 
         date_format = xlwt.XFStyle()
         date_format.num_format_str = "dd/mm/yyyy"

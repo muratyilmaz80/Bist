@@ -140,7 +140,7 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati, reportFi
         nakit = getBilancoDegeri("Nakit ve Nakit Benzerleri", bilancoDonemiColumn)
         alacaklar = getBilancoDegeri("Ticari Alacaklar", bilancoDonemiColumn) + getBilancoDegeri("Diğer Alacaklar",
                                                                                                  bilancoDonemiColumn) + getBilancoDegeri(
-            "Ticari Alacaklar1", bilancoDonemiColumn)
+            "Ticari Alacaklar1", bilancoDonemiColumn) + getBilancoDegeri("Diğer Alacaklar1", bilancoDonemiColumn)
         stoklar = getBilancoDegeri("Stoklar", bilancoDonemiColumn)
         digerVarliklar = getBilancoDegeri("Diğer Dönen Varlıklar", bilancoDonemiColumn)
         finansalVarliklar = getBilancoDegeri("Finansal Yatırımlar", bilancoDonemiColumn) + getBilancoDegeri(
@@ -150,6 +150,15 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati, reportFi
 
         likidasyonDegeri = nakit + (alacaklar * 0.7) + (stoklar * 0.5) + (digerVarliklar * 0.7) + (
                     finansalVarliklar * 0.7) + (maddiDuranVarliklar * 0.2)
+
+        # print ("---------MURAT-------------")
+        # print ("Nakit: " , nakit)
+        # print("Alacaklar: " , alacaklar)
+        # print("Stoklar: " , stoklar)
+        # print("Diger Varliklar: " , digerVarliklar)
+        # print("Finansal Varliklar: " , finansalVarliklar)
+        # print("MaddiDuranVarliklar: " , maddiDuranVarliklar)
+        # print("---------MURAT-------------")
 
         return likidasyonDegeri
 
@@ -431,7 +440,7 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati, reportFi
                 (((sonCeyrekSatisArtisYuzdesi + birOncekiCeyrekSatisArtisYuzdesi) / 2) + 1) * sonDortCeyrekHasilatToplami)
 
     # HASILAT TAHMININI MANUEL DEGISTIRMEK ICIN
-    # onumuzdekiDortCeyrekHasilatTahmini = 4000000000
+    # onumuzdekiDortCeyrekHasilatTahmini = 35000000000
 
     my_logger.info("Önümüzdeki 4 Çeyrek Hasılat Tahmini: %s TL", "{:,.0f}".format(onumuzdekiDortCeyrekHasilatTahmini).replace(",","."))
 

@@ -53,6 +53,7 @@ def fnc(pg):
             i = 0
             hitTa = 0
             hitFy = 0
+            hitDa = 0
             lst = set()
 
             for EachPart in soup.find_all('tr', {"class": trTagClass}):
@@ -69,6 +70,11 @@ def fnc(pg):
                         hitFy = hitFy + 1
                         if hitFy == 2:
                             label = "Finansal Yatırımlar1"
+
+                    if label == "Diğer Alacaklar":
+                        hitDa = hitDa + 1
+                        if hitDa == 2:
+                            label = "Diğer Alacaklar1"
 
                     df.rename(index={i: label}, inplace=True)
 
@@ -118,4 +124,4 @@ def fncMultiple(s):
 
 #fnc("https://www.kap.org.tr/tr/Bildirim/846388")
 
-fncMultiple("954792")
+fncMultiple("908692-943471-956538-980158")
