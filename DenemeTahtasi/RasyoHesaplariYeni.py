@@ -45,6 +45,19 @@ def hesapla(varHisseAdi, varBilancoDonemi):
                     return sheet.cell_value(rowi, column)
         return 0
 
+    def getBilancoDegeriYeni(label, col):
+        column = donemColumnFind(bilancoDonemi)+col
+        print ("Bulunan Column: ", column)
+
+        for rowi in range(sheet.nrows):
+            cell = sheet.cell(rowi, 0)
+            if cell.value == label:
+                if sheet.cell_value(rowi, column)=="":
+                    # print (label + " :Bilanço alanı boş!")
+                    return 0
+                else:
+                    return sheet.cell_value(rowi, column)
+        return 0
 
     def getBilancoTitleRow(title):
         for rowi in range(sheet.nrows):
@@ -290,6 +303,10 @@ def hesapla(varHisseAdi, varBilancoDonemi):
     # Borç Kaynak Oranı Hesabı
     borcKaynakOrani = getBilancoDegeri("TOPLAM YÜKÜMLÜLÜKLER", bilancoDonemiColumn) / getBilancoDegeri("TOPLAM KAYNAKLAR", bilancoDonemiColumn)
     print("Borç/Kaynak Oranı: ", "{:.2%}".format(borcKaynakOrani))
+
+    deneme = getBilancoDegeriYeni("TOPLAM YÜKÜMLÜLÜKLER", -1)
+    print ("Toplam Yükümlülükler: ", deneme)
+
 
 
 hesapla(hisseAdi, bilancoDonemi)

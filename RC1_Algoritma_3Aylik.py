@@ -440,7 +440,7 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati, reportFi
                 (((sonCeyrekSatisArtisYuzdesi + birOncekiCeyrekSatisArtisYuzdesi) / 2) + 1) * sonDortCeyrekHasilatToplami)
 
     # HASILAT TAHMININI MANUEL DEGISTIRMEK ICIN
-    # onumuzdekiDortCeyrekHasilatTahmini = 35000000000
+    # onumuzdekiDortCeyrekHasilatTahmini = 900000000
 
     my_logger.info("Önümüzdeki 4 Çeyrek Hasılat Tahmini: %s TL", "{:,.0f}".format(onumuzdekiDortCeyrekHasilatTahmini).replace(",","."))
 

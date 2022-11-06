@@ -6,7 +6,7 @@ from RC1_GetBondYield import returnBondYield
 from RC1_GetGuncelHisseDegeri import returnGuncelHisseDegeri
 
 
-varHisseAdi ="BRSAN"
+varHisseAdi ="BNTAS"
 
 varBilancoDosyasi = "//Users//myilmaz//Documents//bist//bilancolar//" + varHisseAdi + ".xlsx"
 
