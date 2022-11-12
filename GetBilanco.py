@@ -124,4 +124,4 @@ def fncMultiple(s):
 
 #fnc("https://www.kap.org.tr/tr/Bildirim/846388")
 
-fncMultiple("1077047")
+fncMultiple("1079265-1079280-1079283")

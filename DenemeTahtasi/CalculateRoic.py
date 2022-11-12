@@ -48,9 +48,8 @@ def hesapla(varHisseAdi, varBilancoDonemi):
     pazarlamaGiderleri = getBilancoDegeri("Pazarlama Giderleri", bilancoDonemiColumn);
     amortismanlar = getBilancoDegeri("Amortisman ve İtfa Gideri İle İlgili Düzeltmeler", bilancoDonemiColumn);
 
-    netFaaliyetKari = 
 
-    print ("FAVÖK: ", favok)
+    print ("FAVÖK: ")
 
 
 hesapla(hisseAdi, bilancoDonemi)

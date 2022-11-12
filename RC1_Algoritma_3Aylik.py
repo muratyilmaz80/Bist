@@ -440,7 +440,7 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati, reportFi
                 (((sonCeyrekSatisArtisYuzdesi + birOncekiCeyrekSatisArtisYuzdesi) / 2) + 1) * sonDortCeyrekHasilatToplami)
 
     # HASILAT TAHMININI MANUEL DEGISTIRMEK ICIN
-    # onumuzdekiDortCeyrekHasilatTahmini = 900000000
+    # onumuzdekiDortCeyrekHasilatTahmini = 6600000000
 
     my_logger.info("Önümüzdeki 4 Çeyrek Hasılat Tahmini: %s TL", "{:,.0f}".format(onumuzdekiDortCeyrekHasilatTahmini).replace(",","."))
 
@@ -451,7 +451,7 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati, reportFi
 
     onumuzdekiDortCeyrekFaaliyetKarMarjiTahmini = (birOncekiBilancoDonemiFaaliyetKari + bilancoDonemiFaaliyetKari) / (
                 bilancoDonemiHasilat + birOncekiBilancoDonemiHasilat)
-    my_logger.info("Önümüzdeki 4 Çeyrek Faaliyet Kar Marjı Tahmini: %s TL", "{:.2%}".format(onumuzdekiDortCeyrekFaaliyetKarMarjiTahmini))
+    my_logger.info("Önümüzdeki 4 Çeyrek Faaliyet Kar Marjı Tahmini: %s ", "{:.2%}".format(onumuzdekiDortCeyrekFaaliyetKarMarjiTahmini))
 
     faaliyetKariTahmini1 = onumuzdekiDortCeyrekHasilatTahmini * onumuzdekiDortCeyrekFaaliyetKarMarjiTahmini
     my_logger.info("Faaliyet Kar Tahmini1: %s TL", "{:,.0f}".format(faaliyetKariTahmini1).replace(",","."))
@@ -465,7 +465,18 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati, reportFi
     ortalamaFaaliyetKariTahmini = (faaliyetKariTahmini1 + faaliyetKariTahmini2) / 2
     my_logger.info("Ortalama Faaliyet Kari Tahmini: %s TL", "{:,.0f}".format(ortalamaFaaliyetKariTahmini).replace(",","."))
 
-    hisseBasinaOrtalamaKarTahmini = (ortalamaFaaliyetKariTahmini * anaOrtaklikPayi) / sermaye
+    # print ("----MURAT-----")
+    #
+    # istiraklerdenGelenKarRow = getBilancoTitleRow("Özkaynak Yöntemiyle Değerlenen Yatırımların Karlarından (Zararlarından) Paylar")
+    # istiraklerdenGelenNetKarSonCeyrek = ceyrekDegeriHesapla(istiraklerdenGelenKarRow,bilancoDonemiColumn)
+    # print ("İştiraklerden Gelen Net Kar Son Çeyrek: ", "{:,.0f}".format(istiraklerdenGelenNetKarSonCeyrek).replace(",","."))
+    #
+    # istiraklerdenGelenNetKarYillik = ceyrekDegeriHesapla(istiraklerdenGelenKarRow,bilancoDonemiColumn) + ceyrekDegeriHesapla(istiraklerdenGelenKarRow,birOncekibilancoDonemiColumn) + ceyrekDegeriHesapla(istiraklerdenGelenKarRow,ikiOncekibilancoDonemiColumn) + ceyrekDegeriHesapla(istiraklerdenGelenKarRow,ucOncekibilancoDonemiColumn)
+    # print ("İştiraklerden Gelen Net Kar Yıllık: ", "{:,.0f}".format(istiraklerdenGelenNetKarYillik).replace(",","."))
+    #
+    # print("----MURAT-----")
+
+    hisseBasinaOrtalamaKarTahmini = ((ortalamaFaaliyetKariTahmini) * anaOrtaklikPayi) / sermaye
     my_logger.info("Hisse Başına Ortalama Kar Tahmini: %s TL", format(hisseBasinaOrtalamaKarTahmini, ".2f"))
 
     likidasyonDegeri = likidasyonDegeriHesapla(bilancoDonemi)
