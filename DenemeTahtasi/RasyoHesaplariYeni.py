@@ -3,7 +3,7 @@ from RC1_GetGuncelHisseDegeri import returnGuncelHisseDegeri
 import os
 import sys
 
-hisseAdi = "IEYHO"
+hisseAdi = "USAK    "
 bilancoDonemi = 202209
 directory = "//Users//myilmaz//Documents//bist//bilancolar"
 
