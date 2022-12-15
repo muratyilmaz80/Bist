@@ -6,15 +6,15 @@ import os
 import sys
 
 
-hisseAdi = "ALARK"
+hisseAdi = "SAHOL"
 bilancoDonemi = 202209
-directory = "//Users//myilmaz//Documents//bist//bilancolar"
+directory = "//Users//myilmaz//Documents//bist//bilancolar_yeni//bilancolar"
 
 def hesapla(varHisseAdi, varBilancoDonemi):
 
     print ("Hisse Adı: ", varHisseAdi)
 
-    bilancoDosyasi = "//Users//myilmaz//Documents//bist//bilancolar//" + varHisseAdi + ".xlsx"
+    bilancoDosyasi = "//Users//myilmaz//Documents//bist//bilancolar_yeni//bilancolar//" + varHisseAdi + ".xlsx"
     wb = xlrd.open_workbook(bilancoDosyasi)
     sheet = wb.sheet_by_index(0)
 
@@ -107,19 +107,6 @@ def hesapla(varHisseAdi, varBilancoDonemi):
     argeGiderleriRow = getBilancoTitleRow("Araştırma ve Geliştirme Giderleri")
     amortismanlarRow = getBilancoTitleRow("Amortisman ve İtfa Gideri İle İlgili Düzeltmeler")
 
-    # hasilat = ceyrekDegeriHesapla (hasilatRow, 0)
-    # print("Hasılat: ", "{:,.0f}".format(hasilat).replace(",", "."))
-    # brutKar = ceyrekDegeriHesapla (brutKarRow, 0)
-    # print("Brüt Kar: ", "{:,.0f}".format(brutKar).replace(",", "."))
-    # efk = ceyrekDegeriHesapla (efkRow, 0)
-    # print("Esas Faaliyet Karı: ", "{:,.0f}".format(efk).replace(",", "."))
-    # donemKari = ceyrekDegeriHesapla (donemKariRow, 0)
-    # print("Dönem Karı: ", "{:,.0f}".format(donemKari).replace(",", "."))
-    # netFaaliyetKari = efk - ceyrekDegeriHesapla (esasFaaliyetlerdenDigerGelirlerRow, 0) - ceyrekDegeriHesapla (esasFaaliyetlerdenDigerGiderlerRow, 0)
-    # print("Net Faaliyet Karı: ", "{:,.0f}".format(netFaaliyetKari).replace(",", "."))
-
-
-
     def yillikFavokHesapla (sonCeyrek):
 
         yillikBrutKar = yilliklandirmisDegerHesapla(brutKarRow, sonCeyrek)
@@ -135,14 +122,19 @@ def hesapla(varHisseAdi, varBilancoDonemi):
             yillikPazarlamaGiderleri = 0
 
         if (argeGiderleriRow != -1):
-            yillikArgeGiderleri = yilliklandirmisDegerHesapla(argeGiderleriRow, sonCeyrek)
+            try:
+                yillikArgeGiderleri = yilliklandirmisDegerHesapla(argeGiderleriRow, sonCeyrek)
+            except Exception as e:
+                yillikArgeGiderleri = 0
         else:
             yillikArgeGiderleri = 0
+
+
 
         if (amortismanlarRow != -1):
             yillikAmortisman = yilliklandirmisDegerHesapla(amortismanlarRow, sonCeyrek)
         else:
-            illikAmortisman = 0
+            yillikAmortisman = 0
 
         favokYillik = yillikBrutKar + yillikPazarlamaGiderleri + yillikGenelYonetimGiderleri + yillikArgeGiderleri + yillikAmortisman
         return favokYillik
@@ -167,9 +159,13 @@ def hesapla(varHisseAdi, varBilancoDonemi):
             pazarlamaGiderleri = 0
 
         if (argeGiderleriRow != -1):
-            argeGiderleri = ceyrekDegeriHesapla(argeGiderleriRow, ceyrek)
+            try:
+                argeGiderleri = ceyrekDegeriHesapla(argeGiderleriRow, ceyrek)
+            except Exception as e:
+                argeGiderleri = 0
         else:
             argeGiderleri = 0
+
 
         if (amortismanlarRow != -1):
             amortisman = ceyrekDegeriHesapla(amortismanlarRow, ceyrek)
@@ -179,20 +175,22 @@ def hesapla(varHisseAdi, varBilancoDonemi):
         favokCeyrek = ceyrekBrutKar + pazarlamaGiderleri + genelYonetimGiderleri + argeGiderleri + amortisman
         return favokCeyrek
 
-
     print("Çeyreklik FAVÖK: ", "{:,.0f}".format(ceyrekFavokHesapla(0)).replace(",", "."))
 
 
 
 # Istiraklerden Gelen Net Kar Kontrolu
+    try:
+        istiraklerdenGelenKarRow = getBilancoTitleRow("Özkaynak Yöntemiyle Değerlenen Yatırımların Karlarından (Zararlarından) Paylar")
+        istiraklerdenGelenNetKarSonCeyrek = ceyrekDegeriHesapla(istiraklerdenGelenKarRow, 0)
+        print("Özkaynak Yöntemiyle Değerlenen Yatırım Karları: ","{:,.0f}".format(istiraklerdenGelenNetKarSonCeyrek).replace(",", "."))
+        print()
+    except Exception as e:
+        print("Bilançoda Özkaynak Yöntemiyle Değerlenen Yatırımların Karlarından (Zararlarından) Paylar Bulunmamaktadır!")
 
-    istiraklerdenGelenKarRow = getBilancoTitleRow("Özkaynak Yöntemiyle Değerlenen Yatırımların Karlarından (Zararlarından) Paylar")
-    istiraklerdenGelenNetKarSonCeyrek = ceyrekDegeriHesapla(istiraklerdenGelenKarRow,0)
-    print ("Özkaynak Yöntemiyle Değerlenen Yatırım Karları: ", "{:,.0f}".format(istiraklerdenGelenNetKarSonCeyrek).replace(",","."))
-    print()
 
 
-# HASILAT NETKAR NERKARMARJI HESAPLARI
+# HASILAT NETKAR NETKARMARJI HESAPLARI
 
     hasilat0 = ceyrekDegeriHesapla (hasilatRow, 0)
     hasilat1 = ceyrekDegeriHesapla (hasilatRow, -1)

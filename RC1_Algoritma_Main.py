@@ -6,9 +6,9 @@ from RC1_GetBondYield import returnBondYield
 from RC1_GetGuncelHisseDegeri import returnGuncelHisseDegeri
 
 
-varHisseAdi ="CASA"
+varHisseAdi ="MAVI"
 
-varBilancoDosyasi = "//Users//myilmaz//Documents//bist//bilancolar//" + varHisseAdi + ".xlsx"
+varBilancoDosyasi = "//Users//myilmaz//Documents//bist//bilancolar_yeni//bilancolar//" + varHisseAdi + ".xlsx"
 
 varBilancoDonemi = 202209
 varBondYield = returnBondYield()
@@ -29,7 +29,7 @@ def runAlgoritmaMultiple(string):
 
     for varHisseAdi in contentList:
 
-        varBilancoDosyasi = "//Users//myilmaz//Documents//bist//bilancolar//" + varHisseAdi + ".xlsx"
+        varBilancoDosyasi = "//Users//myilmaz//Documents//bist//bilancolar_yeni//bilancolar//" + varHisseAdi + ".xlsx"
         varHisseFiyati = returnGuncelHisseDegeri(varHisseAdi)
         runAlgoritma(varBilancoDosyasi, varBilancoDonemi, varBondYield, varHisseFiyati, varReportFile, varLogPath, varLogLevel)
 

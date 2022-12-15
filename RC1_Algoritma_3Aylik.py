@@ -9,7 +9,7 @@ from RC1_BilancoOrtalamaDolarDegeri import ucAylikBilancoDonemiOrtalamaDolarDege
 
 def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati, reportFile, logPath, logLevel):
 
-    hisseAdiTemp = bilancoDosyasi[47:]
+    hisseAdiTemp = bilancoDosyasi[64:]
     hisseAdi = hisseAdiTemp[:-5]
 
     my_logger = logging.getLogger()
@@ -440,7 +440,7 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati, reportFi
                 (((sonCeyrekSatisArtisYuzdesi + birOncekiCeyrekSatisArtisYuzdesi) / 2) + 1) * sonDortCeyrekHasilatToplami)
 
     # HASILAT TAHMININI MANUEL DEGISTIRMEK ICIN
-    # onumuzdekiDortCeyrekHasilatTahmini = 6600000000
+    # onumuzdekiDortCeyrekHasilatTahmini = 15000000000
 
     my_logger.info("Önümüzdeki 4 Çeyrek Hasılat Tahmini: %s TL", "{:,.0f}".format(onumuzdekiDortCeyrekHasilatTahmini).replace(",","."))
 
