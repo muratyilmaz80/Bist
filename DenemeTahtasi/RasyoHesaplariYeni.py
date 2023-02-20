@@ -3,7 +3,7 @@ from RC1_GetGuncelHisseDegeri import returnGuncelHisseDegeri
 import os
 import sys
 
-hisseAdi = "SISE"
+hisseAdi = "ULUUN"
 bilancoDonemi = 202209
 directory = "//Users//myilmaz//Documents//bist//bilancolar_yeni//bilancolar"
 bilancoDosyasi = "//Users//myilmaz//Documents//bist//bilancolar_yeni//bilancolar//" + hisseAdi + ".xlsx"
@@ -285,12 +285,6 @@ def hesapla(varHisseAdi, varBilancoDonemi):
     # ROIC Hesabı
     # ROIC = ((FVÖK * (1 - Vergi Oranı)) / (Alacak + Özsermaye)))
     nopat = getBilancoDegeri("BRÜT KAR (ZARAR)", 0)
-
-    # Sermaye Artirim Potansiyeli Hesabi
-    ozkaynaklar = getBilancoDegeri("TOPLAM ÖZKAYNAKLAR", 0)
-    sermayeArtirimPotansiyeli = (ozkaynaklar - odenmisSermaye)/odenmisSermaye
-    print("Sermaye Artırım Potansiyeli: ", "{:.2%}".format(sermayeArtirimPotansiyeli))
-
 
 hesapla(hisseAdi, bilancoDonemi)
 

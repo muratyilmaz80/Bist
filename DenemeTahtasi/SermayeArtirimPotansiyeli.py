@@ -72,24 +72,40 @@ def getBilancoTitleRow(title):
             return rowi
     return -1
 
+def yilliklandirmisDegerHesapla (row, bd):
+    toplam = ceyrekDegeriHesapla(row, bd) + ceyrekDegeriHesapla(row, bd-1) + ceyrekDegeriHesapla(row, bd-2) + ceyrekDegeriHesapla(row, bd-3)
+    return toplam
+
 
 def toplamKaynaklar(varHisseAdi, varBilancoDonemi):
     try:
         sermaye = getBilancoDegeri("Ödenmiş Sermaye", 0)
         hisseFiyati = returnGuncelHisseDegeri(varHisseAdi)
-        pd = sermaye * hisseFiyati;
+        piyasaDegeri = sermaye * hisseFiyati;
+
+        kisaVadeliFinansalBorclar = getBilancoDegeri("Kısa Vadeli Borçlanmalar", 0) + getBilancoDegeri(
+            "Uzun Vadeli Borçlanmaların Kısa Vadeli Kısımları", 0)
+        uzunVadeliFinansalBorclar = getBilancoDegeri("Uzun Vadeli Borçlanmalar", 0)
+        finansalBorclar = kisaVadeliFinansalBorclar + uzunVadeliFinansalBorclar
+        nakitVeNakitBenzerleri = getBilancoDegeri("Nakit ve Nakit Benzerleri", 0)
+        finansalYatirimlar = getBilancoDegeri("Finansal Yatırımlar", 0)
+        netBorc = finansalBorclar - nakitVeNakitBenzerleri - finansalYatirimlar
+        firmaDegeri = piyasaDegeri + netBorc
+
         toplamKaynaklar =  getBilancoDegeri("TOPLAM KAYNAKLAR", 0)
-        print(varHisseAdi, "\t", "{:,.0f}".format(toplamKaynaklar).replace(",", "."), "\t", "{:,.0f}".format(pd).replace(",", "."))
+        print(varHisseAdi, "\t", "{:,.0f}".format(toplamKaynaklar).replace(",", "."), "\t", "{:,.0f}".format(firmaDegeri).replace(",", "."))
     except Exception as e:
         print(varHisseAdi, "\t", "HATA")
 
 def sermayeArtirimPot (varHisseAdi, varBilancoDonemi):
     odenmisSermaye = getBilancoDegeri("Ödenmiş Sermaye", 0)
     ozkaynaklar = getBilancoDegeri("TOPLAM ÖZKAYNAKLAR", 0)
+    netKarRow = getBilancoTitleRow("Net Dönem Karı veya Zararı")
 
     try:
+        netKarYillik = yilliklandirmisDegerHesapla(netKarRow, 0)
         sermayeArtirimPotansiyeli = (ozkaynaklar - odenmisSermaye) / odenmisSermaye
-        print(varHisseAdi, "\t", "{:.0%}".format(sermayeArtirimPotansiyeli))
+        print(varHisseAdi, "\t", "{:.0%}".format(sermayeArtirimPotansiyeli), "\t", "{:,.0f}".format(odenmisSermaye).replace(",", "."), "\t", "{:,.0f}".format(netKarYillik).replace(",", "."))
     except Exception as e:
         print(varHisseAdi, "\t", "HATA")
 
@@ -105,5 +121,5 @@ for x in list:
     bilancoDosyasi = "//Users//myilmaz//Documents//bist//bilancolar_yeni//bilancolar//" + hisseAdi + ".xlsx"
     wb = xlrd.open_workbook(bilancoDosyasi)
     sheet = wb.sheet_by_index(0)
-    # sermayeArtirimPot(x, 0)
-    toplamKaynaklar(x,0)
+    sermayeArtirimPot(x, 0)
+    # toplamKaynaklar(x,0)

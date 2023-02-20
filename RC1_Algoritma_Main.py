@@ -6,17 +6,17 @@ from RC1_GetBondYield import returnBondYield
 from RC1_GetGuncelHisseDegeri import returnGuncelHisseDegeri
 
 
-varHisseAdi ="MAVI"
+varHisseAdi ="HLGYO"
 
 varBilancoDosyasi = "//Users//myilmaz//Documents//bist//bilancolar_yeni//bilancolar//" + varHisseAdi + ".xlsx"
 
-varBilancoDonemi = 202209
+varBilancoDonemi = 202212
 varBondYield = returnBondYield()
 varHisseFiyati = returnGuncelHisseDegeri(varHisseAdi)
-varReportFile = "//Users//myilmaz//Documents//bist//Report_202209_3Aylik.xls"
-varReportFile6Aylik = "//Users//myilmaz//Documents//bist//Report_202206_6Aylik.xls"
+varReportFile = "//Users//myilmaz//Documents//bist//Report_202212_3Aylik.xls"
+varReportFile6Aylik = "//Users//myilmaz//Documents//bist//Report_202212_6Aylik.xls"
 varLogLevel = logging.DEBUG
-varLogPath = "//Users//myilmaz//Documents//bist//log//2022_09//"
+varLogPath = "//Users//myilmaz//Documents//bist//log//2022_12//"
 
 
 
@@ -39,9 +39,8 @@ runAlgoritma(varBilancoDosyasi, varBilancoDonemi, varBondYield, varHisseFiyati, 
 
 # runAlgoritma6Aylik(varBilancoDosyasi, varBilancoDonemi, varBondYield, varHisseFiyati, varReportFile6Aylik, varLogPath, varLogLevel)
 
-# runAlgoritmaMultiple("DOAS-EMNIS-ARCLK-KRDMD-VESBE-GOODY-PETKM-EREGL-TIRE-TTRAK-ISDMR-BUCIM-ENKAI-BRKSN")
+# runAlgoritmaMultiple("OZGYO-ISGSY")
 
 
 # 6 Aylık İçin
 # runAlgoritmaMultiple("VANGD-UZERB-KSTUR-ORMA-SODSN-SUMAS-TKURU-YBTAS-MERIT-OZRDN")
-# runAlgoritmaMultiple("MEGAP-SEYKM-SAFKR-ISBIR-AYES-IZFAS-IZTAR-RODRG-YONGA-BASCM-BALAT")

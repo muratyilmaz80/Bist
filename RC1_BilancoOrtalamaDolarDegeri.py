@@ -154,7 +154,7 @@ def altiAylikBilancoDonemiOrtalamaDolarDegeriBul(bilancoDonemi):
     return (temp1+temp2)/2
 
 
-print ("Bilanço Dönemi ortalama dolar kuru:", "{:,.3f}".format(ucAylikBilancoDonemiOrtalamaDolarDegeriBul(202209)))
+print ("Bilanço Dönemi ortalama dolar kuru:", "{:,.3f}".format(ucAylikBilancoDonemiOrtalamaDolarDegeriBul(202212)))
 
 # print ("Bilanço Dönemi ortalama dolar kuru:", "{:,.3f}".format(altiAylikBilancoDonemiOrtalamaDolarDegeriBul(202012)))
 

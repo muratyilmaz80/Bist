@@ -289,7 +289,7 @@ def fnc(pg, bildiriNumber):
 
             print("=========================")
 
-            fileName = os.path.join(dirname, "//Users//myilmaz//Documents//bist//bilancolar_yeni//bilancolar//" + stockCode + ".xlsx")
+            fileName = os.path.join(dirname, "//Users//myilmaz//Documents//bist//bilancolar_yeni_//bilancolar//" + stockCode + ".xlsx")
             os.makedirs(os.path.dirname(fileName), exist_ok=True)
 
             if os.path.isfile(fileName):
@@ -310,15 +310,15 @@ def fnc(pg, bildiriNumber):
                     print()
                     return
 
-            f = open("//Users//myilmaz//Documents//bist//bilancolar_yeni//RaporBildiriNolar.txt", "a")
+            f = open("//Users//myilmaz//Documents//bist//bilancolar_yeni_//RaporBildiriNolar.txt", "a")
             f.write(bildiriNumber + "-")
             f.close()
 
-            f = open("//Users//myilmaz//Documents//bist//bilancolar_yeni//BilancosuYeniGelenHisseler.txt", "a")
+            f = open("//Users//myilmaz//Documents//bist//bilancolar_yeni_//BilancosuYeniGelenHisseler.txt", "a")
             f.write(stockCode + "-")
             f.close()
 
-    f2 = open("//Users//myilmaz//Documents//bist//bilancolar_yeni//SonBildiriNo.txt", "r+")
+    f2 = open("//Users//myilmaz//Documents//bist//bilancolar_yeni_//SonBildiriNo.txt", "r+")
     f2.write(bildiriNumber)
     f2.close()
 
@@ -339,7 +339,7 @@ dirname = os.path.dirname(__file__)
 #filename = os.path.join(dirname, "kap_linkler.txt")
 
 
-file = open("//Users//myilmaz//Documents//bist//bilancolar_yeni//SonBildiriNo.txt", "r+")
+file = open("//Users//myilmaz//Documents//bist//bilancolar_yeni_//SonBildiriNo.txt", "r+")
 content_=file.readline()
 #content_=content_.strip()
 #contentList_ =content_.split("-")

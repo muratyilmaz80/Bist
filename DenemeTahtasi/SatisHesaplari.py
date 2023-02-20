@@ -6,7 +6,7 @@ import os
 import sys
 
 
-hisseAdi = "SAHOL"
+hisseAdi = "ULUUN"
 bilancoDonemi = 202209
 directory = "//Users//myilmaz//Documents//bist//bilancolar_yeni//bilancolar"
 
