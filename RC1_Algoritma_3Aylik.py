@@ -105,6 +105,9 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati, reportFi
     # netKarRow = getBilancoTitleRow("Net Dönem Karı veya Zararı");
     netKarRow = getBilancoTitleRow("DÖNEM KARI (ZARARI)");
     brutKarRow = getBilancoTitleRow("BRÜT KAR (ZARAR)");
+    genelYonetimGiderleriRow = getBilancoTitleRow("Genel Yönetim Giderleri");
+    pazarlamaGiderleriRow = getBilancoTitleRow("Pazarlama Giderleri");
+    argeGiderleriRow = getBilancoTitleRow("Araştırma ve Geliştirme Giderleri");
 
     # TODO: Bir önceki çeyrek bilançosunun olmasını garanti edecek şekilde düzenle
 
@@ -138,14 +141,27 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati, reportFi
 
     def likidasyonDegeriHesapla(ceyrek):
         nakit = getBilancoDegeri("Nakit ve Nakit Benzerleri", bilancoDonemiColumn)
-        alacaklar = getBilancoDegeri("Ticari Alacaklar", bilancoDonemiColumn) + getBilancoDegeri("Diğer Alacaklar",
-                                                                                                 bilancoDonemiColumn) + getBilancoDegeri(
-            "Ticari Alacaklar1", bilancoDonemiColumn) + getBilancoDegeri("Diğer Alacaklar1", bilancoDonemiColumn)
         stoklar = getBilancoDegeri("Stoklar", bilancoDonemiColumn)
         digerVarliklar = getBilancoDegeri("Diğer Dönen Varlıklar", bilancoDonemiColumn)
-        finansalVarliklar = getBilancoDegeri("Finansal Yatırımlar", bilancoDonemiColumn) + getBilancoDegeri(
-            "Finansal Yatırımlar1", bilancoDonemiColumn) + getBilancoDegeri("Özkaynak Yöntemiyle Değerlenen Yatırımlar",
-                                                                            bilancoDonemiColumn)
+
+        # Mustomb fetch data koduna göre degisti
+        # alacaklar = getBilancoDegeri("Ticari Alacaklar", bilancoDonemiColumn) + getBilancoDegeri("Diğer Alacaklar",
+        #                                                                                          bilancoDonemiColumn) + getBilancoDegeri(
+        #     "Ticari Alacaklar1", bilancoDonemiColumn) + getBilancoDegeri("Diğer Alacaklar1", bilancoDonemiColumn)
+        # finansalVarliklar = getBilancoDegeri("Finansal Yatırımlar", bilancoDonemiColumn) + getBilancoDegeri(
+        #     "Finansal Yatırımlar1", bilancoDonemiColumn) + getBilancoDegeri("Özkaynak Yöntemiyle Değerlenen Yatırımlar",
+        #                                                                     bilancoDonemiColumn)
+
+        alacaklar = getBilancoDegeri("Dönen Ticari Alacaklar", bilancoDonemiColumn) + \
+                    getBilancoDegeri("Dönen Diğer Alacaklar",bilancoDonemiColumn) + \
+                    getBilancoDegeri("Duran Ticari Alacaklar", bilancoDonemiColumn) + \
+                    getBilancoDegeri("Duran Diğer Alacaklar", bilancoDonemiColumn)
+
+
+        finansalVarliklar = getBilancoDegeri("Duran Finansal Yatırımlar", bilancoDonemiColumn) + \
+                            getBilancoDegeri("Dönen Finansal Yatırımlar", bilancoDonemiColumn) + \
+                            getBilancoDegeri("Özkaynak Yöntemiyle Değerlenen Yatırımlar",bilancoDonemiColumn)
+
         maddiDuranVarliklar = getBilancoDegeri("Maddi Duran Varlıklar", bilancoDonemiColumn)
 
         likidasyonDegeri = nakit + (alacaklar * 0.7) + (stoklar * 0.5) + (digerVarliklar * 0.7) + (
@@ -439,10 +455,18 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati, reportFi
     onumuzdekiDortCeyrekHasilatTahmini = (
                 (((sonCeyrekSatisArtisYuzdesi + birOncekiCeyrekSatisArtisYuzdesi) / 2) + 1) * sonDortCeyrekHasilatToplami)
 
-    # HASILAT TAHMININI MANUEL DEGISTIRMEK ICIN
-    # onumuzdekiDortCeyrekHasilatTahmini = 15000000000
+    hasilatlarCeyrek = [ucOncekiBilancoDonemiHasilat, ikiOncekiBilancoDonemiHasilat, birOncekiBilancoDonemiHasilat, bilancoDonemiHasilat]
+    maxHasilatCeyrek = max (hasilatlarCeyrek)
 
-    my_logger.info("Önümüzdeki 4 Çeyrek Hasılat Tahmini: %s TL", "{:,.0f}".format(onumuzdekiDortCeyrekHasilatTahmini).replace(",","."))
+    my_logger.info("Önümüzdeki 4 Çeyrek Hasılat Tahmini: %s TL","{:,.0f}".format(onumuzdekiDortCeyrekHasilatTahmini).replace(",", "."))
+
+    if (onumuzdekiDortCeyrekHasilatTahmini > 4*maxHasilatCeyrek ):
+        onumuzdekiDortCeyrekHasilatTahmini = 4*maxHasilatCeyrek
+        my_logger.info("Önümüzdeki 4 Çeyrek Hasılat Tahmini 4*maxCeyrek olarak duzeltildi:")
+        my_logger.info("Önümüzdeki 4 Çeyrek Hasılat Tahmini: %s TL", "{:,.0f}".format(onumuzdekiDortCeyrekHasilatTahmini).replace(",", "."))
+
+    # HASILAT TAHMININI MANUEL DEGISTIRMEK ICIN
+    # onumuzdekiDortCeyrekHasilatTahmini = 700000000000
 
     ucOncekibilancoDonemiFaaliyetKari = ceyrekDegeriHesapla(faaliyetKariRow, ucOncekibilancoDonemiColumn)
     ikiOncekiBilancoDonemiFaaliyetKari = ceyrekDegeriHesapla(faaliyetKariRow, ikiOncekibilancoDonemiColumn)
@@ -503,6 +527,13 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati, reportFi
     my_logger.info("Gerçek Fiyata Uzaklık %s TL:", format(gercekFiyataUzaklikTl, ".2f"))
 
 
+
+
+
+
+
+
+
     # Netpro Hesapla
     my_logger.info("")
     my_logger.info("")
@@ -524,7 +555,7 @@ def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati, reportFi
     fkOrani = hisseFiyati/((sonDortDonemNetKarToplami*anaOrtaklikPayi)/(sermaye))
     my_logger.info("F/K Oranı: %s", "{:,.2f}".format(fkOrani))
 
-    hbkOrani = sonDortDonemNetKarToplami/(sermaye)
+    hbkOrani = sonDortDonemNetKarToplami/(sermaye) * anaOrtaklikPayi
     my_logger.info ("HBK Oranı: %s", "{:,.2f}".format(hbkOrani))
 
     netProEstDegeri = ((ortalamaFaaliyetKariTahmini / sonDortDonemFaaliyetKariToplami) * sonDortDonemNetKarToplami) * anaOrtaklikPayi

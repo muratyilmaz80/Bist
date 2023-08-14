@@ -114,15 +114,21 @@ class Fetch:
         if response.status_code != 204:  # serverdan boş response dönüp dönmediğini kontrol et
             fiyatBilgiJSON = response.json()
             # print("fiyatBilgiJSON: ", fiyatBilgiJSON)
-            fiyatBilgiData = fiyatBilgiJSON['value']
-            if len(fiyatBilgiData) != 0:
-                fiyatBilgiData = fiyatBilgiData[0]
-                duzeltilmemisFiyat = fiyatBilgiData['HG_KAPANIS']
-                duzeltilmisFiyat = fiyatBilgiData['HGDG_KAPANIS']
-                # print("fiyatBilgiData:",fiyatBilgiData)
-                print("düzeltilmemiş fiyat at", gonderimTarihi, ": ", duzeltilmemisFiyat)
-                print("düzeltilmiş fiyat at", gonderimTarihi, ": ", duzeltilmisFiyat)
-            else:
+
+
+            try:
+                fiyatBilgiData = fiyatBilgiJSON['value']
+
+
+                if len(fiyatBilgiData) != 0:
+                    fiyatBilgiData = fiyatBilgiData[0]
+                    duzeltilmemisFiyat = fiyatBilgiData['HG_KAPANIS']
+                    duzeltilmisFiyat = fiyatBilgiData['HGDG_KAPANIS']
+                    # print("fiyatBilgiData:",fiyatBilgiData)
+                    print("düzeltilmemiş fiyat at", gonderimTarihi, ": ", duzeltilmemisFiyat)
+                    print("düzeltilmiş fiyat at", gonderimTarihi, ": ", duzeltilmisFiyat)
+
+            except:
                 print("düzeltilmemiş ve düzeltilmiş fiyat bilgisine ulaşılamadı, 0'a set edildi")
                 duzeltilmemisFiyat = 0
                 duzeltilmisFiyat = 0

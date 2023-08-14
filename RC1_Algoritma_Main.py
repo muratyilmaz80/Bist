@@ -6,17 +6,17 @@ from RC1_GetBondYield import returnBondYield
 from RC1_GetGuncelHisseDegeri import returnGuncelHisseDegeri
 
 
-varHisseAdi ="HLGYO"
+varHisseAdi ="PARSN"
 
 varBilancoDosyasi = "//Users//myilmaz//Documents//bist//bilancolar_yeni//bilancolar//" + varHisseAdi + ".xlsx"
 
-varBilancoDonemi = 202212
+varBilancoDonemi = 202306
 varBondYield = returnBondYield()
 varHisseFiyati = returnGuncelHisseDegeri(varHisseAdi)
-varReportFile = "//Users//myilmaz//Documents//bist//Report_202212_3Aylik.xls"
-varReportFile6Aylik = "//Users//myilmaz//Documents//bist//Report_202212_6Aylik.xls"
+varReportFile = "//Users//myilmaz//Documents//bist//Report_202306_3Aylik.xls"
+varReportFile6Aylik = "//Users//myilmaz//Documents//bist//Report_202306_6Aylik.xls"
 varLogLevel = logging.DEBUG
-varLogPath = "//Users//myilmaz//Documents//bist//log//2022_12//"
+varLogPath = "//Users//myilmaz//Documents//bist//log//2023_06//"
 
 
 
@@ -41,6 +41,6 @@ runAlgoritma(varBilancoDosyasi, varBilancoDonemi, varBondYield, varHisseFiyati, 
 
 # runAlgoritmaMultiple("OZGYO-ISGSY")
 
-
 # 6 Aylık İçin
 # runAlgoritmaMultiple("VANGD-UZERB-KSTUR-ORMA-SODSN-SUMAS-TKURU-YBTAS-MERIT-OZRDN")
+

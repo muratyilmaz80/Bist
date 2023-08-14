@@ -3,8 +3,8 @@ from RC1_GetGuncelHisseDegeri import returnGuncelHisseDegeri
 import os
 import sys
 
-hisseAdi = "ULUUN"
-bilancoDonemi = 202209
+hisseAdi = "KAREL"
+bilancoDonemi = 202306
 directory = "//Users//myilmaz//Documents//bist//bilancolar_yeni//bilancolar"
 bilancoDosyasi = "//Users//myilmaz//Documents//bist//bilancolar_yeni//bilancolar//" + hisseAdi + ".xlsx"
 wb = xlrd.open_workbook(bilancoDosyasi)
@@ -101,8 +101,12 @@ def hesapla(varHisseAdi, varBilancoDonemi):
 
     netKarBuyumeOraniYillik = (sonDortDonemNetKarToplami/oncekiYilNetKarToplami-1)
     print ("Yıllık Net Kar Büyüme: ", "{:.2%}".format(netKarBuyumeOraniYillik))
+    print("Son Dört Çeyrek Net Kar Toplamı: ", "{:,.0f}".format(sonDortDonemNetKarToplami).replace(",", "."))
+    print("Önceki Yıl Net Kar Toplamı: ", "{:,.0f}".format(oncekiYilNetKarToplami).replace(",", "."))
     oncekiYilAyniCeyregeGoreNetKarBuyume = (ceyrekDegeriHesapla(netKarRow, 0)/ceyrekDegeriHesapla(netKarRow, -4) - 1)
     print("Önceki Yıl Aynı Çeyreğe Göre Net Kar Büyüme: ", "{:.2%}".format(oncekiYilAyniCeyregeGoreNetKarBuyume))
+    print("Son Çeyrek Net Kar: ", "{:,.0f}".format(ceyrekDegeriHesapla(netKarRow, 0)).replace(",", "."))
+    print("Önceki Yıl Aynı Çeyrek Net Kar: ", "{:,.0f}".format(ceyrekDegeriHesapla(netKarRow, -4)).replace(",", "."))
 
 
     # TEMEL CARPANLAR
