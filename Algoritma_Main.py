@@ -1,9 +1,9 @@
 import logging
 
-from RC1_Algoritma_3Aylik import runAlgoritma
-from RC1_Algoritma_6Aylik import runAlgoritma6Aylik
-from RC1_GetBondYield import returnBondYield
-from RC1_GetGuncelHisseDegeri import returnGuncelHisseDegeri
+from Algoritma_3Aylik import runAlgoritma
+from Algoritma_6Aylik import runAlgoritma6Aylik
+from GetBondYield import returnBondYield
+from GetGuncelHisseDegeri import returnGuncelHisseDegeri
 
 
 varHisseAdi ="VAKKO"

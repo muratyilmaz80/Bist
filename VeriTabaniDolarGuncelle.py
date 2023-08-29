@@ -4,7 +4,7 @@ from xlrd import xldate_as_tuple
 from xlutils.copy import copy
 import os.path
 from datetime import datetime, timedelta
-from RC1_GetDolarDegeriOnline import DovizKurlari
+from GetDolarDegeriOnline import DovizKurlari
 
 
 veriTabaniFile = "//Users//myilmaz//Documents//bist//VeriTabani.xls"

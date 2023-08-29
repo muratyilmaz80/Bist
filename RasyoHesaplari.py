@@ -1,6 +1,6 @@
 
-from RC1_GetGuncelHisseDegeri import returnGuncelHisseDegeri
-from RC1_GetHisseHalkaAciklikOrani import returnHisseHalkaAciklikOrani
+from GetGuncelHisseDegeri import returnGuncelHisseDegeri
+from GetHisseHalkaAciklikOrani import returnHisseHalkaAciklikOrani
 import os
 import xlrd
 import xlwt
@@ -302,7 +302,7 @@ def hesapla(varHisseAdi, varBilancoDonemi):
 
     # Halka Açıklık Oranını Getir
     halkaAciklikOrani = returnHisseHalkaAciklikOrani(varHisseAdi)
-
+    print("Halka Açıklık Oranı: ", "{:.2%}".format(halkaAciklikOrani))
 
 
 

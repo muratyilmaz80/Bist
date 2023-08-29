@@ -1,10 +1,10 @@
 import xlrd
-from RC1_ExcelRowClass import ExcelRowClass
-from RC1_Rapor_Olustur import exportReportExcel
+from ExcelRowClass import ExcelRowClass
+from Rapor_Olustur import exportReportExcel
 from prettytable import PrettyTable
 import logging
 import sys
-from RC1_BilancoOrtalamaDolarDegeri import ucAylikBilancoDonemiOrtalamaDolarDegeriBul
+from BilancoOrtalamaDolarDegeri import ucAylikBilancoDonemiOrtalamaDolarDegeriBul
 
 
 def runAlgoritma(bilancoDosyasi, bilancoDonemi, bondYield, hisseFiyati, reportFile, logPath, logLevel):

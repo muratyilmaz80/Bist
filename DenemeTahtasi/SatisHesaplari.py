@@ -1,7 +1,7 @@
 import xlrd
 from prettytable import PrettyTable
 
-from RC1_GetGuncelHisseDegeri import returnGuncelHisseDegeri
+from GetGuncelHisseDegeri import returnGuncelHisseDegeri
 import os
 import sys
 

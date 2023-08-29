@@ -1,5 +1,5 @@
 import xlrd
-from RC1_GetGuncelHisseDegeri import returnGuncelHisseDegeri
+from GetGuncelHisseDegeri import returnGuncelHisseDegeri
 import os
 
 hisseAdi = "GSDHO"

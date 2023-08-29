@@ -6,7 +6,6 @@ def returnHisseHalkaAciklikOrani(hisseAdi):
     url1 = "https://www.isyatirim.com.tr/tr-tr/analiz/hisse/Sayfalar/sirket-karti.aspx?hisse="
     url2 = hisseAdi
     url = url1 + url2
-    print (url)
     page = requests.get(url)
     soup = BeautifulSoup(page.text, 'html.parser')
 
