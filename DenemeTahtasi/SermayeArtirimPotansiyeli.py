@@ -3,7 +3,7 @@ from RC1_GetGuncelHisseDegeri import returnGuncelHisseDegeri
 import os
 import sys
 
-bilancoDonemi = 202209
+bilancoDonemi = 202306
 directory = "//Users//myilmaz//Documents//bist//bilancolar_yeni//bilancolar"
 
 
@@ -99,7 +99,7 @@ def toplamKaynaklar(varHisseAdi, varBilancoDonemi):
 
 def sermayeArtirimPot (varHisseAdi, varBilancoDonemi):
     odenmisSermaye = getBilancoDegeri("Ödenmiş Sermaye", 0)
-    ozkaynaklar = getBilancoDegeri("TOPLAM ÖZKAYNAKLAR", 0)
+    ozkaynaklar = getBilancoDegeri("Ana Ortaklığa Ait Özkaynaklar", 0)
     netKarRow = getBilancoTitleRow("Net Dönem Karı veya Zararı")
 
     try:
@@ -108,8 +108,6 @@ def sermayeArtirimPot (varHisseAdi, varBilancoDonemi):
         print(varHisseAdi, "\t", "{:.0%}".format(sermayeArtirimPotansiyeli), "\t", "{:,.0f}".format(odenmisSermaye).replace(",", "."), "\t", "{:,.0f}".format(netKarYillik).replace(",", "."))
     except Exception as e:
         print(varHisseAdi, "\t", "HATA")
-
-
 
 l=os.listdir(directory)
 list=[x.split('.')[0] for x in l]

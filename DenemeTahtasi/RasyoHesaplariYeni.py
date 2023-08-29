@@ -1,9 +1,16 @@
-import xlrd
-from RC1_GetGuncelHisseDegeri import returnGuncelHisseDegeri
-import os
-import sys
 
-hisseAdi = "KAREL"
+from RC1_GetGuncelHisseDegeri import returnGuncelHisseDegeri
+from RC1_GetHisseHalkaAciklikOrani import returnHisseHalkaAciklikOrani
+import os
+import xlrd
+import xlwt
+from xlutils.copy import copy
+import os.path
+from datetime import datetime
+
+varReportFile = "//Users//myilmaz//Documents//bist//Report_202306_Rasyolar.xls"
+
+hisseAdi = "DEVA"
 bilancoDonemi = 202306
 directory = "//Users//myilmaz//Documents//bist//bilancolar_yeni//bilancolar"
 bilancoDosyasi = "//Users//myilmaz//Documents//bist//bilancolar_yeni//bilancolar//" + hisseAdi + ".xlsx"
@@ -122,7 +129,8 @@ def hesapla(varHisseAdi, varBilancoDonemi):
     print("Piyasa Değeri (PD): ", "{:,.0f}".format(piyasaDegeri).replace(",", "."))
     nakitVeNakitBenzerleri = getBilancoDegeri("Nakit ve Nakit Benzerleri", 0)
     print ("Nakit ve Nakit Benzerleri: ", "{:,.0f}".format(nakitVeNakitBenzerleri).replace(",", "."))
-    print ("Nakit / PD: ", "{:,.2f}".format(nakitVeNakitBenzerleri/piyasaDegeri))
+    nakitPd = nakitVeNakitBenzerleri/piyasaDegeri
+    print ("Nakit / PD: ", "{:,.2f}".format(nakitPd))
 
     defterDegeri = getBilancoDegeri("Ana Ortaklığa Ait Özkaynaklar", 0)
     dortOncekiCeyrekDefterDegeri = getBilancoDegeri("Ana Ortaklığa Ait Özkaynaklar", -4)
@@ -144,7 +152,8 @@ def hesapla(varHisseAdi, varBilancoDonemi):
     netBorc = finansalBorclar - nakitVeNakitBenzerleri - finansalYatirimlar
     firmaDegeri = piyasaDegeri + netBorc
     print ("Firma Değeri (FD): ", "{:,.0f}".format(firmaDegeri).replace(",","."))
-    print("Nakit / FD: ", "{:,.2f}".format(nakitVeNakitBenzerleri / firmaDegeri))
+    nakitFd = nakitVeNakitBenzerleri / firmaDegeri
+    print("Nakit / FD: ", "{:,.2f}".format(nakitFd))
 
 
     # Yillik Hasilat Hesabi
@@ -289,6 +298,88 @@ def hesapla(varHisseAdi, varBilancoDonemi):
     # ROIC Hesabı
     # ROIC = ((FVÖK * (1 - Vergi Oranı)) / (Alacak + Özsermaye)))
     nopat = getBilancoDegeri("BRÜT KAR (ZARAR)", 0)
+
+
+    # Halka Açıklık Oranını Getir
+    halkaAciklikOrani = returnHisseHalkaAciklikOrani(varHisseAdi)
+
+
+
+
+
+
+
+
+    #Excel'e Rasyolari Yazdir
+    #######################################################################################
+    def createTopRow():
+        bookSheetWrite.write(0, 0, "Hisse Adı")
+        bookSheetWrite.write(0, 1, "Tarih")
+        bookSheetWrite.write(0, 2, "Hisse Fiyatı")
+        bookSheetWrite.write(0, 3, "Net Kar Büyüme Yıllık")
+        bookSheetWrite.write(0, 4, "Net Kar Büyüme 4 Önceki Çeyreğe Göre")
+        bookSheetWrite.write(0, 5, "F/K")
+        bookSheetWrite.write(0, 6, "Nakit/PD")
+        bookSheetWrite.write(0, 7, "Nakit/FD")
+        bookSheetWrite.write(0, 8, "PD/DD")
+        bookSheetWrite.write(0, 9, "PEG")
+        bookSheetWrite.write(0, 10, "FD/Satışlar")
+        bookSheetWrite.write(0, 11, "FD/FAVÖK")
+        bookSheetWrite.write(0, 12, "PD/EFK")
+        bookSheetWrite.write(0, 13, "Cari Oran")
+        bookSheetWrite.write(0, 14, "ROE (Özsermaye Karlılığı)")
+        bookSheetWrite.write(0, 15, "ROA (Aktif Karlılık)")
+        bookSheetWrite.write(0, 16, "Yıllık Net Kar Marjı")
+        bookSheetWrite.write(0, 17, "Son Çeyrek Net Kar Marjı")
+        bookSheetWrite.write(0, 18, "Aktif Devir Hızı")
+        bookSheetWrite.write(0, 19, "Borç/Kaynak")
+        bookSheetWrite.write(0, 20, "Halka Açıklık Oranı")
+
+
+    def reportResults(rowNumber):
+        bookSheetWrite.write(rowNumber, 0, varHisseAdi)
+        bookSheetWrite.write(rowNumber, 1, datetime.today().strftime('%d.%m.%Y'))
+        bookSheetWrite.write(rowNumber, 2, hisseFiyati)
+        bookSheetWrite.write(rowNumber, 3, netKarBuyumeOraniYillik)
+        bookSheetWrite.write(rowNumber, 4, oncekiYilAyniCeyregeGoreNetKarBuyume)
+        bookSheetWrite.write(rowNumber, 5, fkOrani)
+        bookSheetWrite.write(rowNumber, 6, nakitPd)
+        bookSheetWrite.write(rowNumber, 7, nakitFd)
+        bookSheetWrite.write(rowNumber, 8, pddd)
+        bookSheetWrite.write(rowNumber, 9, pegOrani)
+        bookSheetWrite.write(rowNumber, 10, fdSatislar)
+        bookSheetWrite.write(rowNumber, 11, fdfavok)
+        bookSheetWrite.write(rowNumber, 12, pdefk)
+        bookSheetWrite.write(rowNumber, 13, cariOran)
+        bookSheetWrite.write(rowNumber, 14, roe)
+        bookSheetWrite.write(rowNumber, 15, aktifKarlilik)
+        bookSheetWrite.write(rowNumber, 16, netKarMarji)
+        bookSheetWrite.write(rowNumber, 17, sonCeyrekNetKarMarji)
+        bookSheetWrite.write(rowNumber, 18, aktifDevirHizi)
+        bookSheetWrite.write(rowNumber, 19, borcKaynakOrani)
+        bookSheetWrite.write(rowNumber, 20, halkaAciklikOrani)
+
+    if os.path.isfile(varReportFile):
+        print("Rapor dosyası var, güncellenecek:", varReportFile)
+        bookRead = xlrd.open_workbook(varReportFile, formatting_info=True)
+        sheetRead = bookRead.sheet_by_index(0)
+        rowNumber = sheetRead.nrows
+        bookWrite = copy(bookRead)
+        bookSheetWrite = bookWrite.get_sheet(0)
+        reportResults(rowNumber)
+        bookWrite.save(varReportFile)
+
+    else:
+        print("Rapor dosyası yeni oluşturulacak: ", varReportFile)
+        bookWrite = xlwt.Workbook()
+        bookSheetWrite = bookWrite.add_sheet(str(bilancoDonemi))
+        createTopRow()
+        reportResults(1)
+        bookWrite.save(varReportFile)
+
+
+
+    
 
 hesapla(hisseAdi, bilancoDonemi)
 
