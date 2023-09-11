@@ -8,11 +8,12 @@ from xlutils.copy import copy
 import os.path
 from datetime import datetime
 
-varReportFile = "//Users//myilmaz//Documents//bist//Report_202306_Rasyolar.xls"
 
-hisseAdi = "SISE"
+hisseAdi = "EREGL"
 bilancoDonemi = 202306
 directory = "//Users//myilmaz//Documents//bist//bilancolar_yeni//bilancolar"
+varReportFile = "//Users//myilmaz//Documents//bist//Report_202306_Rasyolar.xls"
+
 bilancoDosyasi = "//Users//myilmaz//Documents//bist//bilancolar_yeni//bilancolar//" + hisseAdi + ".xlsx"
 wb = xlrd.open_workbook(bilancoDosyasi)
 sheet = wb.sheet_by_index(0)
@@ -69,7 +70,7 @@ def getBilancoDegeri(label, col):
         cell = sheet.cell(rowi, 0)
         if cell.value == label:
             if sheet.cell_value(rowi, column)=="":
-                # print (label + " :Bilanço alanı boş!")
+                print (label + " :Bilanço alanı boş!")
                 return 0
             else:
                 return sheet.cell_value(rowi, column)
@@ -89,11 +90,43 @@ def yilliklandirmisDegerHesapla (row, bd):
     return toplam
 
 
-def hesapla(varHisseAdi, varBilancoDonemi):
+def rasyoHesapla(varHisseAdi, varBilancoDonemi):
 
     print ("Hisse Adı: ", varHisseAdi)
     hisseFiyati = returnGuncelHisseDegeri(varHisseAdi)
     print ("Güncel Hisse Fiyatı: ", hisseFiyati)
+
+    # LİKİDİTE ORANLARI
+    def cariOranHesapla(varHisseAdi, varBilancoDonemi):
+        donenVarliklar = getBilancoDegeri("TOPLAM DÖNEN VARLIKLAR", 0)
+        kisaVadeliYukumlulukler = getBilancoDegeri("TOPLAM KISA VADELİ YÜKÜMLÜLÜKLER", 0)
+        cariOran = donenVarliklar / kisaVadeliYukumlulukler
+        print("LİKİDİTE ORANLARI:")
+        print("Cari Oran: ", "{:.3}".format(cariOran))
+
+    def likitOraniHesapla(varHisseAdi, varBilancoDonemi):
+        donenVarliklar = getBilancoDegeri("TOPLAM DÖNEN VARLIKLAR", 0)
+        stoklar = getBilancoDegeri("Stoklar", 0)
+        digerDonenVarliklar = getBilancoDegeri("Diğer Dönen Varlıklar",0)
+        kisaVadeliYukumlulukler = getBilancoDegeri("TOPLAM KISA VADELİ YÜKÜMLÜLÜKLER", 0)
+        likitOrani = (donenVarliklar - stoklar - digerDonenVarliklar)/kisaVadeliYukumlulukler
+        print("Likit Oranı: ", "{:.3}".format(likitOrani))
+
+    def nakitOraniHesapla (varHisseAdi, varBilancoDonemi):
+        hazirDegerler = getBilancoDegeri("Nakit ve Nakit Benzerleri", 0)
+        kisaVadeliYukumlulukler = getBilancoDegeri("TOPLAM KISA VADELİ YÜKÜMLÜLÜKLER", 0)
+        nakitOrani = hazirDegerler/kisaVadeliYukumlulukler
+        print("Nakit Oranı: ", "{:.3}".format(nakitOrani))
+
+    cariOranHesapla(hisseAdi,bilancoDonemi)
+    likitOraniHesapla(hisseAdi,bilancoDonemi)
+    nakitOraniHesapla(hisseAdi,bilancoDonemi)
+
+
+rasyoHesapla(hisseAdi,bilancoDonemi)
+
+
+def hesapla(varHisseAdi, varBilancoDonemi):
 
     # BİLANÇO KALEMLERİ TANIMLAMALARI
     netKarRow = getBilancoTitleRow("Net Dönem Karı veya Zararı")
@@ -259,11 +292,7 @@ def hesapla(varHisseAdi, varBilancoDonemi):
     print("---------- DİĞER ORANLAR ----------")
 
 
-    # Cari Oran Hesabı
-    donenVarliklar = getBilancoDegeri("TOPLAM DÖNEN VARLIKLAR", 0)
-    kisaVadeliYukumlulukler = getBilancoDegeri("TOPLAM KISA VADELİ YÜKÜMLÜLÜKLER", 0)
-    cariOran = donenVarliklar / kisaVadeliYukumlulukler
-    print("Cari Oran: ", "{:.3}".format(cariOran))
+
 
 
     #DUPONT ANALİZİ ORANLARI
@@ -302,32 +331,32 @@ def hesapla(varHisseAdi, varBilancoDonemi):
 
 
     # Halka Açıklık Oranını Getir
-    halkaAciklikOrani = returnHisseHalkaAciklikOrani(varHisseAdi)
-    print("Halka Açıklık Oranı: ", "{:.2%}".format(halkaAciklikOrani))
+    # halkaAciklikOrani = returnHisseHalkaAciklikOrani(varHisseAdi)
+    # print("Halka Açıklık Oranı: ", "{:.2%}".format(halkaAciklikOrani))
 
     # Piyasa Değerini Getir
-    print ("Piyasa Değeri: " + "{:,.0f}".format(piyasaDegeri/1000000).replace(",", ".") + " Milyon TL")
+    # print ("Piyasa Değeri: " + "{:,.0f}".format(piyasaDegeri/1000000).replace(",", ".") + " Milyon TL")
 
     # Sermaye Getir
-    print ("Sermaye: " + "{:,.0f}".format(sermaye/1000000).replace(",", ".") + " Milyon TL")
+    # print ("Sermaye: " + "{:,.0f}".format(sermaye/1000000).replace(",", ".") + " Milyon TL")
 
     # Bedelsiz Sermaye Artırım Potansiyeli Hesapla
 
-    def sermayeArtirimPot(varHisseAdi, varBilancoDonemi):
-        odenmisSermaye = getBilancoDegeri("Ödenmiş Sermaye", 0)
-        ozkaynaklar = getBilancoDegeri("Ana Ortaklığa Ait Özkaynaklar", 0)
-        netKarRow = getBilancoTitleRow("Net Dönem Karı veya Zararı")
+    # def sermayeArtirimPot(varHisseAdi, varBilancoDonemi):
+    #     odenmisSermaye = getBilancoDegeri("Ödenmiş Sermaye", 0)
+    #     ozkaynaklar = getBilancoDegeri("Ana Ortaklığa Ait Özkaynaklar", 0)
+    #     netKarRow = getBilancoTitleRow("Net Dönem Karı veya Zararı")
+    #
+    #     try:
+    #         netKarYillik = yilliklandirmisDegerHesapla(netKarRow, 0)
+    #         sermayeArtirimPotansiyeli = (ozkaynaklar - odenmisSermaye) / odenmisSermaye
+    #         print("Sermaye Artirim Potansiyeli:" , "{:.0%}".format(sermayeArtirimPotansiyeli))
+    #         return sermayeArtirimPotansiyeli
+    #     except Exception as e:
+    #         print(varHisseAdi, "\t", "HATA")
+    #         return -1
 
-        try:
-            netKarYillik = yilliklandirmisDegerHesapla(netKarRow, 0)
-            sermayeArtirimPotansiyeli = (ozkaynaklar - odenmisSermaye) / odenmisSermaye
-            print("Sermaye Artirim Potansiyeli:" , "{:.0%}".format(sermayeArtirimPotansiyeli))
-            return sermayeArtirimPotansiyeli
-        except Exception as e:
-            print(varHisseAdi, "\t", "HATA")
-            return -1
-
-    sermayeArtirimPotansiyeli = sermayeArtirimPot(hisseAdi, bilancoDonemi)
+    # sermayeArtirimPotansiyeli = sermayeArtirimPot(hisseAdi, bilancoDonemi)
 
 
 
@@ -365,82 +394,83 @@ def hesapla(varHisseAdi, varBilancoDonemi):
 
 
 
+
+    # hesapla(hisseAdi, bilancoDonemi)
+
+
+
     #Excel'e Rasyolari Yazdir
     #######################################################################################
-    def createTopRow():
-        bookSheetWrite.write(0, 0, "Hisse Adı")
-        bookSheetWrite.write(0, 1, "Tarih")
-        bookSheetWrite.write(0, 2, "Hisse Fiyatı")
-        bookSheetWrite.write(0, 3, "Net Kar Büyüme Yıllık")
-        bookSheetWrite.write(0, 4, "Net Kar Büyüme 4 Önceki Çeyreğe Göre")
-        bookSheetWrite.write(0, 5, "F/K")
-        bookSheetWrite.write(0, 6, "Nakit/PD")
-        bookSheetWrite.write(0, 7, "Nakit/FD")
-        bookSheetWrite.write(0, 8, "PD/DD")
-        bookSheetWrite.write(0, 9, "PEG")
-        bookSheetWrite.write(0, 10, "FD/Satışlar")
-        bookSheetWrite.write(0, 11, "FD/FAVÖK")
-        bookSheetWrite.write(0, 12, "PD/EFK")
-        bookSheetWrite.write(0, 13, "Cari Oran")
-        bookSheetWrite.write(0, 14, "ROE (Özsermaye Karlılığı)")
-        bookSheetWrite.write(0, 15, "ROA (Aktif Karlılık)")
-        bookSheetWrite.write(0, 16, "Yıllık Net Kar Marjı")
-        bookSheetWrite.write(0, 17, "Son Çeyrek Net Kar Marjı")
-        bookSheetWrite.write(0, 18, "Aktif Devir Hızı")
-        bookSheetWrite.write(0, 19, "Borç/Kaynak")
-        bookSheetWrite.write(0, 20, "Halka Açıklık Oranı")
-        bookSheetWrite.write(0, 21, "Piyasa Değeri Milyon TL")
-        bookSheetWrite.write(0, 22, "Sermaye Milyon TL")
-        bookSheetWrite.write(0, 23, "Sermaye Artırım Potansiyeli")
+    # def createTopRow():
+    #     bookSheetWrite.write(0, 0, "Hisse Adı")
+    #     bookSheetWrite.write(0, 1, "Tarih")
+    #     bookSheetWrite.write(0, 2, "Hisse Fiyatı")
+    #     bookSheetWrite.write(0, 3, "Net Kar Büyüme Yıllık")
+    #     bookSheetWrite.write(0, 4, "Net Kar Büyüme 4 Önceki Çeyreğe Göre")
+    #     bookSheetWrite.write(0, 5, "F/K")
+    #     bookSheetWrite.write(0, 6, "Nakit/PD")
+    #     bookSheetWrite.write(0, 7, "Nakit/FD")
+    #     bookSheetWrite.write(0, 8, "PD/DD")
+    #     bookSheetWrite.write(0, 9, "PEG")
+    #     bookSheetWrite.write(0, 10, "FD/Satışlar")
+    #     bookSheetWrite.write(0, 11, "FD/FAVÖK")
+    #     bookSheetWrite.write(0, 12, "PD/EFK")
+    #     bookSheetWrite.write(0, 13, "Cari Oran")
+    #     bookSheetWrite.write(0, 14, "ROE (Özsermaye Karlılığı)")
+    #     bookSheetWrite.write(0, 15, "ROA (Aktif Karlılık)")
+    #     bookSheetWrite.write(0, 16, "Yıllık Net Kar Marjı")
+    #     bookSheetWrite.write(0, 17, "Son Çeyrek Net Kar Marjı")
+    #     bookSheetWrite.write(0, 18, "Aktif Devir Hızı")
+    #     bookSheetWrite.write(0, 19, "Borç/Kaynak")
+    #     bookSheetWrite.write(0, 20, "Halka Açıklık Oranı")
+    #     bookSheetWrite.write(0, 21, "Piyasa Değeri Milyon TL")
+    #     bookSheetWrite.write(0, 22, "Sermaye Milyon TL")
+    #     bookSheetWrite.write(0, 23, "Sermaye Artırım Potansiyeli")
+    #
+    # def reportResults(rowNumber):
+    #     bookSheetWrite.write(rowNumber, 0, varHisseAdi)
+    #     bookSheetWrite.write(rowNumber, 1, datetime.today().strftime('%d.%m.%Y'))
+    #     bookSheetWrite.write(rowNumber, 2, hisseFiyati)
+    #     bookSheetWrite.write(rowNumber, 3, netKarBuyumeOraniYillik)
+    #     bookSheetWrite.write(rowNumber, 4, oncekiYilAyniCeyregeGoreNetKarBuyume)
+    #     bookSheetWrite.write(rowNumber, 5, fkOrani)
+    #     bookSheetWrite.write(rowNumber, 6, nakitPd)
+    #     bookSheetWrite.write(rowNumber, 7, nakitFd)
+    #     bookSheetWrite.write(rowNumber, 8, pddd)
+    #     bookSheetWrite.write(rowNumber, 9, pegOrani)
+    #     bookSheetWrite.write(rowNumber, 10, fdSatislar)
+    #     bookSheetWrite.write(rowNumber, 11, fdfavok)
+    #     bookSheetWrite.write(rowNumber, 12, pdefk)
+    #     bookSheetWrite.write(rowNumber, 13, cariOran)
+    #     bookSheetWrite.write(rowNumber, 14, roe)
+    #     bookSheetWrite.write(rowNumber, 15, aktifKarlilik)
+    #     bookSheetWrite.write(rowNumber, 16, netKarMarji)
+    #     bookSheetWrite.write(rowNumber, 17, sonCeyrekNetKarMarji)
+    #     bookSheetWrite.write(rowNumber, 18, aktifDevirHizi)
+    #     bookSheetWrite.write(rowNumber, 19, borcKaynakOrani)
+    #     bookSheetWrite.write(rowNumber, 20, halkaAciklikOrani)
+    #     bookSheetWrite.write(rowNumber, 21, (int) (piyasaDegeri/1000000))
+    #     bookSheetWrite.write(rowNumber, 22, (int) (sermaye / 1000000))
+    #     bookSheetWrite.write(rowNumber, 23, sermayeArtirimPotansiyeli)
+    #
+    #
+    # if os.path.isfile(varReportFile):
+    #     print("Rapor dosyası var, güncellenecek:", varReportFile)
+    #     bookRead = xlrd.open_workbook(varReportFile, formatting_info=True)
+    #     sheetRead = bookRead.sheet_by_index(0)
+    #     rowNumber = sheetRead.nrows
+    #     bookWrite = copy(bookRead)
+    #     bookSheetWrite = bookWrite.get_sheet(0)
+    #     reportResults(rowNumber)
+    #     bookWrite.save(varReportFile)
+    #
+    # else:
+    #     print("Rapor dosyası yeni oluşturulacak: ", varReportFile)
+    #     bookWrite = xlwt.Workbook()
+    #     bookSheetWrite = bookWrite.add_sheet(str(bilancoDonemi))
+    #     createTopRow()
+    #     reportResults(1)
+    #     bookWrite.save(varReportFile)
+    #
 
-    def reportResults(rowNumber):
-        bookSheetWrite.write(rowNumber, 0, varHisseAdi)
-        bookSheetWrite.write(rowNumber, 1, datetime.today().strftime('%d.%m.%Y'))
-        bookSheetWrite.write(rowNumber, 2, hisseFiyati)
-        bookSheetWrite.write(rowNumber, 3, netKarBuyumeOraniYillik)
-        bookSheetWrite.write(rowNumber, 4, oncekiYilAyniCeyregeGoreNetKarBuyume)
-        bookSheetWrite.write(rowNumber, 5, fkOrani)
-        bookSheetWrite.write(rowNumber, 6, nakitPd)
-        bookSheetWrite.write(rowNumber, 7, nakitFd)
-        bookSheetWrite.write(rowNumber, 8, pddd)
-        bookSheetWrite.write(rowNumber, 9, pegOrani)
-        bookSheetWrite.write(rowNumber, 10, fdSatislar)
-        bookSheetWrite.write(rowNumber, 11, fdfavok)
-        bookSheetWrite.write(rowNumber, 12, pdefk)
-        bookSheetWrite.write(rowNumber, 13, cariOran)
-        bookSheetWrite.write(rowNumber, 14, roe)
-        bookSheetWrite.write(rowNumber, 15, aktifKarlilik)
-        bookSheetWrite.write(rowNumber, 16, netKarMarji)
-        bookSheetWrite.write(rowNumber, 17, sonCeyrekNetKarMarji)
-        bookSheetWrite.write(rowNumber, 18, aktifDevirHizi)
-        bookSheetWrite.write(rowNumber, 19, borcKaynakOrani)
-        bookSheetWrite.write(rowNumber, 20, halkaAciklikOrani)
-        bookSheetWrite.write(rowNumber, 21, (int) (piyasaDegeri/1000000))
-        bookSheetWrite.write(rowNumber, 22, (int) (sermaye / 1000000))
-        bookSheetWrite.write(rowNumber, 23, sermayeArtirimPotansiyeli)
-
-
-    if os.path.isfile(varReportFile):
-        print("Rapor dosyası var, güncellenecek:", varReportFile)
-        bookRead = xlrd.open_workbook(varReportFile, formatting_info=True)
-        sheetRead = bookRead.sheet_by_index(0)
-        rowNumber = sheetRead.nrows
-        bookWrite = copy(bookRead)
-        bookSheetWrite = bookWrite.get_sheet(0)
-        reportResults(rowNumber)
-        bookWrite.save(varReportFile)
-
-    else:
-        print("Rapor dosyası yeni oluşturulacak: ", varReportFile)
-        bookWrite = xlwt.Workbook()
-        bookSheetWrite = bookWrite.add_sheet(str(bilancoDonemi))
-        createTopRow()
-        reportResults(1)
-        bookWrite.save(varReportFile)
-
-
-
-    
-
-hesapla(hisseAdi, bilancoDonemi)
 
