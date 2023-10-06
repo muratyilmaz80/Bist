@@ -1,3 +1,4 @@
+import math
 
 from GetGuncelHisseDegeri import returnGuncelHisseDegeri
 from GetHisseHalkaAciklikOrani import returnHisseHalkaAciklikOrani
@@ -10,7 +11,7 @@ from datetime import datetime
 import pandas as pd
 
 
-hisseAdi = "SISE"
+hisseAdi = "DEVA"
 print("Hisse Adı: ", hisseAdi)
 bilancoDonemi = 202306
 print (f"Bilanço Dönemi: {bilancoDonemi}")
@@ -65,7 +66,10 @@ def getBilancoDegeri(label, col):
     donem = bilancoDoneminiBul(col)
     try:
         bilancoDegeri = bd_df.loc[label][donem]
-        return bilancoDegeri
+        if math.isnan(bilancoDegeri):
+            return 0
+        else:
+            return bilancoDegeri
     except:
         print (f"Bilançoda ilgili alan bulunamadı! Label: {label} Çeyrek: {donem}")
         return -1;
@@ -80,6 +84,8 @@ def rasyolariHesapla():
 
     rasyolariHesapla.netKarBuyumeOraniYillik = -1
     rasyolariHesapla.oncekiYilAyniCeyregeGoreNetKarBuyume = -1
+    rasyolariHesapla.yillikEsasFaaliyetKariBuyumeOrani = -1
+    rasyolariHesapla.yillikHasilatBuyumeOrani = -1
     rasyolariHesapla.fkOrani = -1
     rasyolariHesapla.nakitPd = -1
     rasyolariHesapla.nakitFd = -1
@@ -87,6 +93,8 @@ def rasyolariHesapla():
     rasyolariHesapla.pegOrani = -1
     rasyolariHesapla.fdSatislar = -1
     rasyolariHesapla.favok = -1 #Hesaplarda kullanmak icin
+    rasyolariHesapla.favokOncekiYil = -1  # Hesaplarda kullanmak icin
+    rasyolariHesapla.yillikFavokArtisOrani = -1
     rasyolariHesapla.yillikEsasFaaliyetKari = -1 #Hesaplarda kullanmak icin
     rasyolariHesapla.yillikHasilat = -1 #Hesaplarda kullanmak icin
     rasyolariHesapla.yillikNetKar = -1 #Hesaplarda kullanmak icin
@@ -108,6 +116,7 @@ def rasyolariHesapla():
     rasyolariHesapla.piyasaDegeri = -1
     rasyolariHesapla.sermaye = -1
     rasyolariHesapla.sermayeArtirimPotansiyeli = -1
+    rasyolariHesapla.yillikOzsermayeBuyumesi = -1
 
     # Ortak Hesaplamalar
     rasyolariHesapla.yillikHasilat = yilliklandirmisDegerHesapla("Hasılat", 0)
@@ -137,6 +146,18 @@ def rasyolariHesapla():
         oyacnkPrint = "{:,.0f}".format(ceyrekDegeriHesapla("Net Dönem Karı veya Zararı", -4)).replace(",", ".")
         oncekiYilAyniCeyregeGoreNetKarBuyumePrint = "{:.2%}".format(rasyolariHesapla.oncekiYilAyniCeyregeGoreNetKarBuyume)
         print(f"Önceki Yıl Aynı Çeyreğe Göre Net Kar Büyüme: {oncekiYilAyniCeyregeGoreNetKarBuyumePrint} ({scnkPrint}/{oyacnkPrint})" )
+
+    def esasFaaliyetKariBuyumeOraniHesapla():
+        yillikEfk = yilliklandirmisDegerHesapla("ESAS FAALİYET KARI (ZARARI)", 0)
+        oncekiYilEfk = yilliklandirmisDegerHesapla("ESAS FAALİYET KARI (ZARARI)", -4)
+        rasyolariHesapla.yillikEsasFaaliyetKariBuyumeOrani = (yillikEfk / oncekiYilEfk -1)
+        print (f"Yıllık Esas Faaliyet Karı Artış Oranı: {rasyolariHesapla.yillikEsasFaaliyetKariBuyumeOrani}")
+
+    def hasilatBuyumeOraniHesapla():
+        yillikHasilat = yilliklandirmisDegerHesapla("Hasılat", 0)
+        oncekiYilHasilat = yilliklandirmisDegerHesapla("Hasılat", -4)
+        rasyolariHesapla.yillikHasilatBuyumeOrani = (yillikHasilat / oncekiYilHasilat -1)
+        print (f"Yıllık Hasılat Artış Oranı: {rasyolariHesapla.yillikHasilatBuyumeOrani}")
 
 
     def fkOraniHesapla():
@@ -195,7 +216,6 @@ def rasyolariHesapla():
 
 
     def favokHesabi():
-
         yillikBrutKar = yilliklandirmisDegerHesapla("BRÜT KAR (ZARAR)", 0)
         yillikGenelYonetimGiderleri = yilliklandirmisDegerHesapla("Genel Yönetim Giderleri", 0)
 
@@ -219,6 +239,38 @@ def rasyolariHesapla():
 
         rasyolariHesapla.favok = yillikBrutKar + yillikPazarlamaGiderleri + yillikGenelYonetimGiderleri + yillikArgeGiderleri + yillikAmortisman
         print("FAVÖK: ", "{:,.0f}".format(rasyolariHesapla.favok).replace(",", "."))
+
+
+
+    def oncekiYilFavokHesabi():
+        yillikBrutKar = yilliklandirmisDegerHesapla("BRÜT KAR (ZARAR)", -4)
+        yillikGenelYonetimGiderleri = yilliklandirmisDegerHesapla("Genel Yönetim Giderleri", -4)
+
+        try:
+            yillikPazarlamaGiderleri = yilliklandirmisDegerHesapla("Pazarlama Giderleri", -4)
+        except Exception as e:
+            print("Bilançoda Pazarlama Giderleri Bulunmamaktadır!")
+            yillikPazarlamaGiderleri = 0
+
+        try:
+            yillikArgeGiderleri = yilliklandirmisDegerHesapla("Araştırma ve Geliştirme Giderleri", -4)
+        except Exception as e:
+            print("Bilançoda AR-GE Giderleri Bulunmamaktadır!")
+            yillikArgeGiderleri = 0
+
+        try:
+            yillikAmortisman = yilliklandirmisDegerHesapla("Amortisman ve İtfa Gideri İle İlgili Düzeltmeler", -4)
+        except Exception as e:
+            print("Bilançoda Amortisman Gideri Bulunmamaktadır!")
+            yillikAmortisman = 0
+
+        rasyolariHesapla.favokOncekiYil = yillikBrutKar + yillikPazarlamaGiderleri + yillikGenelYonetimGiderleri + yillikArgeGiderleri + yillikAmortisman
+        print("Önceki Yıl FAVÖK: ", "{:,.0f}".format(rasyolariHesapla.favokOncekiYil).replace(",", "."))
+
+
+    def favokArtisOraniHesapla():
+        rasyolariHesapla.yillikFavokArtisOrani = (rasyolariHesapla.favok / rasyolariHesapla.favokOncekiYil -1)
+        print("Yıllık FAVÖK Artış Oranı: ", "{:.2%}".format(rasyolariHesapla.yillikFavokArtisOrani))
 
     def fdFavokOraniHesabi():
         rasyolariHesapla.fdfavok = rasyolariHesapla.firmaDegeri/rasyolariHesapla.favok
@@ -305,32 +357,43 @@ def rasyolariHesapla():
             rasyolariHesapla.sermayeArtirimPotansiyeli = (ozkaynaklar - odenmisSermaye) / odenmisSermaye
             print("Sermaye Artirim Potansiyeli:" , "{:.0%}".format(rasyolariHesapla.sermayeArtirimPotansiyeli))
 
-    def roicHesapla():
-        print("-------------ROIC HESABI----------")
-        # uzunVadeBorcunKısaVadeliKisimlari = getBilancoDegeri("Uzun Vadeli Borçlanmaların Kısa Vadeli Kısımları", 0)
-        # kisaVadeliFinansalBorclar = getBilancoDegeri("Kısa Vadeli Borçlanmalar",0) + uzunVadeBorcunKısaVadeliKisimlari + getBilancoDegeri("Kısa Diğer Finansal Yükümlülükler1",0)
-        # uzunVadeliBorclar = getBilancoDegeri("Uzun Vadeli Borçlanmalar",0)
-        # uzunDigerFinansalYukumlulukler = getBilancoDegeri("Uzun Diğer Finansal Yükümlülükler",0)
-        # kisaDigerFinansalYukumlulukler = getBilancoDegeri("Kısa Diğer Finansal Yükümlülükler",0)
-        # toplamKisaVadeliFinansalBorclar = kisaVadeliFinansalBorclar + kisaDigerFinansalYukumlulukler
-        # toplamUzunVadeliFinansalBorclar = uzunVadeliBorclar + uzunDigerFinansalYukumlulukler
-        # yatirilmisSermaye = toplamOzkaynak + toplamKisaVadeliFinansalBorclar + toplamUzunVadeliFinansalBorclar
-        # toplamOzkaynak = getBilancoDegeri("TOPLAM ÖZKAYNAKLAR", 0)
-        yillikEsasFaaliyetKari = yilliklandirmisDegerHesapla(esasFaaliyetKariRow, 0)
-        yillikDonemVergi = yilliklandirmisDegerHesapla(donemVergiGideriRow, 0)
-        yillikErtelenmisVergiGeliri = yilliklandirmisDegerHesapla(ertelenmisVergiGideriRow, 0)
-        nopat = yillikEsasFaaliyetKari - yillikDonemVergi + yillikErtelenmisVergiGeliri
+    # def roicHesapla():
+    #
+    #     uzunVadeBorcunKısaVadeliKisimlari = getBilancoDegeri("Uzun Vadeli Borçlanmaların Kısa Vadeli Kısımları", 0)
+    #     kisaVadeliBorclanmalar = getBilancoDegeri("Kısa Vadeli Borçlanmalar",0)
+    #     digerKisaVadeliYukumlulukler = getBilancoDegeri("Diğer Kısa Vadeli Yükümlülükler",0)
+    #     kisaVadeliFinansalBorclar = kisaVadeliBorclanmalar + uzunVadeBorcunKısaVadeliKisimlari + digerKisaVadeliYukumlulukler
+    #
+    #     uzunVadeliBorclar = getBilancoDegeri("Uzun Vadeli Borçlanmalar",0)
+    #     digerUzunVadeliYukumlulukler = getBilancoDegeri("Diğer Uzun Vadeli Yükümlülükler",0)
+    #     uzunVadeliFinansalBorclar = uzunVadeliBorclar + digerUzunVadeliYukumlulukler
+    #
+    #     toplamFinansalBorclar = uzunVadeliFinansalBorclar + kisaVadeliFinansalBorclar
+    #
+    #     toplamOzkaynaklar = getBilancoDegeri("TOPLAM ÖZKAYNAKLAR", 0)
+    #     nakitVeNakitBenzerleri = getBilancoDegeri("Nakit ve Nakit Benzerleri", 0)
+    #     ertelenmisGelirler = getBilancoDegeri("Kısa Ertelenmiş Gelirler", 0) + getBilancoDegeri("Uzun Ertelenmiş Gelirler", 0)
+    #     uzunVadeliKarsiliklar = getBilancoDegeri("Uzun Vadeli Karşılıklar", 0)
+    #     kontrolGucuOlmayanPaylar = getBilancoDegeri("Kontrol Gücü Olmayan Paylar", 0)
+    #
+    #     yatirilanSermaye = toplamOzkaynaklar + toplamFinansalBorclar - nakitVeNakitBenzerleri + ertelenmisGelirler + uzunVadeliKarsiliklar + kontrolGucuOlmayanPaylar
+    #
+    #     yilliklandirilmisVergi = yilliklandirmisDegerHesapla("Sürdürülen Faaliyetler Vergi (Gideri) Geliri",0)
+    #     yillikEsasFaaliyetKari = yilliklandirmisDegerHesapla("ESAS FAALİYET KARI (ZARARI)",0)
+    #     ertelenmisVergi = yilliklandirmisDegerHesapla("Ertelenmiş Vergi (Gideri) Geliri", 0)
+    #     isletmeKarliligi = yillikEsasFaaliyetKari + yilliklandirilmisVergi + ertelenmisVergi
+    #
+    #     roic = isletmeKarliligi / yatirilanSermaye
+    #     print("ROIC: ", "{:.2%}".format(roic))
 
-        kontrolGucuOlmayanPaylar = getBilancoDegeri("Kontrol Gücü Olmayan Paylar", 0)
-        anaOrtakligaAitOzkaynaklar = getBilancoDegeri("Ana Ortaklığa Ait Özkaynaklar", 0)
-        ozkaynaklar = anaOrtakligaAitOzkaynaklar - nakitVeNakitBenzerleri - finansalYatirimlar
-        kvFinansalBorclar = getBilancoDegeri("Kısa Vadeli Borçlanmalar", 0)
-        uvFinansalBorclar = getBilancoDegeri("Uzun Vadeli Borçlanmalar", 0)
-        ertelenmisGelirler = getBilancoDegeri("Ertelenmiş Gelirler", 0)
-        uzunVadeliKarsiliklar = getBilancoDegeri("Uzun Vadeli Karşılıklar", 0)
-        finansmanYaklasimi = ozkaynaklar + kvFinansalBorclar + uvFinansalBorclar + ertelenmisGelirler + uzunVadeliKarsiliklar + kontrolGucuOlmayanPaylar
-        roic = nopat / finansmanYaklasimi
-        print("ROIC: ", "{:.2%}".format(roic))
+
+    def ozsermayeBuyumesiHesapla():
+        defterDegeri = getBilancoDegeri("Ana Ortaklığa Ait Özkaynaklar", 0)
+        dortOncekiCeyrekDefterDegeri = getBilancoDegeri("Ana Ortaklığa Ait Özkaynaklar", -4)
+        rasyolariHesapla.yillikOzsermayeBuyumesi = defterDegeri / dortOncekiCeyrekDefterDegeri
+        print("Yıllık Özsermaye Büyümesi: ", "{:.2%}".format(rasyolariHesapla.yillikOzsermayeBuyumesi))
+
+
 
     def excelExport():
         def createTopRow():
@@ -339,28 +402,33 @@ def rasyolariHesapla():
             bookSheetWrite.write(0, 2, "Hisse Fiyatı")
             bookSheetWrite.write(0, 3, "Net Kar Büyüme Yıllık")
             bookSheetWrite.write(0, 4, "Net Kar Büyüme 4 Önceki Çeyreğe Göre")
-            bookSheetWrite.write(0, 5, "F/K")
-            bookSheetWrite.write(0, 6, "Nakit/PD")
-            bookSheetWrite.write(0, 7, "Nakit/FD")
-            bookSheetWrite.write(0, 8, "PD/DD")
-            bookSheetWrite.write(0, 9, "PEG")
-            bookSheetWrite.write(0, 10, "FD/Satışlar")
-            bookSheetWrite.write(0, 11, "FD/FAVÖK")
-            bookSheetWrite.write(0, 12, "PD/EFK")
-            bookSheetWrite.write(0, 13, "Cari Oran")
-            bookSheetWrite.write(0, 14, "Likit Oranı")
-            bookSheetWrite.write(0, 15, "Nakit Oranı")
-            bookSheetWrite.write(0, 16, "Asit Test Oranı")
-            bookSheetWrite.write(0, 17, "ROE (Özsermaye Karlılığı)")
-            bookSheetWrite.write(0, 18, "ROA (Aktif Karlılık)")
-            bookSheetWrite.write(0, 19, "Yıllık Net Kar Marjı")
-            bookSheetWrite.write(0, 20, "Son Çeyrek Net Kar Marjı")
-            bookSheetWrite.write(0, 21, "Aktif Devir Hızı")
-            bookSheetWrite.write(0, 22, "Borç/Kaynak")
-            bookSheetWrite.write(0, 23, "Halka Açıklık Oranı")
-            bookSheetWrite.write(0, 24, "Piyasa Değeri Milyon TL")
-            bookSheetWrite.write(0, 25, "Sermaye Milyon TL")
-            bookSheetWrite.write(0, 26, "Sermaye Artırım Potansiyeli")
+            bookSheetWrite.write(0, 5, "Esas Faaliyet Karı Büyüme Yıllık")
+            bookSheetWrite.write(0, 6, "Hasılat Büyüme Yıllık")
+            bookSheetWrite.write(0, 7, "FAVÖK Büyüme Yıllık")
+            bookSheetWrite.write(0, 8, "F/K")
+            bookSheetWrite.write(0, 9, "Nakit/PD")
+            bookSheetWrite.write(0, 10, "Nakit/FD")
+            bookSheetWrite.write(0, 11, "PD/DD")
+            bookSheetWrite.write(0, 12, "PEG")
+            bookSheetWrite.write(0, 13, "FD/Satışlar")
+            bookSheetWrite.write(0, 14, "FD/FAVÖK")
+            bookSheetWrite.write(0, 15, "PD/EFK")
+            bookSheetWrite.write(0, 16, "Cari Oran")
+            bookSheetWrite.write(0, 17, "Likit Oranı")
+            bookSheetWrite.write(0, 18, "Nakit Oranı")
+            bookSheetWrite.write(0, 19, "Asit Test Oranı")
+            bookSheetWrite.write(0, 20, "ROE (Özsermaye Karlılığı)")
+            bookSheetWrite.write(0, 21, "ROA (Aktif Karlılık)")
+            bookSheetWrite.write(0, 22, "Yıllık Net Kar Marjı")
+            bookSheetWrite.write(0, 23, "Son Çeyrek Net Kar Marjı")
+            bookSheetWrite.write(0, 24, "Aktif Devir Hızı")
+            bookSheetWrite.write(0, 25, "Borç/Kaynak")
+            bookSheetWrite.write(0, 26, "Özsermaye Büyümesi")
+            bookSheetWrite.write(0, 27, "Halka Açıklık Oranı")
+            bookSheetWrite.write(0, 28, "Piyasa Değeri Milyon TL")
+            bookSheetWrite.write(0, 29, "Sermaye Milyon TL")
+            bookSheetWrite.write(0, 30, "Sermaye Artırım Potansiyeli")
+
 
         def reportResults(rowNumber):
             bookSheetWrite.write(rowNumber, 0, hisseAdi)
@@ -368,28 +436,32 @@ def rasyolariHesapla():
             bookSheetWrite.write(rowNumber, 2, hisseFiyati)
             bookSheetWrite.write(rowNumber, 3, rasyolariHesapla.netKarBuyumeOraniYillik)
             bookSheetWrite.write(rowNumber, 4, rasyolariHesapla.oncekiYilAyniCeyregeGoreNetKarBuyume)
-            bookSheetWrite.write(rowNumber, 5, rasyolariHesapla.fkOrani)
-            bookSheetWrite.write(rowNumber, 6, rasyolariHesapla.nakitPd)
-            bookSheetWrite.write(rowNumber, 7, rasyolariHesapla.nakitFd)
-            bookSheetWrite.write(rowNumber, 8, rasyolariHesapla.pddd)
-            bookSheetWrite.write(rowNumber, 9, rasyolariHesapla.pegOrani)
-            bookSheetWrite.write(rowNumber, 10, rasyolariHesapla.fdSatislar)
-            bookSheetWrite.write(rowNumber, 11, rasyolariHesapla.fdfavok)
-            bookSheetWrite.write(rowNumber, 12, rasyolariHesapla.pdefk)
-            bookSheetWrite.write(rowNumber, 13, rasyolariHesapla.cariOran)
-            bookSheetWrite.write(rowNumber, 14, rasyolariHesapla.likitOrani)
-            bookSheetWrite.write(rowNumber, 15, rasyolariHesapla.nakitOrani)
-            bookSheetWrite.write(rowNumber, 16, rasyolariHesapla.asitTestOrani)
-            bookSheetWrite.write(rowNumber, 17, rasyolariHesapla.roe)
-            bookSheetWrite.write(rowNumber, 18, rasyolariHesapla.aktifKarlilik)
-            bookSheetWrite.write(rowNumber, 19, rasyolariHesapla.yillikNetKarMarji)
-            bookSheetWrite.write(rowNumber, 20, rasyolariHesapla.sonCeyrekNetKarMarji)
-            bookSheetWrite.write(rowNumber, 21, rasyolariHesapla.aktifDevirHizi)
-            bookSheetWrite.write(rowNumber, 22, rasyolariHesapla.borcKaynakOrani)
-            bookSheetWrite.write(rowNumber, 23, rasyolariHesapla.halkaAciklikOrani)
-            bookSheetWrite.write(rowNumber, 24, (int)(rasyolariHesapla.piyasaDegeri / 1000000))
-            bookSheetWrite.write(rowNumber, 25, (int)(rasyolariHesapla.sermaye / 1000000))
-            bookSheetWrite.write(rowNumber, 26, rasyolariHesapla.sermayeArtirimPotansiyeli)
+            bookSheetWrite.write(rowNumber, 5, rasyolariHesapla.yillikEsasFaaliyetKariBuyumeOrani)
+            bookSheetWrite.write(rowNumber, 6, rasyolariHesapla.yillikHasilatBuyumeOrani)
+            bookSheetWrite.write(rowNumber, 7, rasyolariHesapla.yillikFavokArtisOrani)
+            bookSheetWrite.write(rowNumber, 8, rasyolariHesapla.fkOrani)
+            bookSheetWrite.write(rowNumber, 9, rasyolariHesapla.nakitPd)
+            bookSheetWrite.write(rowNumber, 10, rasyolariHesapla.nakitFd)
+            bookSheetWrite.write(rowNumber, 11, rasyolariHesapla.pddd)
+            bookSheetWrite.write(rowNumber, 12, rasyolariHesapla.pegOrani)
+            bookSheetWrite.write(rowNumber, 13, rasyolariHesapla.fdSatislar)
+            bookSheetWrite.write(rowNumber, 14, rasyolariHesapla.fdfavok)
+            bookSheetWrite.write(rowNumber, 15, rasyolariHesapla.pdefk)
+            bookSheetWrite.write(rowNumber, 16, rasyolariHesapla.cariOran)
+            bookSheetWrite.write(rowNumber, 17, rasyolariHesapla.likitOrani)
+            bookSheetWrite.write(rowNumber, 18, rasyolariHesapla.nakitOrani)
+            bookSheetWrite.write(rowNumber, 19, rasyolariHesapla.asitTestOrani)
+            bookSheetWrite.write(rowNumber, 20, rasyolariHesapla.roe)
+            bookSheetWrite.write(rowNumber, 21, rasyolariHesapla.aktifKarlilik)
+            bookSheetWrite.write(rowNumber, 22, rasyolariHesapla.yillikNetKarMarji)
+            bookSheetWrite.write(rowNumber, 23, rasyolariHesapla.sonCeyrekNetKarMarji)
+            bookSheetWrite.write(rowNumber, 24, rasyolariHesapla.aktifDevirHizi)
+            bookSheetWrite.write(rowNumber, 25, rasyolariHesapla.borcKaynakOrani)
+            bookSheetWrite.write(rowNumber, 26, rasyolariHesapla.yillikOzsermayeBuyumesi)
+            bookSheetWrite.write(rowNumber, 27, rasyolariHesapla.halkaAciklikOrani)
+            bookSheetWrite.write(rowNumber, 28, (int)(rasyolariHesapla.piyasaDegeri / 1000000))
+            bookSheetWrite.write(rowNumber, 29, (int)(rasyolariHesapla.sermaye / 1000000))
+            bookSheetWrite.write(rowNumber, 30, rasyolariHesapla.sermayeArtirimPotansiyeli)
 
         if os.path.isfile(varReportFile):
             print("Rapor dosyası var, güncellenecek:", varReportFile)
@@ -411,9 +483,10 @@ def rasyolariHesapla():
 
 
 
-
     netKarBuyumeOraniYillikHesapla()
     oncekiYilAyniCeyregeGoreNetKarBuyumeOraniHesapla()
+    esasFaaliyetKariBuyumeOraniHesapla()
+    hasilatBuyumeOraniHesapla()
     fkOraniHesapla()
     piyasaDegeriHesapla()
     nakitPdOraniHespala()
@@ -424,6 +497,8 @@ def rasyolariHesapla():
     nakitFdOraniHesapla()
     fdSatislarOraniHesapla()
     favokHesabi()
+    oncekiYilFavokHesabi()
+    favokArtisOraniHesapla()
     fdFavokOraniHesabi()
     pdEfkOraniHesapla()
     hbkOraniHesapla()
@@ -433,6 +508,7 @@ def rasyolariHesapla():
     sonCeyrekNetKarMarjiHesapla()
     aktifDevirHiziHesapla()
     borcKaynakOraniHesapla()
+    ozsermayeBuyumesiHesapla()
     cariOranHesapla()
     likitOraniHesapla()
     nakitOraniHesapla()
@@ -440,11 +516,6 @@ def rasyolariHesapla():
     halkaAciklikOraniniGetir()
     sermayeArtirimPotansiyeliniHesapla()
     excelExport()
-
-
-
-
-
 
 
 rasyolariHesapla()

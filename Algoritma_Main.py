@@ -1,23 +1,19 @@
 import logging
-
-from Algoritma_3Aylik import runAlgoritma
-from Algoritma_6Aylik import runAlgoritma6Aylik
+from Algoritma_3Aylik_Yeni import Algoritma
 from GetBondYield import returnBondYield
 from GetGuncelHisseDegeri import returnGuncelHisseDegeri
 
-
-varHisseAdi ="VAKKO"
+varHisseAdi ="SISE"
 
 varBilancoDosyasi = "//Users//myilmaz//Documents//bist//bilancolar_yeni//bilancolar//" + varHisseAdi + ".xlsx"
-
 varBilancoDonemi = 202306
 varBondYield = returnBondYield()
 varHisseFiyati = returnGuncelHisseDegeri(varHisseAdi)
 varReportFile = "//Users//myilmaz//Documents//bist//Report_202306_3Aylik.xls"
-varReportFile6Aylik = "//Users//myilmaz//Documents//bist//Report_202306_6Aylik.xls"
 varLogLevel = logging.DEBUG
 varLogPath = "//Users//myilmaz//Documents//bist//log//2023_06//"
 
+algoritma = Algoritma(varBilancoDosyasi, varBilancoDonemi, varBondYield, varHisseFiyati, varReportFile, varLogPath, varLogLevel)
 
 
 def runAlgoritmaMultiple(string):
@@ -31,11 +27,10 @@ def runAlgoritmaMultiple(string):
 
         varBilancoDosyasi = "//Users//myilmaz//Documents//bist//bilancolar_yeni//bilancolar//" + varHisseAdi + ".xlsx"
         varHisseFiyati = returnGuncelHisseDegeri(varHisseAdi)
-        runAlgoritma(varBilancoDosyasi, varBilancoDonemi, varBondYield, varHisseFiyati, varReportFile, varLogPath, varLogLevel)
+        algoritma.runAlgoritma()
 
 
-
-runAlgoritma(varBilancoDosyasi, varBilancoDonemi, varBondYield, varHisseFiyati, varReportFile, varLogPath, varLogLevel)
+algoritma.runAlgoritma()
 
 # runAlgoritma6Aylik(varBilancoDosyasi, varBilancoDonemi, varBondYield, varHisseFiyati, varReportFile6Aylik, varLogPath, varLogLevel)
 
