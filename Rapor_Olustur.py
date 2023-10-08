@@ -65,7 +65,7 @@ def exportReportExcel(hisse,file,bilancoDonemi,ExcelRowClass):
         bookSheetWrite.write(rowNumber, 4, ExcelRowClass.birOncekiBilancoDonemiHasilat)
         bookSheetWrite.write(rowNumber, 5, ExcelRowClass.besOncekiBilancoDonemiHasilat)
         bookSheetWrite.write(rowNumber, 6, ExcelRowClass.birOncekiBilancoDonemiHasilatDegisimi)
-        bookSheetWrite.write(rowNumber, 7, ExcelRowClass.bilancoDonemiHasilatGelirArtisiGecmeDurumu)
+        bookSheetWrite.write(rowNumber, 7, ExcelRowClass.bilancoDonemiHasilatDegisimiGecmeDurumu)
         bookSheetWrite.write(rowNumber, 8, ExcelRowClass.oncekiBilancoDonemiHasilatGelirArtisiGecmeDurumu)
         bookSheetWrite.write(rowNumber, 9, ExcelRowClass.bilancoDonemiFaaliyetKari)
         bookSheetWrite.write(rowNumber, 10, ExcelRowClass.oncekiYilAyniCeyrekFaaliyetKari)

@@ -6,16 +6,16 @@ class ExcelRowClass:
     birOncekiBilancoDonemiHasilat = None
     besOncekiBilancoDonemiHasilat = None
     birOncekiBilancoDonemiHasilatDegisimi = None
-    bilancoDonemiHasilatGelirArtisiGecmeDurumu = None
-    oncekiBilancoDonemiHasilatGelirArtisiGecmeDurumu = None
+    bilancoDonemiHasilatDegisimiGecmeDurumu = None
+    birOncekiBilancoDonemiHasilatDegisimiGecmeDurumu = None
     bilancoDonemiFaaliyetKari = None
     oncekiYilAyniCeyrekFaaliyetKari = None
     bilancoDonemiFaaliyetKariDegisimi = None
     birOncekiBilancoDonemiFaaliyetKari = None
     besOncekiBilancoDonemiFaaliyetKari = None
     oncekiBilancoDonemiFaaliyetKariDegisimi = None
-    bilancoDonemiFaaliyetKariArtisiGecmeDurumu = None
-    oncekiBilancoDonemiFaaliyetKarArtisiGecmeDurumu = None
+    bilancoDonemiFaaliyetKariDegisimiGecmeDurumu = None
+    birOncekiBilancoDonemiFaaliyetKarDegisimiGecmeDurumu = None
 
     bilancoDonemiOrtalamaDolarKuru = None
     bilancoDonemiDolarHasilat = None
