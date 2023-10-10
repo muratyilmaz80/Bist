@@ -1,9 +1,13 @@
+from openpyxl import load_workbook
+
 from ExcelRowClass import ExcelRowClass
 from Rapor_Olustur import exportReportExcel
 from prettytable import PrettyTable
-import logging,sys,math, xlrd
+import logging,sys,math
 from BilancoOrtalamaDolarDegeri import ucAylikBilancoDonemiOrtalamaDolarDegeriBul
 import pandas as pd
+import xlrd, xlwt
+from xlutils.copy import copy
 
 class Algoritma():
 
@@ -16,11 +20,12 @@ class Algoritma():
         self.my_logger = logging.getLogger()
         self.my_logger.setLevel(logLevel)
         self.bilancoDonemi = bilancoDonemi
-        output_file_handler = logging.FileHandler(logPath + self.hisseAdi + ".txt")
-        output_file_handler.level = logging.INFO
-        stdout_handler = logging.StreamHandler(sys.stdout)
-        self.my_logger.addHandler(output_file_handler)
-        self.my_logger.addHandler(stdout_handler)
+        self.reportFile = reportFile
+        self.output_file_handler = logging.FileHandler(logPath + self.hisseAdi + ".txt")
+        self.output_file_handler.level = logging.INFO
+        self.stdout_handler = logging.StreamHandler(sys.stdout)
+        self.my_logger.addHandler(self.output_file_handler)
+        self.my_logger.addHandler(self.stdout_handler)
         self.bd_df = pd.read_excel(self.bilancoDosyasi, index_col=0)
         self.cok_kullanilan_degerleri_hesapla()
         self.my_logger.info ("-------------------------------- %s ------------------------", self.hisseAdi)
@@ -37,7 +42,7 @@ class Algoritma():
     def bilancoDoneminiBul(self,i):
         if (i > 0):
             print("Hatalı Bilanço Dönemi!")
-            return -999;
+            return -999
         elif (i == 0):
             return self.bilancoDonemi
         else:
@@ -71,6 +76,20 @@ class Algoritma():
             return (self.bd_df.loc[r][donem] - self.bd_df.loc[r][birOncekibilancoDonemi])
 
 
+    def yilliklandirmisDegerHesapla(self, row, bd):
+        toplam = self.ceyrekDegeriHesapla(row, bd) + self.ceyrekDegeriHesapla(row, bd - 1) + self.ceyrekDegeriHesapla(row,bd - 2) + self.ceyrekDegeriHesapla(row, bd - 3)
+        return toplam
+
+    def onceki_yil_ayni_ceyrege_gore_degisimi_hesapla(self, row, donem):
+        self.my_logger.debug("fonksiyon: onceki_yil_ayni_ceyrek_degisimi_hesapla")
+        ceyrekDegeri = self.ceyrekDegeriHesapla(row, donem)
+        self.my_logger.debug(f"Çeyrek Değeri: {ceyrekDegeri}")
+        oncekiCeyrekDegeri = self.ceyrekDegeriHesapla(row, donem - 4)
+        self.my_logger.debug(f"Önceki Çeyrek Değeri: {oncekiCeyrekDegeri}", )
+        degisimSonucu = ceyrekDegeri / oncekiCeyrekDegeri - 1
+        return degisimSonucu
+
+
     def cok_kullanilan_degerleri_hesapla(self):
         self.hasilat0 = self.ceyrekDegeriHesapla("Hasılat", 0)
         self.hasilat1 = self.ceyrekDegeriHesapla("Hasılat", -1)
@@ -80,6 +99,7 @@ class Algoritma():
         self.hasilat5 = self.ceyrekDegeriHesapla("Hasılat", -5)
         self.hasilat6 = self.ceyrekDegeriHesapla("Hasılat", -6)
         self.hasilat7 = self.ceyrekDegeriHesapla("Hasılat", -7)
+        self.yillikHasilat = self.yilliklandirmisDegerHesapla("Hasılat", 0)
 
         self.faaliyetKari0 = self.ceyrekDegeriHesapla("ESAS FAALİYET KARI (ZARARI)", 0)
         self.faaliyetKari1 = self.ceyrekDegeriHesapla("ESAS FAALİYET KARI (ZARARI)", -1)
@@ -111,6 +131,9 @@ class Algoritma():
         self.nakit = self.getBilancoDegeri("Nakit ve Nakit Benzerleri", 0)
         self.stoklar = self.getBilancoDegeri("Stoklar", 0)
         self.digerVarliklar = self.getBilancoDegeri("Diğer Dönen Varlıklar", 0)
+        self.sermaye = self.getBilancoDegeri("Ödenmiş Sermaye", 0)
+        self.anaOrtaklikPayi = self.getBilancoDegeri("Ana Ortaklık Payları", 0) / self.getBilancoDegeri("DÖNEM KARI (ZARARI)", 0)
+        self.borclar = int(self.getBilancoDegeri("TOPLAM YÜKÜMLÜLÜKLER", 0))
 
         self.alacaklar = self.getBilancoDegeri("Dönen Ticari Alacaklar", 0) + \
                     self.getBilancoDegeri("Dönen Diğer Alacaklar", 0) + \
@@ -132,20 +155,6 @@ class Algoritma():
         self.ortalamaDolarKuru6 = ucAylikBilancoDonemiOrtalamaDolarDegeriBul(self.bilancoDoneminiBul(-6))
         self.ortalamaDolarKuru7 = ucAylikBilancoDonemiOrtalamaDolarDegeriBul(self.bilancoDoneminiBul(-7))
 
-
-
-    def yilliklandirmisDegerHesapla(self, row, bd):
-        toplam = self.ceyrekDegeriHesapla(row, bd) + self.ceyrekDegeriHesapla(row, bd - 1) + self.ceyrekDegeriHesapla(row,bd - 2) + self.ceyrekDegeriHesapla(row, bd - 3)
-        return toplam
-
-    def onceki_yil_ayni_ceyrege_gore_degisimi_hesapla(self, row, donem):
-        self.my_logger.debug("fonksiyon: onceki_yil_ayni_ceyrek_degisimi_hesapla")
-        ceyrekDegeri = self.ceyrekDegeriHesapla(row, donem)
-        self.my_logger.debug(f"Çeyrek Değeri: {ceyrekDegeri}")
-        oncekiCeyrekDegeri = self.ceyrekDegeriHesapla(row, donem - 4)
-        self.my_logger.debug(f"Önceki Çeyrek Değeri: {oncekiCeyrekDegeri}", )
-        degisimSonucu = ceyrekDegeri / oncekiCeyrekDegeri - 1
-        return degisimSonucu
 
 
     def likidasyonDegeriHesapla(self):
@@ -372,50 +381,41 @@ class Algoritma():
             self.my_logger.info("")
             self.my_logger.info("----------------GERÇEK DEĞER HESABI--------------------------------------------")
 
-            sermaye = self.getBilancoDegeri("Ödenmiş Sermaye", 0)
-            self.my_logger.info("Sermaye: %s TL", "{:,.0f}".format(sermaye).replace(",", "."))
-
-            anaOrtaklikPayi = self.getBilancoDegeri("Ana Ortaklık Payları", 0) / self.getBilancoDegeri("DÖNEM KARI (ZARARI)", 0)
-            self.my_logger.info("Ana Ortaklık Payı: %s", "{:.3f}".format(anaOrtaklikPayi))
+            self.my_logger.info("Sermaye: %s TL", "{:,.0f}".format(self.sermaye).replace(",", "."))
+            self.my_logger.info("Ana Ortaklık Payı: %s", "{:.3f}".format(self.anaOrtaklikPayi))
 
             hasilat0Degisimi = self.onceki_yil_ayni_ceyrege_gore_degisimi_hesapla("Hasılat", 0)
             hasilat1Degisimi = self.onceki_yil_ayni_ceyrege_gore_degisimi_hesapla("Hasılat", -1)
-
-            sonDortCeyrekHasilatToplami = self.yilliklandirmisDegerHesapla("Hasılat", 0)
-            self.my_logger.info("Son 4 Çeyrek Hasılat Toplamı: %s TL","{:,.0f}".format(sonDortCeyrekHasilatToplami).replace(",", "."))
-
-            onumuzdekiDortCeyrekHasilatTahmini = ((((hasilat0Degisimi + hasilat1Degisimi) / 2) + 1) * sonDortCeyrekHasilatToplami)
+            self.my_logger.info("Son 4 Çeyrek Hasılat Toplamı: %s TL","{:,.0f}".format(self.yillikHasilat).replace(",", "."))
+            self.onumuzdekiDortCeyrekHasilatTahmini = ((((hasilat0Degisimi + hasilat1Degisimi) / 2) + 1) * self.yillikHasilat)
 
             hasilatlarCeyrek = [self.hasilat3, self.hasilat2, self.hasilat1, self.hasilat0]
             maxHasilatCeyrek = max(hasilatlarCeyrek)
 
-            self.my_logger.info("Önümüzdeki 4 Çeyrek Hasılat Tahmini: %s TL","{:,.0f}".format(onumuzdekiDortCeyrekHasilatTahmini).replace(",", "."))
+            self.my_logger.info("Önümüzdeki 4 Çeyrek Hasılat Tahmini: %s TL","{:,.0f}".format(self.onumuzdekiDortCeyrekHasilatTahmini).replace(",", "."))
 
-            if (onumuzdekiDortCeyrekHasilatTahmini > 4 * maxHasilatCeyrek):
-                onumuzdekiDortCeyrekHasilatTahmini = 4 * maxHasilatCeyrek
+            if (self.onumuzdekiDortCeyrekHasilatTahmini > 4 * maxHasilatCeyrek):
+                self.onumuzdekiDortCeyrekHasilatTahmini = 4 * maxHasilatCeyrek
                 self.my_logger.info("Önümüzdeki 4 Çeyrek Hasılat Tahmini 4*maxCeyrek olarak duzeltildi:")
                 self.my_logger.info("Önümüzdeki 4 Çeyrek Hasılat Tahmini: %s TL",
-                               "{:,.0f}".format(onumuzdekiDortCeyrekHasilatTahmini).replace(",", "."))
+                               "{:,.0f}".format(self.onumuzdekiDortCeyrekHasilatTahmini).replace(",", "."))
 
             # HASILAT TAHMININI MANUEL DEGISTIRMEK ICIN
-            # onumuzdekiDortCeyrekHasilatTahmini = 700000000000
+            # self.onumuzdekiDortCeyrekHasilatTahmini = 700000000000
 
-            faaliyetKari0 = self.ceyrekDegeriHesapla("ESAS FAALİYET KARI (ZARARI)", 0)
-            faaliyetKari1 = self.ceyrekDegeriHesapla("ESAS FAALİYET KARI (ZARARI)", -1)
-            faaliyetKari2 = self.ceyrekDegeriHesapla("ESAS FAALİYET KARI (ZARARI)", -2)
-            faaliyetKari3 = self.ceyrekDegeriHesapla("ESAS FAALİYET KARI (ZARARI)", -3)
 
-            onumuzdekiDortCeyrekFaaliyetKarMarjiTahmini = (faaliyetKari1 + faaliyetKari0) / (self.hasilat0 + self.hasilat1)
-            self.my_logger.info("Önümüzdeki 4 Çeyrek Faaliyet Kar Marjı Tahmini: %s ","{:.2%}".format(onumuzdekiDortCeyrekFaaliyetKarMarjiTahmini))
 
-            faaliyetKariTahmini1 = onumuzdekiDortCeyrekHasilatTahmini * onumuzdekiDortCeyrekFaaliyetKarMarjiTahmini
-            self.my_logger.info("Faaliyet Kar Tahmini1: %s TL", "{:,.0f}".format(faaliyetKariTahmini1).replace(",", "."))
+            self.onumuzdekiDortCeyrekFaaliyetKarMarjiTahmini = (self.faaliyetKari1 + self.faaliyetKari0) / (self.hasilat0 + self.hasilat1)
+            self.my_logger.info("Önümüzdeki 4 Çeyrek Faaliyet Kar Marjı Tahmini: %s ","{:.2%}".format(self.onumuzdekiDortCeyrekFaaliyetKarMarjiTahmini))
 
-            faaliyetKariTahmini2 = ((faaliyetKari1 + faaliyetKari0) * 2 * 0.3) + (faaliyetKari0 * 4 * 0.5) + ((faaliyetKari3 + faaliyetKari2 + faaliyetKari1 + faaliyetKari0) * 0.2)
-            self.my_logger.info("Faaliyet Kar Tahmini2: %s TL", "{:,.0f}".format(faaliyetKariTahmini2).replace(",", "."))
+            self.faaliyetKariTahmini1 = self.onumuzdekiDortCeyrekHasilatTahmini * self.onumuzdekiDortCeyrekFaaliyetKarMarjiTahmini
+            self.my_logger.info("Faaliyet Kar Tahmini1: %s TL", "{:,.0f}".format(self.faaliyetKariTahmini1).replace(",", "."))
 
-            ortalamaFaaliyetKariTahmini = (faaliyetKariTahmini1 + faaliyetKariTahmini2) / 2
-            self.my_logger.info("Ortalama Faaliyet Kari Tahmini: %s TL","{:,.0f}".format(ortalamaFaaliyetKariTahmini).replace(",", "."))
+            self.faaliyetKariTahmini2 = ((self.faaliyetKari1 + self.faaliyetKari0) * 2 * 0.3) + (self.faaliyetKari0 * 4 * 0.5) + ((self.faaliyetKari3 + self.faaliyetKari2 + self.faaliyetKari1 + self.faaliyetKari0) * 0.2)
+            self.my_logger.info("Faaliyet Kar Tahmini2: %s TL", "{:,.0f}".format(self.faaliyetKariTahmini2).replace(",", "."))
+
+            self.ortalamaFaaliyetKariTahmini = (self.faaliyetKariTahmini1 + self.faaliyetKariTahmini2) / 2
+            self.my_logger.info("Ortalama Faaliyet Kari Tahmini: %s TL","{:,.0f}".format(self.ortalamaFaaliyetKariTahmini).replace(",", "."))
 
             # print ("----MURAT-----")
             #
@@ -428,31 +428,30 @@ class Algoritma():
             #
             # print("----MURAT-----")
 
-            hisseBasinaOrtalamaKarTahmini = ((ortalamaFaaliyetKariTahmini) * anaOrtaklikPayi) / sermaye
-            self.my_logger.info("Hisse Başına Ortalama Kar Tahmini: %s TL", format(hisseBasinaOrtalamaKarTahmini, ".2f"))
+            self.hisseBasinaOrtalamaKarTahmini = ((self.ortalamaFaaliyetKariTahmini) * self.anaOrtaklikPayi) / self.sermaye
+            self.my_logger.info("Hisse Başına Ortalama Kar Tahmini: %s TL", format(self.hisseBasinaOrtalamaKarTahmini, ".2f"))
 
-            likidasyonDegeri = self.likidasyonDegeriHesapla()
-            self.my_logger.info("Likidasyon Değeri: %s TL", "{:,.0f}".format(likidasyonDegeri).replace(",", "."))
+            self.likidasyonDegeri = self.likidasyonDegeriHesapla()
+            self.my_logger.info("Likidasyon Değeri: %s TL", "{:,.0f}".format(self.likidasyonDegeri).replace(",", "."))
 
-            borclar = int(self.getBilancoDegeri("TOPLAM YÜKÜMLÜLÜKLER", 0))
-            self.my_logger.info("Borçlar: %s TL", "{:,.0f}".format(borclar).replace(",", "."))
+            self.my_logger.info("Borçlar: %s TL", "{:,.0f}".format(self.borclar).replace(",", "."))
 
-            bilancoEtkisi = (likidasyonDegeri - borclar) / sermaye * anaOrtaklikPayi
-            self.my_logger.info("Bilanço Etkisi: %s TL", format(bilancoEtkisi, ".2f"))
+            self.bilancoEtkisi = (self.likidasyonDegeri - self.borclar) / self.sermaye * self.anaOrtaklikPayi
+            self.my_logger.info("Bilanço Etkisi: %s TL", format(self.bilancoEtkisi, ".2f"))
 
-            gercekDeger = (hisseBasinaOrtalamaKarTahmini * 7) + bilancoEtkisi
-            self.my_logger.info("Gerçek Hisse Değeri: %s TL", format(gercekDeger, ".2f"))
+            self.gercekDeger = (self.hisseBasinaOrtalamaKarTahmini * 7) + self.bilancoEtkisi
+            self.my_logger.info("Gerçek Hisse Değeri: %s TL", format(self.gercekDeger, ".2f"))
 
-            targetBuy = gercekDeger * 0.66
-            self.my_logger.info("Target Buy: %s TL", format(targetBuy, ".2f"))
+            self.targetBuy = self.gercekDeger * 0.66
+            self.my_logger.info("Target Buy: %s TL", format(self.targetBuy, ".2f"))
 
             self.my_logger.info("Bilanço Tarihindeki Hisse Fiyatı: %s TL", format(self.hisseFiyati, ".2f"))
 
-            gercekFiyataUzaklik = self.hisseFiyati / targetBuy
-            self.my_logger.info("Gerçek Fiyata Uzaklık Oranı: %s", "{:.2%}".format(gercekFiyataUzaklik))
+            self.gercekFiyataUzaklik = self.hisseFiyati / self.targetBuy
+            self.my_logger.info("Gerçek Fiyata Uzaklık Oranı: %s", "{:.2%}".format(self.gercekFiyataUzaklik))
 
-            gercekFiyataUzaklikTl = self.hisseFiyati - targetBuy
-            self.my_logger.info("Gerçek Fiyata Uzaklık %s TL:", format(gercekFiyataUzaklikTl, ".2f"))
+            self.gercekFiyataUzaklikTl = self.hisseFiyati - self.targetBuy
+            self.my_logger.info("Gerçek Fiyata Uzaklık %s TL:", format(self.gercekFiyataUzaklikTl, ".2f"))
 
 
 
@@ -473,16 +472,15 @@ class Algoritma():
             anaOrtaklikPayi = self.getBilancoDegeri("Ana Ortaklık Payları", 0) / self.getBilancoDegeri("DÖNEM KARI (ZARARI)", 0)
             sermaye = self.getBilancoDegeri("Ödenmiş Sermaye", 0)
 
-            fkOrani = self.hisseFiyati / ((sonDortDonemNetKarToplami * anaOrtaklikPayi) / (sermaye))
-            self.my_logger.info("F/K Oranı: %s", "{:,.2f}".format(fkOrani))
+            self.fkOrani = self.hisseFiyati / ((sonDortDonemNetKarToplami * anaOrtaklikPayi) / (sermaye))
+            self.my_logger.info("F/K Oranı: %s", "{:,.2f}".format(self.fkOrani))
 
-            hbkOrani = sonDortDonemNetKarToplami / (sermaye) * anaOrtaklikPayi
-            self.my_logger.info("HBK Oranı: %s", "{:,.2f}".format(hbkOrani))
+            self.hbkOrani = sonDortDonemNetKarToplami / (sermaye) * anaOrtaklikPayi
+            self.my_logger.info("HBK Oranı: %s", "{:,.2f}".format(self.hbkOrani))
 
             hasilat0Degisimi = self.onceki_yil_ayni_ceyrege_gore_degisimi_hesapla("Hasılat", 0)
             hasilat1Degisimi = self.onceki_yil_ayni_ceyrege_gore_degisimi_hesapla("Hasılat", -1)
-            sonDortCeyrekHasilatToplami = self.yilliklandirmisDegerHesapla("Hasılat", 0)
-            onumuzdekiDortCeyrekHasilatTahmini = ((((hasilat0Degisimi + hasilat1Degisimi) / 2) + 1) * sonDortCeyrekHasilatToplami)
+            onumuzdekiDortCeyrekHasilatTahmini = ((((hasilat0Degisimi + hasilat1Degisimi) / 2) + 1) * self.yillikHasilat)
 
             onumuzdekiDortCeyrekFaaliyetKarMarjiTahmini = (self.faaliyetKari1 + self.faaliyetKari0) / (self.hasilat0 + self.hasilat1)
             self.my_logger.info("Önümüzdeki 4 Çeyrek Faaliyet Kar Marjı Tahmini: %s ","{:.2%}".format(onumuzdekiDortCeyrekFaaliyetKarMarjiTahmini))
@@ -501,16 +499,16 @@ class Algoritma():
             self.my_logger.info("Piyasa Değeri: %s TL", "{:,.0f}".format(piyasaDegeri).replace(",", "."))
             self.my_logger.info("self.bondYield: %s", "{:.2%}".format(self.bondYield))
 
-            netProKriteri = (netProEstDegeri / piyasaDegeri) / self.bondYield
-            netProKriteriGecmeDurumu = (netProKriteri > 2)
-            self.my_logger.info("NetPro Kriteri (2'den Büyük Olmalı): %s %s", format(netProKriteri, ".2f"), str(netProKriteriGecmeDurumu))
+            self.netProKriteri = (netProEstDegeri / piyasaDegeri) / self.bondYield
+            self.netProKriteriGecmeDurumu = (self.netProKriteri > 2)
+            self.my_logger.info("NetPro Kriteri (2'den Büyük Olmalı): %s %s", format(self.netProKriteri, ".2f"), str(self.netProKriteriGecmeDurumu))
 
             minNetProIcinhisseFiyati = (netProEstDegeri / (1.9 * self.bondYield) - (bilancoEtkisi * sermaye * -1)) / sermaye
             self.my_logger.info("NetPro 1.9 Olması İçin Olması Gereken Hisse Fiyatı: %s", format(minNetProIcinhisseFiyati, ".2f"))
 
-            forwardPeKriteri = (piyasaDegeri) / netProEstDegeri
-            forwardPeKriteriGecmeDurumu = (forwardPeKriteri < 4)
-            printText = "Forward PE Kriteri (4'ten Küçük Olmalı): " + format(forwardPeKriteri, ".2f") + " " + str(forwardPeKriteriGecmeDurumu)
+            self.forwardPeKriteri = (piyasaDegeri) / netProEstDegeri
+            self.forwardPeKriteriGecmeDurumu = (self.forwardPeKriteri < 4)
+            printText = "Forward PE Kriteri (4'ten Küçük Olmalı): " + format(self.forwardPeKriteri, ".2f") + " " + str(self.forwardPeKriteriGecmeDurumu)
             self.my_logger.info(printText)
 
 
@@ -625,71 +623,69 @@ class Algoritma():
 
             dolarFaaliyetKari0Print = "{:,.0f}".format(self.dolarFaaliyetKari0).replace(",", ".")
             dolarFaaliyetKari4Print = "{:,.0f}".format(self.dolarFaaliyetKari4).replace(",",".")
-            self.dolarFaaliyetKariDegisimi0 = self.dolarFaaliyetKari0/self.dolarFaaliyetKari4-1
-            dolarFaaliyetKariDegisimi0Print = "{:.2%}".format(self.dolarFaaliyetKariDegisimi0)
+            self.dolarFaaliyetKari0Degisimi = self.dolarFaaliyetKari0/self.dolarFaaliyetKari4-1
+            dolarFaaliyetKari0DegisimiPrint = "{:.2%}".format(self.dolarFaaliyetKari0Degisimi)
 
             dolarFaaliyetKari1Print = "{:,.0f}".format(self.dolarFaaliyetKari1).replace(",", ".")
             dolarFaaliyetKari5Print = "{:,.0f}".format(self.dolarFaaliyetKari5).replace(",", ".")
-            self.dolarFaaliyetKariDegisimi1 = self.dolarFaaliyetKari1/self.dolarFaaliyetKari5-1
-            dolarFaaliyetKariDegisimi1Print = "{:.2%}".format(self.dolarFaaliyetKariDegisimi1)
+            self.dolarFaaliyetKari1Degisimi = self.dolarFaaliyetKari1/self.dolarFaaliyetKari5-1
+            dolarFaaliyetKari1DegisimiPrint = "{:.2%}".format(self.dolarFaaliyetKari1Degisimi)
 
             dolarFaaliyetKari2Print = "{:,.0f}".format(self.dolarFaaliyetKari2).replace(",", ".")
             dolarFaaliyetKari6Print = "{:,.0f}".format(self.dolarFaaliyetKari6).replace(",", ".")
-            dolarFaaliyetKariDegisimi2Print = "{:.2%}".format(self.dolarFaaliyetKari2/self.dolarFaaliyetKari6-1)
+            dolarFaaliyetKari2DegisimiPrint = "{:.2%}".format(self.dolarFaaliyetKari2/self.dolarFaaliyetKari6-1)
 
             dolarFaaliyetKari3Print = "{:,.0f}".format(self.dolarFaaliyetKari3).replace(",", ".")
             dolarFaaliyetKari7Print = "{:,.0f}".format(self.dolarFaaliyetKari7).replace(",", ".")
-            dolarFaaliyetKariDegisimi3Print = "{:.2%}".format(self.dolarFaaliyetKari3/self.dolarFaaliyetKari7-1)
+            dolarFaaliyetKari3DegisimiPrint = "{:.2%}".format(self.dolarFaaliyetKari3/self.dolarFaaliyetKari7-1)
 
             dolarFaaliyetKariTablosu = PrettyTable()
             dolarFaaliyetKariTablosu.field_names = ["ÇEYREK", "FAALİYET KARI (DOLAR)", "ÖNCEKİ YIL", "ÖNCEKİ YIL FAALİYET KARI (DOLAR)", "YÜZDE DEĞİŞİM"]
             dolarFaaliyetKariTablosu.align["FAALİYET KARI (DOLAR)"] = "r"
             dolarFaaliyetKariTablosu.align["ÖNCEKİ YIL FAALİYET KARI (DOLAR)"] = "r"
             dolarFaaliyetKariTablosu.align["YÜZDE DEĞİŞİM"] = "r"
-            dolarFaaliyetKariTablosu.add_row([self.bilancoDoneminiBul(0), dolarFaaliyetKari0Print, self.bilancoDoneminiBul(-4), dolarFaaliyetKari4Print, dolarFaaliyetKariDegisimi0Print])
-            dolarFaaliyetKariTablosu.add_row([self.bilancoDoneminiBul(-1), dolarFaaliyetKari1Print, self.bilancoDoneminiBul(-5), dolarFaaliyetKari5Print, dolarFaaliyetKariDegisimi1Print])
-            dolarFaaliyetKariTablosu.add_row([self.bilancoDoneminiBul(-2), dolarFaaliyetKari2Print, self.bilancoDoneminiBul(-6), dolarFaaliyetKari6Print, dolarFaaliyetKariDegisimi2Print])
-            dolarFaaliyetKariTablosu.add_row([self.bilancoDoneminiBul(-3), dolarFaaliyetKari3Print, self.bilancoDoneminiBul(-7), dolarFaaliyetKari7Print, dolarFaaliyetKariDegisimi3Print])
+            dolarFaaliyetKariTablosu.add_row([self.bilancoDoneminiBul(0), dolarFaaliyetKari0Print, self.bilancoDoneminiBul(-4), dolarFaaliyetKari4Print, dolarFaaliyetKari0DegisimiPrint])
+            dolarFaaliyetKariTablosu.add_row([self.bilancoDoneminiBul(-1), dolarFaaliyetKari1Print, self.bilancoDoneminiBul(-5), dolarFaaliyetKari5Print, dolarFaaliyetKari1DegisimiPrint])
+            dolarFaaliyetKariTablosu.add_row([self.bilancoDoneminiBul(-2), dolarFaaliyetKari2Print, self.bilancoDoneminiBul(-6), dolarFaaliyetKari6Print, dolarFaaliyetKari2DegisimiPrint])
+            dolarFaaliyetKariTablosu.add_row([self.bilancoDoneminiBul(-3), dolarFaaliyetKari3Print, self.bilancoDoneminiBul(-7), dolarFaaliyetKari7Print, dolarFaaliyetKari3DegisimiPrint])
             self.my_logger.info (dolarFaaliyetKariTablosu)
 
             # Bilanço Dönem Faaliyet Kar Artış Kriteri (DOLAR)
             if self.netKar0 < 0:
-                self.bilancoDonemiDolarFaaliyetKariArtisiGecmeDurumu = False
-                printText = "Bilanço Dönemi (DOLAR) Faaliyet Karı Artışı: " + str(self.bilancoDonemiDolarFaaliyetKariArtisiGecmeDurumu) + " Son Çeyrek Net Kar Negatif"
+                self.bilancoDonemiDolarFaaliyetKariDegisimiGecmeDurumu = False
+                printText = "Bilanço Dönemi (DOLAR) Faaliyet Karı Artışı: " + str(self.bilancoDonemiDolarFaaliyetKariDegisimiGecmeDurumu) + " Son Çeyrek Net Kar Negatif"
                 self.my_logger.info (printText)
 
-            elif (self.dolarFaaliyetKari0 < 0):
-                self.bilancoDonemiDolarFaaliyetKariArtisiGecmeDurumu = False
-                printText = "Bilanço Dönemi (DOLAR) Faaliyet Karı Artışı: " + str(self.bilancoDonemiDolarFaaliyetKariArtisiGecmeDurumu) + " Son Ceyrek Dolar Faaliyet Kari Negatif"
+            elif self.dolarFaaliyetKari0 < 0:
+                self.bilancoDonemiDolarFaaliyetKariDegisimiGecmeDurumu = False
+                printText = "Bilanço Dönemi (DOLAR) Faaliyet Karı Artışı: " + str(self.bilancoDonemiDolarFaaliyetKariDegisimiGecmeDurumu) + " Son Ceyrek Dolar Faaliyet Kari Negatif"
                 self.my_logger.info (printText)
 
             elif (self.dolarFaaliyetKari0 > 0) and (self.dolarFaaliyetKari4 < 0):
                 self.bilancoDonemiDolarFaaliyetKariArtisi = 0
                 self.bilancoDonemiDolarFaaliyetKariArtisiGecmeDurumu = True
-                printText = "Bilanço Dönemi (DOLAR) Faaliyet Karı Artışı: " + str(self.bilancoDonemiDolarFaaliyetKariArtisiGecmeDurumu) + " Son Çeyrek Dolar Faaliyet Karı Negatiften Pozitife Geçmiş"
+                printText = "Bilanço Dönemi (DOLAR) Faaliyet Karı Artışı: " + str(self.bilancoDonemiDolarFaaliyetKariDegisimiGecmeDurumu) + " Son Çeyrek Dolar Faaliyet Karı Negatiften Pozitife Geçmiş"
                 self.my_logger.info (printText)
 
             else:
-                self.bilancoDonemiDolarFaaliyetKariArtisiGecmeDurumu = (self.dolarFaaliyetKariDegisimi0 > 0.15)
-                printText = "Bilanço Dönemi (DOLAR) Faaliyet Karı Artışı: " + "{:.2%}".format(self.dolarFaaliyetKariDegisimi0) + " >? 15% " + str(self.bilancoDonemiDolarFaaliyetKariArtisiGecmeDurumu)
+                self.bilancoDonemiDolarFaaliyetKariDegisimiGecmeDurumu = (self.dolarFaaliyetKari0Degisimi > 0.15)
+                printText = "Bilanço Dönemi (DOLAR) Faaliyet Karı Artışı: " + "{:.2%}".format(self.dolarFaaliyetKari0Degisimi) + " >? 15% " + str(self.bilancoDonemiDolarFaaliyetKariDegisimiGecmeDurumu)
                 self.my_logger.info(printText)
 
 
             # Önceki Dönem Faaliyet Kar Artış Kriteri (DOLAR)
 
-            if self.dolarFaaliyetKariDegisimi0 >= 1:
-                self.birOncekibilancoDonemiDolarFaaliyetKarArtisiGecmeDurumu = True
-                printText = "Önceki Bilanço Dönemi (DOLAR) Faaliyet Kar Artışı: Bilanço Dönemi Artış " + "{:.2%}".format(self.dolarFaaliyetKariDegisimi0) + " > 100%, Karşılaştırma Yapılmayacak: " + str(self.birOncekibilancoDonemiDolarFaaliyetKarArtisiGecmeDurumu)
+            if self.dolarFaaliyetKari0Degisimi >= 1:
+                self.birOncekibilancoDonemiDolarFaaliyetKariDegisimiGecmeDurumu = True
+                printText = "Önceki Bilanço Dönemi (DOLAR) Faaliyet Kar Artışı: Bilanço Dönemi Artış " + "{:.2%}".format(self.dolarFaaliyetKari0Degisimi) + " > 100%, Karşılaştırma Yapılmayacak: " + str(self.birOncekibilancoDonemiDolarFaaliyetKariDegisimiGecmeDurumu)
                 self.my_logger.info(printText)
 
 
             else:
-                self.birOncekibilancoDonemiDolarFaaliyetKarArtisiGecmeDurumu = (self.dolarFaaliyetKariDegisimi1 < self.dolarFaaliyetKariDegisimi0)
-                printText = "Önceki Bilanço Dönemi (DOLAR) Faaliyet Kar Artışı: " + "{:.2%}".format(self.dolarFaaliyetKariDegisimi1) + \
-                            " <? " + "{:.2%}".format(self.dolarFaaliyetKariDegisimi0) + " " + str(self.birOncekibilancoDonemiDolarFaaliyetKarArtisiGecmeDurumu)
+                self.birOncekibilancoDonemiDolarFaaliyetKariDegisimiGecmeDurumu = (self.dolarFaaliyetKari1Degisimi < self.dolarFaaliyetKari0Degisimi)
+                printText = "Önceki Bilanço Dönemi (DOLAR) Faaliyet Kar Artışı: " + "{:.2%}".format(self.dolarFaaliyetKari1Degisimi) + \
+                            " <? " + "{:.2%}".format(self.dolarFaaliyetKari0Degisimi) + " " + str(self.birOncekibilancoDonemiDolarFaaliyetKariDegisimiGecmeDurumu)
                 self.my_logger.info(printText)
-
-
 
 
 
@@ -701,61 +697,64 @@ class Algoritma():
             self.my_logger.debug("")
             self.my_logger.debug("")
             self.my_logger.debug("----------------RAPOR DOSYASI OLUŞTURMA/GÜNCELLEME-------------------------------------")
-
             self.my_logger.debug (self.hisseAdi)
+
+
+
+
 
             excelRow = ExcelRowClass()
 
             excelRow.bilancoDonemiHasilat = self.hasilat0
             excelRow.oncekiYilAyniCeyrekHasilat = self.hasilat4
             excelRow.bilancoDonemiHasilatDegisimi = self.hasilat0Degisimi
-            excelRow.birOncekibilancoDonemiHasilat = self.hasilat1
-            excelRow.besOncekibilancoDonemiHasilat = self.hasilat5
-            excelRow.birOncekibilancoDonemiHasilatDegisimi = self.hasilat1Degisimi
+            excelRow.oncekiBilancoDonemiHasilat = self.hasilat1
+            excelRow.besOncekiBilancoDonemiHasilat = self.hasilat5
+            excelRow.oncekiBilancoDonemiHasilatDegisimi = self.hasilat1Degisimi
             excelRow.bilancoDonemiHasilatDegisimiGecmeDurumu = self.bilancoDonemiHasilatDegisimiGecmeDurumu
-            excelRow.birOncekibilancoDonemiHasilatDegisimiGecmeDurumu = self.oncekiDonemHasilatDegisimiGecmeDurumu
+            excelRow.oncekiBilancoDonemiHasilatDegisimiGecmeDurumu = self.oncekiDonemHasilatDegisimiGecmeDurumu
             excelRow.bilancoDonemiFaaliyetKari = self.faaliyetKari0
             excelRow.oncekiYilAyniCeyrekFaaliyetKari = self.faaliyetKari4
             excelRow.bilancoDonemiFaaliyetKariDegisimi = self.faaliyetKari0Degisimi
-            excelRow.birOncekibilancoDonemiFaaliyetKari = self.faaliyetKari1
-            excelRow.besOncekibilancoDonemiFaaliyetKari = self.faaliyetKari5
-            excelRow.oncekibilancoDonemiFaaliyetKariDegisimi = self.faaliyetKari1Degisimi
+            excelRow.oncekiBilancoDonemiFaaliyetKari = self.faaliyetKari1
+            excelRow.besOncekiBilancoDonemiFaaliyetKari = self.faaliyetKari5
+            excelRow.oncekiBilancoDonemiFaaliyetKariDegisimi = self.faaliyetKari1Degisimi
             excelRow.bilancoDonemiFaaliyetKariDegisimiGecmeDurumu = self.bilancoDonemiFaaliyetKariDegisimiGecmeDurumu
-            excelRow.birOncekibilancoDonemiFaaliyetKarDegisimiGecmeDurumu = self.birOncekibilancoDonemiFaaliyetKariDegisimiGecmeDurumu
+            excelRow.oncekiBilancoDonemiFaaliyetKarDegisimiGecmeDurumu = self.birOncekibilancoDonemiFaaliyetKariDegisimiGecmeDurumu
 
             excelRow.bilancoDonemiOrtalamaDolarKuru = self.ortalamaDolarKuru0
             excelRow.bilancoDonemiDolarHasilat = self.dolarHasilat0
             excelRow.oncekiYilAyniCeyrekDolarHasilat = self.dolarHasilat4
             excelRow.bilancoDonemiDolarHasilatDegisimi = self.dolarHasilat0Degisimi
-            excelRow.birOncekibilancoDonemiDolarHasilatDegisimi = self.dolarHasilat1Degisimi
-            excelRow.bilancoDonemiDolarHasilatGelirArtisiGecmeDurumu = self.bilancoDonemiDolarHasilatGelirArtisiGecmeDurumu
-            excelRow.oncekibilancoDonemiDolarHasilatGelirArtisiGecmeDurumu = self.oncekibilancoDonemiDolarHasilatGelirArtisiGecmeDurumu
-            excelRow.bilancoDonemiDolarFaaliyetKari = self.bilancoDonemiDolarFaaliyetKari
-            excelRow.dortOncekibilancoDonemiDolarFaaliyetKari = dortOncekiself.bilancoDonemiDolarFaaliyetKari
-            excelRow.bilancoDonemiDolarFaaliyetKariDegisimi = self.bilancoDonemiDolarFaaliyetKariDegisimi
-            excelRow.birOncekibilancoDonemiDolarFaaliyetKariDegisimi = birOncekibilancoDonemiDolarFaaliyetKariDegisimi
-            excelRow.bilancoDonemiDolarFaaliyetKariArtisiGecmeDurumu = self.bilancoDonemiDolarFaaliyetKariArtisiGecmeDurumu
-            excelRow.oncekibilancoDonemiDolarFaaliyetKarArtisiGecmeDurumu = birOncekibilancoDonemiDolarFaaliyetKarArtisiGecmeDurumu
+            excelRow.oncekiBilancoDonemiDolarHasilatDegisimi = self.dolarHasilat1Degisimi
+            excelRow.bilancoDonemiDolarHasilatDegisimiGecmeDurumu = self.bilancoDonemiDolarHasilatGelirArtisiGecmeDurumu
+            excelRow.oncekiBilancoDonemiDolarHasilatDegisimiGecmeDurumu = self.birOncekibilancoDonemiDolarFaaliyetKariDegisimiGecmeDurumu
+            excelRow.bilancoDonemiDolarFaaliyetKari = self.dolarFaaliyetKari0
+            excelRow.dortOncekiBilancoDonemiDolarFaaliyetKari = self.dolarFaaliyetKari4
+            excelRow.bilancoDonemiDolarFaaliyetKariDegisimi = self.dolarFaaliyetKari0Degisimi
+            excelRow.oncekiBilancoDonemiDolarFaaliyetKariDegisimi = self.dolarFaaliyetKari1Degisimi
+            excelRow.bilancoDonemiDolarFaaliyetKariDegisimiGecmeDurumu = self.bilancoDonemiDolarFaaliyetKariDegisimiGecmeDurumu
+            excelRow.oncekiBilancoDonemiDolarFaaliyetKariDegisimiGecmeDurumu = self.birOncekibilancoDonemiDolarFaaliyetKariDegisimiGecmeDurumu
 
             excelRow.sermaye = self.sermaye
-            excelRow.anaOrtaklikPayi = anaOrtaklikPayi
-            excelRow.sonDortbilancoDonemiHasilatToplami = sonDortCeyrekHasilatToplami
-            excelRow.onumuzdekiDortbilancoDonemiHasilatTahmini = onumuzdekiDortCeyrekHasilatTahmini
-            excelRow.onumuzdekiDortbilancoDonemiFaaliyetKarMarjiTahmini = onumuzdekiDortCeyrekFaaliyetKarMarjiTahmini
-            excelRow.faaliyetKariTahmini1 = faaliyetKariTahmini1
-            excelRow.faaliyetKariTahmini2 = faaliyetKariTahmini2
-            excelRow.ortalamaFaaliyetKariTahmini = ortalamaFaaliyetKariTahmini
-            excelRow.hisseBasinaOrtalamaKarTahmini = hisseBasinaOrtalamaKarTahmini
-            excelRow.bilancoEtkisi = bilancoEtkisi
-            excelRow.bilancoTarihihisseFiyati = self.hisseFiyati
-            excelRow.gercekHisseDegeri = gercekDeger
-            excelRow.targetBuy = targetBuy
-            excelRow.gercekFiyataUzaklik = gercekFiyataUzaklik
-            excelRow.fkOrani = fkOrani
-            excelRow.hbkOrani = hbkOrani
+            excelRow.anaOrtaklikPayi = self.anaOrtaklikPayi
+            excelRow.sonDortBilancoDonemiHasilatToplami = self.yillikHasilat
+            excelRow.onumuzdekiDortBilancoDonemiHasilatTahmini = self. onumuzdekiDortCeyrekHasilatTahmini
+            excelRow.onumuzdekiDortBilancoDonemiFaaliyetKarMarjiTahmini = self.onumuzdekiDortCeyrekFaaliyetKarMarjiTahmini
+            excelRow.faaliyetKariTahmini1 = self.faaliyetKariTahmini1
+            excelRow.faaliyetKariTahmini2 = self.faaliyetKariTahmini2
+            excelRow.ortalamaFaaliyetKariTahmini = self.ortalamaFaaliyetKariTahmini
+            excelRow.hisseBasinaOrtalamaKarTahmini = self.hisseBasinaOrtalamaKarTahmini
+            excelRow.bilancoEtkisi = self.bilancoEtkisi
+            excelRow.bilancoTarihiHisseFiyati = self.hisseFiyati
+            excelRow.gercekHisseDegeri = self.gercekDeger
+            excelRow.targetBuy = self.targetBuy
+            excelRow.gercekFiyataUzaklik = self.gercekFiyataUzaklik
+            excelRow.fkOrani = self.fkOrani
+            excelRow.hbkOrani = self.hbkOrani
 
-            excelRow.netProKriteri = netProKriteri
-            excelRow.forwardPeKriteri = forwardPeKriteri
+            excelRow.netProKriteri = self.netProKriteri
+            excelRow.forwardPeKriteri = self.forwardPeKriteri
 
             exportReportExcel(self.hisseAdi, self.reportFile, self.bilancoDonemi, excelRow)
 
@@ -768,6 +767,26 @@ class Algoritma():
             self.my_logger.removeHandler(self.stdout_handler)
 
 
+        def rapor_olustur_df():
+            df1 = pd.DataFrame([['a', 'b'], ['c', 'd']],
+                               index=['row 1', 'row 2'],
+                               columns=['col 1', 'col 2'])
+
+            book = load_workbook("//Users//myilmaz//Documents//bist//Output.xlsx")
+            writer = pd.ExcelWriter("//Users//myilmaz//Documents//bist//Output.xlsx", engine='openpyxl')
+            writer.book = book
+
+            df1.to_excel(writer, index=False, header=False, startrow=1)
+
+            writer.save()
+            writer.close()
+
+
+            df2 = pd.DataFrame([['e', 'f'], ['g', 'h']],
+                               index=['row 1', 'row 2'],
+                               columns=['col 1', 'col 2'])
+
+
 
         hasilat_hesaplari()
         faaliyet_kari_hesaplari()
@@ -778,4 +797,5 @@ class Algoritma():
         bilanco_donemi_dolar_hesabi()
         dolar_hasilat_hesaplari()
         dolar_faaliyet_kari_hesaplari()
-        rapor_olustur_excel()
+        # rapor_olustur_excel()
+        rapor_olustur_df()
