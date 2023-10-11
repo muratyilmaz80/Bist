@@ -16,7 +16,6 @@ class ExcelRowClass:
     oncekiBilancoDonemiFaaliyetKariDegisimi = None
     bilancoDonemiFaaliyetKariDegisimiGecmeDurumu = None
     oncekiBilancoDonemiFaaliyetKarDegisimiGecmeDurumu = None
-
     bilancoDonemiOrtalamaDolarKuru = None
     bilancoDonemiDolarHasilat = None
     oncekiYilAyniCeyrekDolarHasilat = None
@@ -30,7 +29,6 @@ class ExcelRowClass:
     oncekiBilancoDonemiDolarFaaliyetKariDegisimi = None
     bilancoDonemiDolarFaaliyetKariDegisimiGecmeDurumu = None
     oncekiBilancoDonemiDolarFaaliyetKarDegisimiGecmeDurumu = None
-
     sermaye = None
     anaOrtaklikPayi = None
     sonDortBilancoDonemiHasilatToplami = None
@@ -45,9 +43,35 @@ class ExcelRowClass:
     gercekHisseDegeri = None
     targetBuy = None
     gercekFiyataUzaklik = None
-
-    fkOrani = None
-    hbkOrani = None
-
     netProKriteri = None
     forwardPeKriteri = None
+
+    tarih = None
+    netKarBuyumeYillik = None
+    netKarBuyume4OncekiCeyregeGore = None
+    esasFaaliyetKariBuyumeYillik = None
+    hasilatBuyumeYillik = None
+    favokBuyumeYillik = None
+    fkOrani = None
+    nakitPd = None
+    nakitFd = None
+    pdDd = None
+    pegOrani = None
+    fdSatislar = None
+    fdFavok = None
+    pdEfk = None
+    cariOran = None
+    likitOrani = None
+    nakitOrani = None
+    asitTestOrani = None
+    roe = None
+    roa = None
+    yillikNetKarMarji = None
+    sonCeyrekNetKarMarji = None
+    aktifDevirHizi = None
+    borcKaynak = None
+    ozsermayeBuyumesi = None
+    halkaAciklikOrani = None
+    piyasaDegeri = None
+    sermaye = None
+    sermayeArtirimPotansiyeli = None
