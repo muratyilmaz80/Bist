@@ -704,69 +704,78 @@ class Algoritma():
 
 
 
+
+
         # RASYO HESAPLARI
-        #TODO: printleri loga çevir
-
-
         def netKarBuyumeOraniYillikHesapla():
             self.netKarBuyumeOraniYillik = (self.yillikNetKar / self.oncekiYilNetKar - 1)
             ynkPrint = "{:,.0f}".format(self.yillikNetKar).replace(",", ".")
             oynkPrint = "{:,.0f}".format(self.oncekiYilNetKar).replace(",", ".")
             nkboyPrint = "{:.2%}".format(self.netKarBuyumeOraniYillik)
-            print(f"Yıllık Net Kar Büyüme: {nkboyPrint} ({ynkPrint}/{oynkPrint})")
+            self.my_logger.info(f"Yıllık Net Kar Büyüme: {nkboyPrint} ({ynkPrint}/{oynkPrint})")
 
         def oncekiYilAyniCeyregeGoreNetKarBuyumeOraniHesapla():
             self.oncekiYilAyniCeyregeGoreNetKarBuyume = self.netKar0 / self.netKar4 - 1
             scnkPrint = "{:,.0f}".format(self.netKar0).replace(",", ".")
             oyacnkPrint = "{:,.0f}".format(self.netKar4).replace(",", ".")
             oncekiYilAyniCeyregeGoreNetKarBuyumePrint = "{:.2%}".format(self.oncekiYilAyniCeyregeGoreNetKarBuyume)
-            print(f"Önceki Yıl Aynı Çeyreğe Göre Net Kar Büyüme: {oncekiYilAyniCeyregeGoreNetKarBuyumePrint} ({scnkPrint}/{oyacnkPrint})")
+            self.my_logger.info(f"Önceki Yıl Aynı Çeyreğe Göre Net Kar Büyüme: {oncekiYilAyniCeyregeGoreNetKarBuyumePrint} ({scnkPrint}/{oyacnkPrint})")
 
         def esasFaaliyetKariBuyumeOraniHesapla():
             yillikEfk = self.yilliklandirmisDegerHesapla("ESAS FAALİYET KARI (ZARARI)", 0)
             oncekiYilEfk = self.yilliklandirmisDegerHesapla("ESAS FAALİYET KARI (ZARARI)", -4)
             self.yillikEsasFaaliyetKariBuyumeOrani = (yillikEfk / oncekiYilEfk - 1)
-            print(f"Yıllık Esas Faaliyet Karı Artış Oranı: {self.yillikEsasFaaliyetKariBuyumeOrani}")
+            buyume = "{:.2%}".format(self.yillikEsasFaaliyetKariBuyumeOrani)
+            self.my_logger.info(f"Yıllık Esas Faaliyet Karı Artış Oranı: {buyume}")
 
         def hasilatBuyumeOraniHesapla():
             self.yillikHasilatBuyumeOrani = (self.yillikHasilat / self.oncekiYilHasilat - 1)
-            print(f"Yıllık Hasılat Artış Oranı: {self.yillikHasilatBuyumeOrani}")
+            hasilat = "{:.2%}".format(self.yillikHasilatBuyumeOrani)
+            self.my_logger.info(f"Yıllık Hasılat Artış Oranı: {hasilat}")
 
         def fkOraniHesapla():
             self.fkOrani = self.hisseFiyati / ((self.yillikNetKar * self.anaOrtaklikPayi) / (self.sermaye))
-            print("F/K Orani: ", "{:,.2f}".format(self.fkOrani))
+            fk = "{:,.2f}".format(self.fkOrani)
+            self.my_logger.info(f"F/K Orani: {fk}")
 
         def piyasaDegeriHesapla():
             self.piyasaDegeri = self.sermaye * self.hisseFiyati;
-            print("Piyasa Değeri (PD): ", "{:,.0f}".format(self.piyasaDegeri).replace(",", "."))
+            pd = "{:,.0f}".format(self.piyasaDegeri).replace(",", ".")
+            self.my_logger.info(f"Piyasa Değeri (PD):  {pd}")
 
         def pdDdOraniHesapla():
             self.pdDd = self.piyasaDegeri / self.defterDegeri
-            print("PD/DD: ", "{:,.2f}".format(self.pdDd))
+            pddd = "{:,.2f}".format(self.pdDd)
+            self.my_logger.info(f"PD/DD: {pddd}")
 
         def nakitPdOraniHespala():
             self.nakitPd = self.nakitVeNakitBenzerleri / self.piyasaDegeri
-            print("Nakit / PD: ", "{:,.2f}".format(self.nakitPd))
+            nakitpd = "{:,.2f}".format(self.nakitPd)
+            self.my_logger.info(f"Nakit/PD: {nakitpd}")
 
         def pegOraniHesapla():
             self.pegOrani = self.fkOrani / (self.netKarBuyumeOraniYillik * 100)
-            print("PEG Orani: ", "{:,.4f}".format(self.pegOrani))
+            peg = "{:,.4f}".format(self.pegOrani)
+            self.my_logger.info(f"PEG Orani: {peg}")
 
         def netBorcHesapla():
             self.netBorc = self.finansalBorclar - self.nakitVeNakitBenzerleri - self.finansalYatirimlar
-            print("Net Borç: ", "{:,.0f}".format(self.netBorc).replace(",", "."))
+            borc = "{:,.0f}".format(self.netBorc).replace(",", ".")
+            self.my_logger.info(f"Net Borç: {borc}")
 
         def firmaDegeriHesapla():
             self.firmaDegeri = self.piyasaDegeri + self.netBorc
-            print("Firma Değeri (FD): ", "{:,.0f}".format(self.firmaDegeri).replace(",", "."))
+            fd = "{:,.0f}".format(self.firmaDegeri).replace(",", ".")
+            self.my_logger.info(f"Firma Değeri (FD): {fd}")
 
         def nakitFdOraniHesapla():
             self.nakitFd = self.nakitVeNakitBenzerleri / self.firmaDegeri
-            print("Nakit / FD: ", "{:,.2f}".format(self.nakitFd))
+            print("Nakit/FD: ", "{:,.2f}".format(self.nakitFd))
 
         def fdSatislarOraniHesapla():
             self.fdSatislar = self.firmaDegeri / self.yillikHasilat
-            print("FD/Satışlar: ", "{:,.2f}".format(self.fdSatislar))
+            fds = "{:,.2f}".format(self.fdSatislar)
+            self.my_logger.info(f"FD/Satışlar: {fds}")
 
         def genelFavokHesabi(ceyrek):
             yillikBrutKar = self.yilliklandirmisDegerHesapla("BRÜT KAR (ZARAR)", ceyrek)
@@ -791,7 +800,8 @@ class Algoritma():
                 yillikAmortisman = 0
 
             favok = yillikBrutKar + yillikPazarlamaGiderleri + yillikGenelYonetimGiderleri + yillikArgeGiderleri + yillikAmortisman
-            print(f"FAVÖK{ceyrek}: ", "{:,.0f}".format(favok).replace(",", "."))
+            fvk = "{:,.0f}".format(favok).replace(",", ".")
+            self.my_logger.info(f"FAVÖK{ceyrek}: {fvk}")
             return favok
 
         def favokHesapla():
@@ -800,54 +810,65 @@ class Algoritma():
 
         def favokArtisOraniHesapla():
             self.yillikFavokArtisOrani = (self.favok / self.oncekiYilFavok - 1)
-            print("Yıllık FAVÖK Artış Oranı: ", "{:.2%}".format(self.yillikFavokArtisOrani))
+            favokArtis = "{:.2%}".format(self.yillikFavokArtisOrani)
+            self.my_logger.info(f"Yıllık FAVÖK Artış Oranı: {favokArtis}")
 
         def fdFavokOraniHesabi():
             self.fdFavok = self.firmaDegeri / self.favok
-            print("FD/FAVÖK: ", "{:,.2f}".format(self.fdFavok))
+            fdf = "{:,.2f}".format(self.fdFavok)
+            self.my_logger.info(f"FD/FAVÖK: {fdf}")
 
         def pdEfkOraniHesapla():
             self.pdEfk = self.piyasaDegeri / self.yillikFaaliyetKari
-            print("PD/EFK: ""{:,.2f}".format(self.pdEfk))
+            pde = "{:,.2f}".format(self.pdEfk)
+            self.my_logger.info(f"PD/EFK: {pde}")
 
         def hbkOraniHesapla():
             self.hbk = self.yillikNetKar / (self.sermaye)
-            print("HBK:", "{:,.2f}".format(self.hbk))
+            hbk_print = "{:,.2f}".format(self.hbk)
+            self.my_logger.info(f"HBK: {hbk_print}")
 
         def roeHesabi():
             dortOncekiCeyrekDefterDegeri = self.getBilancoDegeri("Ana Ortaklığa Ait Özkaynaklar", -4)
             ortDefterDegeri = (self.defterDegeri + dortOncekiCeyrekDefterDegeri) / 2
             self.roe = self.yillikNetKar / ortDefterDegeri
-            print("ROE (Özsermaye Karlılığı - Özkaynak Getirisi): ", "{:.2%}".format(self.roe))
+            roe_print = "{:.2%}".format(self.roe)
+            self.my_logger.info(f"ROE (Özsermaye Karlılığı - Özkaynak Getirisi): {roe_print}")
 
         def aktifKarlilikHesapla():
             bilancoDonemiToplamVarliklar = self.getBilancoDegeri("TOPLAM VARLIKLAR", 0)
             dortOncekiBilancoDonemiToplamVarliklar = self.getBilancoDegeri("TOPLAM VARLIKLAR", -4)
             toplamVarliklar = (bilancoDonemiToplamVarliklar + dortOncekiBilancoDonemiToplamVarliklar) / 2
             self.roa = self.yillikNetKar / toplamVarliklar
-            print("ROA (Aktif Karlılık): ", "{:.2%}".format(self.roa))
+            roa_print = "{:.2%}".format(self.roa)
+            self.my_logger.info(f"ROA (Aktif Karlılık): {roa_print}")
 
         def yillikNetKarMarjiHesapla():
             self.yillikNetKarMarji = self.yillikNetKar / self.yillikHasilat
-            print("Yıllık Net Kar Marjı: ", "{:.2%}".format(self.yillikNetKarMarji))
+            yillikNetKarMarji_print = "{:.2%}".format(self.yillikNetKarMarji)
+            self.my_logger.info(f"Yıllık Net Kar Marjı: {yillikNetKarMarji_print}")
 
         def sonCeyrekNetKarMarjiHesapla():
             self.sonCeyrekNetKarMarji = self.netKar0/self.hasilat0
-            print("Son Çeyrek Net Kar Marjı: ", "{:.2%}".format(self.sonCeyrekNetKarMarji))
+            sonCeyrekNetKarMarji_print = "{:.2%}".format(self.sonCeyrekNetKarMarji)
+            self.my_logger.info(f"Son Çeyrek Net Kar Marjı: {sonCeyrekNetKarMarji_print}")
 
         def aktifDevirHiziHesapla():
             self.aktifDevirHizi = self.yillikHasilat / self.getBilancoDegeri("TOPLAM VARLIKLAR", 0)
-            print("Aktif Devir Hızı: ", "{:.2}".format(self.aktifDevirHizi))
+            aktifDevirHizi_print = "{:.2}".format(self.aktifDevirHizi)
+            self.my_logger.info(f"Aktif Devir Hızı: {aktifDevirHizi_print}")
 
         def borcKaynakOraniHesapla():
             self.borcKaynakOrani = self.getBilancoDegeri("TOPLAM YÜKÜMLÜLÜKLER", 0) / self.getBilancoDegeri("TOPLAM KAYNAKLAR", 0)
-            print("Borç/Kaynak Oranı: ", "{:.2%}".format(self.borcKaynakOrani))
+            borcKaynakOrani_print = "{:.2%}".format(self.borcKaynakOrani)
+            self.my_logger.info(f"Borç/Kaynak Oranı: {borcKaynakOrani_print}")
 
         def cariOranHesapla():
             donenVarliklar = self.getBilancoDegeri("TOPLAM DÖNEN VARLIKLAR", 0)
             kisaVadeliYukumlulukler = self.getBilancoDegeri("TOPLAM KISA VADELİ YÜKÜMLÜLÜKLER", 0)
             self.cariOran = donenVarliklar / kisaVadeliYukumlulukler
-            print("Cari Oran: ", "{:.3}".format(self.cariOran))
+            cariOran_print = "{:.3}".format(self.cariOran)
+            self.my_logger.info(f"Cari Oran: {cariOran_print}")
 
         def likitOraniHesapla():
             donenVarliklar = self.getBilancoDegeri("TOPLAM DÖNEN VARLIKLAR", 0)
@@ -855,24 +876,28 @@ class Algoritma():
             digerDonenVarliklar = self.getBilancoDegeri("Diğer Dönen Varlıklar", 0)
             kisaVadeliYukumlulukler = self.getBilancoDegeri("TOPLAM KISA VADELİ YÜKÜMLÜLÜKLER", 0)
             self.likitOrani = (donenVarliklar - stoklar - digerDonenVarliklar) / kisaVadeliYukumlulukler
-            print("Likit Oranı: ", "{:.3}".format(self.likitOrani))
+            likitOrani_print = "{:.3}".format(self.likitOrani)
+            self.my_logger.info(f"Likit Oranı: {likitOrani_print}")
 
         def nakitOraniHesapla():
             hazirDegerler = self.getBilancoDegeri("Nakit ve Nakit Benzerleri", 0)
             kisaVadeliYukumlulukler = self.getBilancoDegeri("TOPLAM KISA VADELİ YÜKÜMLÜLÜKLER", 0)
             self.nakitOrani = hazirDegerler / kisaVadeliYukumlulukler
-            print("Nakit Oranı: ", "{:.3}".format(self.nakitOrani))
+            nakitOrani_print = "{:.3}".format(self.nakitOrani)
+            self.my_logger.info(f"Nakit Oranı: {nakitOrani_print}")
 
         def asitTestOraniHesapla():
             donenVarliklar = self.getBilancoDegeri("TOPLAM DÖNEN VARLIKLAR", 0)
             stoklar = self.getBilancoDegeri("Stoklar", 0)
             kisaVadeliYukumlulukler = self.getBilancoDegeri("TOPLAM KISA VADELİ YÜKÜMLÜLÜKLER", 0)
             self.asitTestOrani = (donenVarliklar - stoklar) / kisaVadeliYukumlulukler
-            print("Asit Test Oranı: ", "{:.3}".format(self.asitTestOrani))
+            asitTestOrani_print = "{:.3}".format(self.asitTestOrani)
+            self.my_logger.info(f"Asit Test Oranı: {asitTestOrani_print}")
 
         def halkaAciklikOraniniGetir():
             self.halkaAciklikOrani = returnHisseHalkaAciklikOrani(self.hisseAdi)
-            print("Halka Açıklık Oranı: ", "{:.2%}".format(self.halkaAciklikOrani))
+            halkaAciklikOrani_print = "{:.2%}".format(self.halkaAciklikOrani)
+            self.my_logger.info(f"Halka Açıklık Oranı: {halkaAciklikOrani_print}")
 
         def sermayeArtirimPotansiyeliniHesapla():
             odenmisSermaye = self.getBilancoDegeri("Ödenmiş Sermaye", 0)
@@ -883,7 +908,8 @@ class Algoritma():
         def ozsermayeBuyumesiHesapla():
             dortOncekiCeyrekDefterDegeri = self.getBilancoDegeri("Ana Ortaklığa Ait Özkaynaklar", -4)
             self.yillikOzsermayeBuyumesi = self.defterDegeri / dortOncekiCeyrekDefterDegeri
-            print("Yıllık Özsermaye Büyümesi: ", "{:.2%}".format(self.yillikOzsermayeBuyumesi))
+            yillikOzsermayeBuyumesi_print = "{:.2%}".format(self.yillikOzsermayeBuyumesi)
+            self.my_logger.info(f"Yıllık Özsermaye Büyümesi: {yillikOzsermayeBuyumesi_print}")
 
 
         def rapor_olustur_excel():
@@ -981,6 +1007,11 @@ class Algoritma():
             self.my_logger.removeHandler(self.stdout_handler)
 
 
+        def print_title(title):
+            print ("---------------------------------------------------------")
+            print(f"----------------- {title} ------------------------")
+            print("---------------------------------------------------------")
+
 
         hasilat_hesaplari()
         faaliyet_kari_hesaplari()
@@ -992,6 +1023,7 @@ class Algoritma():
         dolar_hasilat_hesaplari()
         dolar_faaliyet_kari_hesaplari()
 
+        print_title("RASYO HESAPLARI")
         netKarBuyumeOraniYillikHesapla()
         oncekiYilAyniCeyregeGoreNetKarBuyumeOraniHesapla()
         esasFaaliyetKariBuyumeOraniHesapla()
