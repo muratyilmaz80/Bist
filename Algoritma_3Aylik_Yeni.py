@@ -966,8 +966,6 @@ class Algoritma():
             excelRow.netProKriteri = self.netProKriteri
             excelRow.forwardPeKriteri = self.forwardPeKriteri
 
-            #
-
             excelRow.tarih = datetime.today().strftime('%d.%m.%Y')
             excelRow.netKarBuyumeYillik = self.netKarBuyumeOraniYillik
             excelRow.netKarBuyume4OncekiCeyregeGore = self.oncekiYilAyniCeyregeGoreNetKarBuyume
