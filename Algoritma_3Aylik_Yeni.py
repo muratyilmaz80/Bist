@@ -3,11 +3,10 @@ from ExcelRowClass import ExcelRowClass
 from GetHisseHalkaAciklikOrani import returnHisseHalkaAciklikOrani
 from Rapor_Olustur import exportReportExcel
 from prettytable import PrettyTable
-import logging,sys,math
+import logging, sys, math
 from BilancoOrtalamaDolarDegeri import ucAylikBilancoDonemiOrtalamaDolarDegeriBul
 import pandas as pd
-import xlrd, xlwt
-from xlutils.copy import copy
+
 
 class Algoritma():
 
@@ -26,9 +25,16 @@ class Algoritma():
         self.stdout_handler = logging.StreamHandler(sys.stdout)
         self.my_logger.addHandler(self.output_file_handler)
         self.my_logger.addHandler(self.stdout_handler)
-        self.bd_df = pd.read_excel(self.bilancoDosyasi, index_col=0)
+        self.bd_df_ = pd.read_excel(self.bilancoDosyasi, index_col=0)
+        self.bd_df = self.bd_df_.fillna(0)
         self.cok_kullanilan_degerleri_hesapla()
         self.my_logger.info ("-------------------------------- %s ------------------------", self.hisseAdi)
+
+    def safe_divide(self, a, b):
+        if b != 0:
+            return a/b
+        else:
+            return 0
 
     def birOncekibilancoDoneminiHesapla(self, dnm):
         yil = int(dnm / 100)
@@ -39,15 +45,15 @@ class Algoritma():
             return yil * 100 + (ceyrek - 3)
 
 
-    def bilancoDoneminiBul(self,i):
-        if (i > 0):
+    def bilancoDoneminiBul(self, i):
+        if i > 0:
             print("Hatalı Bilanço Dönemi!")
             return -999
-        elif (i == 0):
+        elif i == 0:
             return self.bilancoDonemi
         else:
             a = self.bilancoDonemi
-            while (i < 0):
+            while i < 0:
                 a = self.birOncekibilancoDoneminiHesapla(a)
                 i = i + 1
             return a
@@ -63,7 +69,7 @@ class Algoritma():
                 return bilancoDegeri
         except:
             print(f"Bilançoda ilgili alan bulunamadı! Label: {label} Çeyrek: {donem}")
-            return -1;
+            return -1
 
 
     def ceyrekDegeriHesapla(self, r, col):
@@ -85,8 +91,8 @@ class Algoritma():
         ceyrekDegeri = self.ceyrekDegeriHesapla(row, donem)
         self.my_logger.debug(f"Çeyrek Değeri: {ceyrekDegeri}")
         oncekiCeyrekDegeri = self.ceyrekDegeriHesapla(row, donem - 4)
-        self.my_logger.debug(f"Önceki Çeyrek Değeri: {oncekiCeyrekDegeri}", )
-        degisimSonucu = ceyrekDegeri / oncekiCeyrekDegeri - 1
+        self.my_logger.debug(f"Önceki Çeyrek Değeri: {oncekiCeyrekDegeri}")
+        degisimSonucu = self.safe_divide(ceyrekDegeri,oncekiCeyrekDegeri) -1
         return degisimSonucu
 
 
@@ -139,6 +145,7 @@ class Algoritma():
         self.defterDegeri = self.getBilancoDegeri("Ana Ortaklığa Ait Özkaynaklar", 0)
         self.anaOrtaklikPayi = self.getBilancoDegeri("Ana Ortaklık Payları", 0) / self.getBilancoDegeri("DÖNEM KARI (ZARARI)", 0)
         self.borclar = int(self.getBilancoDegeri("TOPLAM YÜKÜMLÜLÜKLER", 0))
+        self.piyasaDegeri = self.sermaye * self.hisseFiyati
 
         self.alacaklar = self.getBilancoDegeri("Dönen Ticari Alacaklar", 0) + \
                     self.getBilancoDegeri("Dönen Diğer Alacaklar", 0) + \
@@ -174,7 +181,6 @@ class Algoritma():
     def likidasyonDegeriHesapla(self):
         likidasyonDegeri = self.nakit + (self.alacaklar * 0.7) + (self.stoklar * 0.5) + (self.digerVarliklar * 0.7) + (self.finansalVarliklar * 0.7) + (self.maddiDuranVarliklar * 0.2)
         return likidasyonDegeri
-
 
 
 
@@ -302,10 +308,9 @@ class Algoritma():
                 self.my_logger.info(printText)
 
             # Önceki Dönem Faaliyet Kar Artış Kriteri
-
             if self.faaliyetKari0Degisimi >= 1:
                 self.birOncekibilancoDonemiFaaliyetKariDegisimiGecmeDurumu = True
-                printText = "Önceki Dönem Faaliyet Kar Artışı: Bilanço Dönemi Faaliyet Karı Artışı 100%'ün Üzerinde, Karşılaştırma Yapılmayacak: " + "{:.2%}".format(faaliyetKari0Degisimi) + " " + str(self.birOncekibilancoDonemiFaaliyetKariDegisimiGecmeDurumu)
+                printText = "Önceki Dönem Faaliyet Kar Artışı: Bilanço Dönemi Faaliyet Karı Artışı 100%'ün Üzerinde, Karşılaştırma Yapılmayacak: " + "{:.2%}".format(self.faaliyetKari0Degisimi) + " " + str(self.birOncekibilancoDonemiFaaliyetKariDegisimiGecmeDurumu)
                 self.my_logger.info(printText)
 
             else:
@@ -483,18 +488,21 @@ class Algoritma():
             self.my_logger.info("Son 4 Dönem Net Kar Toplamı: %s TL", "{:,.0f}".format(sonDortDonemNetKarToplami).replace(",", "."))
             self.my_logger.info("Son 4 Dönem Faaliyet Karı Toplamı: %s TL", "{:,.0f}".format(sonDortDonemFaaliyetKariToplami).replace(",", "."))
 
-            self.fkOrani = self.hisseFiyati / ((sonDortDonemNetKarToplami * self.anaOrtaklikPayi) / (self.sermaye))
+            self.fkOrani = self.hisseFiyati / ((sonDortDonemNetKarToplami * self.anaOrtaklikPayi) / self.sermaye)
             self.my_logger.info("F/K Oranı: %s", "{:,.2f}".format(self.fkOrani))
 
-            self.hbkOrani = sonDortDonemNetKarToplami / (self.sermaye) * self.anaOrtaklikPayi
-            self.my_logger.info("HBK Oranı: %s", "{:,.2f}".format(self.hbkOrani))
+            # self.hbkOrani = sonDortDonemNetKarToplami / self.sermaye * self.anaOrtaklikPayi
+            # self.hbkOrani = sonDortDonemNetKarToplami / self.sermaye
+            # self.my_logger.info("HBK Oranı: %s", "{:,.2f}".format(self.hbkOrani))
+
+            hbkOraniHesapla()
 
             hasilat0Degisimi = self.onceki_yil_ayni_ceyrege_gore_degisimi_hesapla("Hasılat", 0)
             hasilat1Degisimi = self.onceki_yil_ayni_ceyrege_gore_degisimi_hesapla("Hasılat", -1)
             onumuzdekiDortCeyrekHasilatTahmini = ((((hasilat0Degisimi + hasilat1Degisimi) / 2) + 1) * self.yillikHasilat)
 
             onumuzdekiDortCeyrekFaaliyetKarMarjiTahmini = (self.faaliyetKari1 + self.faaliyetKari0) / (self.hasilat0 + self.hasilat1)
-            self.my_logger.info("Önümüzdeki 4 Çeyrek Faaliyet Kar Marjı Tahmini: %s ","{:.2%}".format(onumuzdekiDortCeyrekFaaliyetKarMarjiTahmini))
+            self.my_logger.info("Önümüzdeki 4 Çeyrek Faaliyet Kar Marjı Tahmini: %s ", "{:.2%}".format(onumuzdekiDortCeyrekFaaliyetKarMarjiTahmini))
             faaliyetKariTahmini1 = onumuzdekiDortCeyrekHasilatTahmini * onumuzdekiDortCeyrekFaaliyetKarMarjiTahmini
             faaliyetKariTahmini2 = ((self.faaliyetKari1 + self.faaliyetKari0) * 2 * 0.3) + (self.faaliyetKari0 * 4 * 0.5) + ((self.faaliyetKari3 + self.faaliyetKari2 + self.faaliyetKari1 + self.faaliyetKari0) * 0.2)
             ortalamaFaaliyetKariTahmini = (faaliyetKariTahmini1 + faaliyetKariTahmini2) / 2
@@ -508,7 +516,7 @@ class Algoritma():
             piyasaDegeri = (bilancoEtkisi * self.sermaye * -1) + (self.hisseFiyati * self.sermaye)
 
             self.my_logger.info("Piyasa Değeri: %s TL", "{:,.0f}".format(piyasaDegeri).replace(",", "."))
-            self.my_logger.info("self.bondYield: %s", "{:.2%}".format(self.bondYield))
+            self.my_logger.info("bondYield: %s", "{:.2%}".format(self.bondYield))
 
             self.netProKriteri = (netProEstDegeri / piyasaDegeri) / self.bondYield
             self.netProKriteriGecmeDurumu = (self.netProKriteri > 2)
@@ -531,14 +539,14 @@ class Algoritma():
             self.my_logger.info("----------------BİLANÇO DOLAR HESABI-------------------------------------")
             self.my_logger.info("")
 
-            self.my_logger.info ("%s Bilanço Dönemi Ortalama Dolar Kuru: %s TL" , self.bilancoDoneminiBul(0) , "{:,.2f}".format(self.ortalamaDolarKuru0))
-            self.my_logger.debug ("%s Bilanço Dönemi Ortalama Dolar Kuru: %s TL" , self.bilancoDoneminiBul(-1) , "{:,.2f}".format(self.ortalamaDolarKuru1))
-            self.my_logger.debug ("%s Bilanço Dönemi Ortalama Dolar Kuru: %s TL" , self.bilancoDoneminiBul(-2) ,"{:,.2f}".format(self.ortalamaDolarKuru2))
-            self.my_logger.debug ("%s Bilanço Dönemi Ortalama Dolar Kuru: %s TL" , self.bilancoDoneminiBul(-3) ,"{:,.2f}".format(self.ortalamaDolarKuru3))
-            self.my_logger.debug ("%s Bilanço Dönemi Ortalama Dolar Kuru: %s TL" , self.bilancoDoneminiBul(-4) ,"{:,.2f}".format(self.ortalamaDolarKuru4))
-            self.my_logger.debug ("%s Bilanço Dönemi Ortalama Dolar Kuru: %s TL", self.bilancoDoneminiBul(-5), "{:,.2f}".format(self.ortalamaDolarKuru5))
-            self.my_logger.debug ("%s Bilanço Dönemi Ortalama Dolar Kuru: %s TL" , self.bilancoDoneminiBul(-6), "{:,.2f}".format(self.ortalamaDolarKuru6))
-            self.my_logger.debug ("%s Bilanço Dönemi Ortalama Dolar Kuru: %s TL", self.bilancoDoneminiBul(-7), "{:,.2f}".format(self.ortalamaDolarKuru7))
+            self.my_logger.info("%s Bilanço Dönemi Ortalama Dolar Kuru: %s TL", self.bilancoDoneminiBul(0) , "{:,.2f}".format(self.ortalamaDolarKuru0))
+            self.my_logger.debug("%s Bilanço Dönemi Ortalama Dolar Kuru: %s TL", self.bilancoDoneminiBul(-1) , "{:,.2f}".format(self.ortalamaDolarKuru1))
+            self.my_logger.debug("%s Bilanço Dönemi Ortalama Dolar Kuru: %s TL", self.bilancoDoneminiBul(-2) ,"{:,.2f}".format(self.ortalamaDolarKuru2))
+            self.my_logger.debug("%s Bilanço Dönemi Ortalama Dolar Kuru: %s TL", self.bilancoDoneminiBul(-3) ,"{:,.2f}".format(self.ortalamaDolarKuru3))
+            self.my_logger.debug("%s Bilanço Dönemi Ortalama Dolar Kuru: %s TL", self.bilancoDoneminiBul(-4) ,"{:,.2f}".format(self.ortalamaDolarKuru4))
+            self.my_logger.debug("%s Bilanço Dönemi Ortalama Dolar Kuru: %s TL", self.bilancoDoneminiBul(-5), "{:,.2f}".format(self.ortalamaDolarKuru5))
+            self.my_logger.debug("%s Bilanço Dönemi Ortalama Dolar Kuru: %s TL", self.bilancoDoneminiBul(-6), "{:,.2f}".format(self.ortalamaDolarKuru6))
+            self.my_logger.debug("%s Bilanço Dönemi Ortalama Dolar Kuru: %s TL", self.bilancoDoneminiBul(-7), "{:,.2f}".format(self.ortalamaDolarKuru7))
 
         def dolar_hasilat_hesaplari():
             # Bilanço Dönemi Satış(Hasılat) Gelirleri (DOLAR)
@@ -558,34 +566,33 @@ class Algoritma():
             self.dolarHasilat7 = self.hasilat7 / self.ortalamaDolarKuru7
 
             dolarHasilat0Print = "{:,.0f}".format(self.dolarHasilat0).replace(",", ".")
-            dolarHasilat4Print = "{:,.0f}".format(self.dolarHasilat4).replace(",",".")
-            self.dolarHasilat0Degisimi = self.dolarHasilat0 / self.dolarHasilat4 - 1
+            dolarHasilat4Print = "{:,.0f}".format(self.dolarHasilat4).replace(",", ".")
+            self.dolarHasilat0Degisimi = self.safe_divide(self.dolarHasilat0, self.dolarHasilat4) - 1
             dolarHasilatDegisimi0Print = "{:.2%}".format(self.dolarHasilat0Degisimi)
 
-            dolarHasilat1Print = "{:,.0f}".format(self.dolarHasilat1).replace(",",".")
+            dolarHasilat1Print = "{:,.0f}".format(self.dolarHasilat1).replace(",", ".")
             dolarHasilat5Print = "{:,.0f}".format(self.dolarHasilat5).replace(",", ".")
-            self.dolarHasilat1Degisimi = self.dolarHasilat1 / self.dolarHasilat5 - 1
+            self.dolarHasilat1Degisimi = self.safe_divide(self.dolarHasilat1, self.dolarHasilat5)-1
             dolarHasilatDegisimi1Print = "{:.2%}".format(self.dolarHasilat1Degisimi)
 
-            dolarHasilat2Print = "{:,.0f}".format(self.dolarHasilat2).replace(",",".")
+            dolarHasilat2Print = "{:,.0f}".format(self.dolarHasilat2).replace(",", ".")
             dolarHasilat6Print = "{:,.0f}".format(self.dolarHasilat6).replace(",", ".")
-            dolarHasilatDegisimi2Print = "{:.2%}".format(self.dolarHasilat2 / self.dolarHasilat6 - 1)
+            dolarHasilatDegisimi2Print = "{:.2%}".format(self.safe_divide(self.dolarHasilat2, self.dolarHasilat6)-1)
 
-            dolarHasilat3Print = "{:,.0f}".format(self.dolarHasilat3).replace(",",".")
+            dolarHasilat3Print = "{:,.0f}".format(self.dolarHasilat3).replace(",", ".")
             dolarHasilat7Print = "{:,.0f}".format(self.dolarHasilat7).replace(",", ".")
-            dolarHasilatDegisimi3Print = "{:.2%}".format(self.dolarHasilat3 / self.dolarHasilat7 - 1)
+            dolarHasilatDegisimi3Print = "{:.2%}".format(self.safe_divide(self.dolarHasilat3, self.dolarHasilat7)-1)
 
             dolarSatisTablosu = PrettyTable()
             dolarSatisTablosu.field_names = ["ÇEYREK", "SATIŞ (USD)", "ÖNCEKİ YIL", "ÖNCEKİ YIL SATIŞ (USD)", "YÜZDE DEĞİŞİM"]
             dolarSatisTablosu.align["SATIŞ (USD)"] = "r"
             dolarSatisTablosu.align["ÖNCEKİ YIL SATIŞ (USD)"] = "r"
             dolarSatisTablosu.align["YÜZDE DEĞİŞİM"] = "r"
-            dolarSatisTablosu.add_row([self.bilancoDoneminiBul(0), dolarHasilat0Print, self.bilancoDoneminiBul(-4),dolarHasilat4Print, dolarHasilatDegisimi0Print])
+            dolarSatisTablosu.add_row([self.bilancoDoneminiBul(0), dolarHasilat0Print, self.bilancoDoneminiBul(-4), dolarHasilat4Print, dolarHasilatDegisimi0Print])
             dolarSatisTablosu.add_row([self.bilancoDoneminiBul(-1), dolarHasilat1Print, self.bilancoDoneminiBul(-5), dolarHasilat5Print, dolarHasilatDegisimi1Print])
             dolarSatisTablosu.add_row([self.bilancoDoneminiBul(-2), dolarHasilat2Print, self.bilancoDoneminiBul(-6), dolarHasilat6Print, dolarHasilatDegisimi2Print])
-            dolarSatisTablosu.add_row([self.bilancoDoneminiBul(-3), dolarHasilat3Print, self.bilancoDoneminiBul(-7),dolarHasilat7Print, dolarHasilatDegisimi3Print])
+            dolarSatisTablosu.add_row([self.bilancoDoneminiBul(-3), dolarHasilat3Print, self.bilancoDoneminiBul(-7), dolarHasilat7Print, dolarHasilatDegisimi3Print])
             self.my_logger.info(dolarSatisTablosu)
-
 
             # Bilanço Dönemi (DOLAR) Satış Geliri Artış Kriteri
             self.bilancoDonemiDolarHasilatGelirArtisiGecmeDurumu = (self.dolarHasilat0Degisimi > 0.1)
@@ -595,7 +602,7 @@ class Algoritma():
 
             # Önceki Dönem (DOLAR) Hasılat Geliri Artış Kriteri
             #
-            if (self.dolarHasilat0Degisimi >= 1):
+            if self.dolarHasilat0Degisimi >= 1:
                 printText = "Bilanço Dönemi (DOLAR) Satış Gelir Artışı %100 Üzerinde, Karşılaştırma Yapılmayacak."
                 self.my_logger.info(printText)
                 self.oncekibilancoDonemiDolarHasilatGelirArtisiGecmeDurumu = True
@@ -633,7 +640,7 @@ class Algoritma():
             self.dolarFaaliyetKari7 = self.faaliyetKari7/self.ortalamaDolarKuru7
 
             dolarFaaliyetKari0Print = "{:,.0f}".format(self.dolarFaaliyetKari0).replace(",", ".")
-            dolarFaaliyetKari4Print = "{:,.0f}".format(self.dolarFaaliyetKari4).replace(",",".")
+            dolarFaaliyetKari4Print = "{:,.0f}".format(self.dolarFaaliyetKari4).replace(",", ".")
             self.dolarFaaliyetKari0Degisimi = self.dolarFaaliyetKari0/self.dolarFaaliyetKari4-1
             dolarFaaliyetKari0DegisimiPrint = "{:.2%}".format(self.dolarFaaliyetKari0Degisimi)
 
@@ -698,14 +705,6 @@ class Algoritma():
                             " <? " + "{:.2%}".format(self.dolarFaaliyetKari0Degisimi) + " " + str(self.birOncekibilancoDonemiDolarFaaliyetKariDegisimiGecmeDurumu)
                 self.my_logger.info(printText)
 
-
-
-
-
-
-
-
-
         # RASYO HESAPLARI
         def netKarBuyumeOraniYillikHesapla():
             self.netKarBuyumeOraniYillik = (self.yillikNetKar / self.oncekiYilNetKar - 1)
@@ -734,12 +733,12 @@ class Algoritma():
             self.my_logger.info(f"Yıllık Hasılat Artış Oranı: {hasilat}")
 
         def fkOraniHesapla():
-            self.fkOrani = self.hisseFiyati / ((self.yillikNetKar * self.anaOrtaklikPayi) / (self.sermaye))
+            # self.fkOrani = self.hisseFiyati / ((self.yillikNetKar * self.anaOrtaklikPayi) / self.sermaye)
+            self.fkOrani = self.hisseFiyati / (self.yillikNetKar / self.sermaye)
             fk = "{:,.2f}".format(self.fkOrani)
             self.my_logger.info(f"F/K Orani: {fk}")
 
         def piyasaDegeriHesapla():
-            self.piyasaDegeri = self.sermaye * self.hisseFiyati;
             pd = "{:,.0f}".format(self.piyasaDegeri).replace(",", ".")
             self.my_logger.info(f"Piyasa Değeri (PD):  {pd}")
 
@@ -783,23 +782,25 @@ class Algoritma():
 
             try:
                 yillikPazarlamaGiderleri = self.yilliklandirmisDegerHesapla("Pazarlama Giderleri", ceyrek)
-            except Exception as e:
+            except:
                 print("Bilançoda Pazarlama Giderleri Bulunmamaktadır!")
                 yillikPazarlamaGiderleri = 0
 
             try:
                 yillikArgeGiderleri = self.yilliklandirmisDegerHesapla("Araştırma ve Geliştirme Giderleri", ceyrek)
-            except Exception as e:
+            except:
                 print("Bilançoda AR-GE Giderleri Bulunmamaktadır!")
                 yillikArgeGiderleri = 0
 
             try:
                 yillikAmortisman = self.yilliklandirmisDegerHesapla("Amortisman ve İtfa Gideri İle İlgili Düzeltmeler", ceyrek)
-            except Exception as e:
+            except:
                 print("Bilançoda Amortisman Gideri Bulunmamaktadır!")
                 yillikAmortisman = 0
 
             favok = yillikBrutKar + yillikPazarlamaGiderleri + yillikGenelYonetimGiderleri + yillikArgeGiderleri + yillikAmortisman
+
+
             fvk = "{:,.0f}".format(favok).replace(",", ".")
             self.my_logger.info(f"FAVÖK{ceyrek}: {fvk}")
             return favok
@@ -824,7 +825,8 @@ class Algoritma():
             self.my_logger.info(f"PD/EFK: {pde}")
 
         def hbkOraniHesapla():
-            self.hbk = self.yillikNetKar / (self.sermaye)
+            #self.hbk = self.yillikNetKar / self.sermaye * self.anaOrtaklikPayi
+            self.hbk = self.yillikNetKar / self.sermaye
             hbk_print = "{:,.2f}".format(self.hbk)
             self.my_logger.info(f"HBK: {hbk_print}")
 
@@ -916,7 +918,7 @@ class Algoritma():
             self.my_logger.debug("")
             self.my_logger.debug("")
             self.my_logger.debug("----------------RAPOR DOSYASI OLUŞTURMA/GÜNCELLEME-------------------------------------")
-            self.my_logger.debug (self.hisseAdi)
+            self.my_logger.debug(self.hisseAdi)
 
             excelRow = ExcelRowClass()
 
@@ -992,8 +994,8 @@ class Algoritma():
             excelRow.borcKaynak = self.borcKaynakOrani
             excelRow.ozsermayeBuyumesi = self.yillikOzsermayeBuyumesi
             excelRow.halkaAciklikOrani = self.halkaAciklikOrani
-            excelRow.piyasaDegeri = (int)(self.piyasaDegeri/1000000)
-            excelRow.sermaye = (int)(self.sermaye/1000000)
+            excelRow.piyasaDegeri = int(self.piyasaDegeri/1000000)
+            excelRow.sermaye = int(self.sermaye/1000000)
             excelRow.sermayeArtirimPotansiyeli = self.sermayeArtirimPotansiyeli
 
             exportReportExcel(self.hisseAdi, self.reportFile, self.bilancoDonemi, excelRow)
@@ -1001,16 +1003,16 @@ class Algoritma():
             self.my_logger.info("")
             self.my_logger.info("")
             self.my_logger.info("")
-            self.my_logger.info ("-------------------------------- %s ------------------------", self.hisseAdi)
+            self.my_logger.info("-------------------------------- %s ------------------------", self.hisseAdi)
 
             self.my_logger.removeHandler(self.output_file_handler)
             self.my_logger.removeHandler(self.stdout_handler)
 
-
         def print_title(title):
-            print ("---------------------------------------------------------")
+            print("---------------------------------------------------------")
             print(f"----------------- {title} ------------------------")
             print("---------------------------------------------------------")
+
 
 
         hasilat_hesaplari()
@@ -1056,5 +1058,3 @@ class Algoritma():
         sermayeArtirimPotansiyeliniHesapla()
         ozsermayeBuyumesiHesapla()
         rapor_olustur_excel()
-
-
