@@ -738,6 +738,7 @@ class Algoritma():
             fk = "{:,.2f}".format(self.fkOrani)
             self.my_logger.info(f"F/K Orani: {fk}")
 
+
         def piyasaDegeriHesapla():
             pd = "{:,.0f}".format(self.piyasaDegeri).replace(",", ".")
             self.my_logger.info(f"Piyasa Değeri (PD):  {pd}")
