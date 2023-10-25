@@ -96,6 +96,24 @@ class Algoritma():
         return degisimSonucu
 
 
+
+
+    def netFaaliyetKari1Hesapla(self, ceyrek):
+        efk = self.ceyrekDegeriHesapla("ESAS FAALİYET KARI (ZARARI)", ceyrek)
+        digerGelirler = self.ceyrekDegeriHesapla("Esas Faaliyetlerden Diğer Gelirler", ceyrek)
+        digerGiderler = self.ceyrekDegeriHesapla("Esas Faaliyetlerden Diğer Giderler", ceyrek)
+        nfk1 = efk - digerGelirler - digerGiderler
+        return nfk1
+
+    def netFaaliyetKari2Hesapla(self, ceyrek):
+        efk = self.ceyrekDegeriHesapla("ESAS FAALİYET KARI (ZARARI)", ceyrek)
+        digerGelirler = self.ceyrekDegeriHesapla("Esas Faaliyetlerden Diğer Gelirler", ceyrek)
+        digerGiderler = self.ceyrekDegeriHesapla("Esas Faaliyetlerden Diğer Giderler", ceyrek)
+        oydyp = self.ceyrekDegeriHesapla("Özkaynak Yöntemiyle Değerlenen Yatırımların Karlarından (Zararlarından) Paylar", ceyrek)
+        nfk2 = efk - digerGelirler - digerGiderler + oydyp
+        return nfk2
+
+
     def cok_kullanilan_degerleri_hesapla(self):
         self.hasilat0 = self.ceyrekDegeriHesapla("Hasılat", 0)
         self.hasilat1 = self.ceyrekDegeriHesapla("Hasılat", -1)
@@ -137,6 +155,29 @@ class Algoritma():
         self.brutKar5 = self.ceyrekDegeriHesapla("BRÜT KAR (ZARAR)", -5)
         self.brutKar6 = self.ceyrekDegeriHesapla("BRÜT KAR (ZARAR)", -6)
         self.brutKar7 = self.ceyrekDegeriHesapla("BRÜT KAR (ZARAR)", -7)
+
+        self.nfk1_0 = self.netFaaliyetKari1Hesapla(0)
+        self.nfk1_1 = self.netFaaliyetKari1Hesapla(-1)
+        self.nfk1_2 = self.netFaaliyetKari1Hesapla(-2)
+        self.nfk1_3 = self.netFaaliyetKari1Hesapla(-3)
+        self.nfk1_4 = self.netFaaliyetKari1Hesapla(-4)
+        self.nfk1_5 = self.netFaaliyetKari1Hesapla(-5)
+        self.nfk1_6 = self.netFaaliyetKari1Hesapla(-6)
+        self.nfk1_7 = self.netFaaliyetKari1Hesapla(-7)
+        self.yillikNfk_1 = self.nfk1_0 + self.nfk1_1 + self.nfk1_2 + self.nfk1_3
+        self.oncekiYilNfk_1 = self.nfk1_4 + self.nfk1_5 + self.nfk1_6 + self.nfk1_7
+
+        #Özkaynak yöntemiyle değerlenen yatırımların karlarından payların eklenmesi
+        self.nfk2_0 = self.netFaaliyetKari2Hesapla(0)
+        self.nfk2_1 = self.netFaaliyetKari2Hesapla(-1)
+        self.nfk2_2 = self.netFaaliyetKari2Hesapla(-2)
+        self.nfk2_3 = self.netFaaliyetKari2Hesapla(-3)
+        self.nfk2_4 = self.netFaaliyetKari2Hesapla(-4)
+        self.nfk2_5 = self.netFaaliyetKari2Hesapla(-5)
+        self.nfk2_6 = self.netFaaliyetKari2Hesapla(-6)
+        self.nfk2_7 = self.netFaaliyetKari2Hesapla(-7)
+        self.yillikNfk_2 = self.nfk2_0 + self.nfk2_1 + self.nfk2_2 + self.nfk2_3
+        self.oncekiYilNfk_2 = self.nfk2_4 + self.nfk2_5 + self.nfk2_6 + self.nfk2_7
 
         self.nakit = self.getBilancoDegeri("Nakit ve Nakit Benzerleri", 0)
         self.stoklar = self.getBilancoDegeri("Stoklar", 0)
@@ -394,11 +435,81 @@ class Algoritma():
             self.my_logger.info(brutKarTablosu)
 
 
+        def nfk_hesaplari():
+            self.my_logger.info("")
+            self.my_logger.info("")
+            self.my_logger.info("")
+            self.my_logger.info("-------------------NET FAALİYET KARI (NFK)--------------------------")
+            self.my_logger.info("")
 
-        def gercek_deger_hesabi():
+            nfk1_0Print = "{:,.0f}".format(self.nfk1_0).replace(",", ".")
+            nfk1_4Print = "{:,.0f}".format(self.nfk1_4).replace(",", ".")
+            nfk1_0DegisimiPrint = "{:.2%}".format(self.nfk1_0 / self.nfk1_4)
+
+            nfk1_1Print = "{:,.0f}".format(self.nfk1_1).replace(",", ".")
+            nfk1_5Print = "{:,.0f}".format(self.nfk1_5).replace(",", ".")
+            nfk1_1DegisimiPrint = "{:.2%}".format(self.nfk1_1 / self.nfk1_5)
+
+            nfk1_2Print = "{:,.0f}".format(self.nfk1_2).replace(",", ".")
+            nfk1_6Print = "{:,.0f}".format(self.nfk1_6).replace(",", ".")
+            nfk1_2DegisimiPrint = "{:.2%}".format(self.nfk1_2 / self.nfk1_6)
+
+            nfk1_3Print = "{:,.0f}".format(self.nfk1_3).replace(",", ".")
+            nfk1_7Print = "{:,.0f}".format(self.nfk1_7).replace(",", ".")
+            nfk1_3DegisimiPrint = "{:.2%}".format(self.nfk1_3 / self.nfk1_7)
+
+            nfk1Tablosu = PrettyTable()
+            nfk1Tablosu.field_names = ["ÇEYREK", "NFK", "ÖNCEKİ YIL", "ÖNCEKİ YIL NFK", "YÜZDE DEĞİŞİM"]
+            nfk1Tablosu.align["NFK"] = "r"
+            nfk1Tablosu.align["ÖNCEKİ YIL NFK"] = "r"
+            nfk1Tablosu.align["YÜZDE DEĞİŞİM"] = "r"
+            nfk1Tablosu.add_row([self.bilancoDoneminiBul(0), nfk1_0Print, self.bilancoDoneminiBul(-4), nfk1_4Print, nfk1_0DegisimiPrint])
+            nfk1Tablosu.add_row([self.bilancoDoneminiBul(-1), nfk1_1Print, self.bilancoDoneminiBul(-5), nfk1_5Print, nfk1_1DegisimiPrint])
+            nfk1Tablosu.add_row([self.bilancoDoneminiBul(-2), nfk1_2Print, self.bilancoDoneminiBul(-6), nfk1_6Print, nfk1_2DegisimiPrint])
+            nfk1Tablosu.add_row([self.bilancoDoneminiBul(-3), nfk1_3Print, self.bilancoDoneminiBul(-7), nfk1_7Print, nfk1_3DegisimiPrint])
+            self.my_logger.info(nfk1Tablosu)
+
             self.my_logger.info("")
             self.my_logger.info("")
-            self.my_logger.info("----------------GERÇEK DEĞER HESABI--------------------------------------------")
+
+            nfk2_0Print = "{:,.0f}".format(self.nfk2_0).replace(",", ".")
+            nfk2_4Print = "{:,.0f}".format(self.nfk2_4).replace(",", ".")
+            nfk2_0DegisimiPrint = "{:.2%}".format(self.nfk2_0 / self.nfk2_4)
+
+            nfk2_1Print = "{:,.0f}".format(self.nfk2_1).replace(",", ".")
+            nfk2_5Print = "{:,.0f}".format(self.nfk2_5).replace(",", ".")
+            nfk2_1DegisimiPrint = "{:.2%}".format(self.nfk2_1 / self.nfk2_5)
+
+            nfk2_2Print = "{:,.0f}".format(self.nfk2_2).replace(",", ".")
+            nfk2_6Print = "{:,.0f}".format(self.nfk2_6).replace(",", ".")
+            nfk2_2DegisimiPrint = "{:.2%}".format(self.nfk2_2 / self.nfk2_6)
+
+            nfk2_3Print = "{:,.0f}".format(self.nfk2_3).replace(",", ".")
+            nfk2_7Print = "{:,.0f}".format(self.nfk2_7).replace(",", ".")
+            nfk2_3DegisimiPrint = "{:.2%}".format(self.nfk2_3 / self.nfk2_7)
+
+            nfk2Tablosu = PrettyTable()
+            nfk2Tablosu.field_names = ["ÇEYREK", "NFK (Özsermaye Y.D.)", "ÖNCEKİ YIL", "ÖNCEKİ YIL NFK (Özsermaye Y.D.)", "YÜZDE DEĞİŞİM"]
+            nfk2Tablosu.align["NFK (Özsermaye Y.D.)"] = "r"
+            nfk2Tablosu.align["ÖNCEKİ YIL NFK (Özsermaye Y.D.)"] = "r"
+            nfk2Tablosu.align["YÜZDE DEĞİŞİM"] = "r"
+            nfk2Tablosu.add_row([self.bilancoDoneminiBul(0), nfk2_0Print, self.bilancoDoneminiBul(-4), nfk2_4Print,
+                                 nfk2_0DegisimiPrint])
+            nfk2Tablosu.add_row([self.bilancoDoneminiBul(-1), nfk2_1Print, self.bilancoDoneminiBul(-5), nfk2_5Print,
+                                 nfk2_1DegisimiPrint])
+            nfk2Tablosu.add_row([self.bilancoDoneminiBul(-2), nfk2_2Print, self.bilancoDoneminiBul(-6), nfk2_6Print,
+                                 nfk2_2DegisimiPrint])
+            nfk2Tablosu.add_row([self.bilancoDoneminiBul(-3), nfk2_3Print, self.bilancoDoneminiBul(-7), nfk2_7Print,
+                                 nfk2_3DegisimiPrint])
+            self.my_logger.info(nfk2Tablosu)
+
+
+
+
+        def gercek_deger_hesabi_efk():
+            self.my_logger.info("")
+            self.my_logger.info("")
+            self.my_logger.info("----------------GERÇEK DEĞER HESABI EFK-------------------------------------------")
 
             self.my_logger.info("Sermaye: %s TL", "{:,.0f}".format(self.sermaye).replace(",", "."))
             self.my_logger.info("Ana Ortaklık Payı: %s", "{:.3f}".format(self.anaOrtaklikPayi))
@@ -423,7 +534,6 @@ class Algoritma():
             # self.onumuzdekiDortCeyrekHasilatTahmini = 700000000000
 
 
-
             self.onumuzdekiDortCeyrekFaaliyetKarMarjiTahmini = (self.faaliyetKari1 + self.faaliyetKari0) / (self.hasilat0 + self.hasilat1)
             self.my_logger.info("Önümüzdeki 4 Çeyrek Faaliyet Kar Marjı Tahmini: %s ","{:.2%}".format(self.onumuzdekiDortCeyrekFaaliyetKarMarjiTahmini))
 
@@ -435,17 +545,6 @@ class Algoritma():
 
             self.ortalamaFaaliyetKariTahmini = (self.faaliyetKariTahmini1 + self.faaliyetKariTahmini2) / 2
             self.my_logger.info("Ortalama Faaliyet Kari Tahmini: %s TL","{:,.0f}".format(self.ortalamaFaaliyetKariTahmini).replace(",", "."))
-
-            # print ("----MURAT-----")
-            #
-            # istiraklerdenGelenKarRow = getBilancoTitleRow("Özkaynak Yöntemiyle Değerlenen Yatırımların Karlarından (Zararlarından) Paylar")
-            # istiraklerdenGelenNetKarSonCeyrek = ceyrekDegeriHesapla(istiraklerdenGelenKarRow,self.bilancoDonemiColumn)
-            # print ("İştiraklerden Gelen Net Kar Son Çeyrek: ", "{:,.0f}".format(istiraklerdenGelenNetKarSonCeyrek).replace(",","."))
-            #
-            # istiraklerdenGelenNetKarYillik = ceyrekDegeriHesapla(istiraklerdenGelenKarRow,self.bilancoDonemiColumn) + ceyrekDegeriHesapla(istiraklerdenGelenKarRow,birOncekibilancoDonemiColumn) + ceyrekDegeriHesapla(istiraklerdenGelenKarRow,ikiOncekiself.bilancoDonemiColumn) + ceyrekDegeriHesapla(istiraklerdenGelenKarRow,ucOncekiself.bilancoDonemiColumn)
-            # print ("İştiraklerden Gelen Net Kar Yıllık: ", "{:,.0f}".format(istiraklerdenGelenNetKarYillik).replace(",","."))
-            #
-            # print("----MURAT-----")
 
             self.hisseBasinaOrtalamaKarTahmini = ((self.ortalamaFaaliyetKariTahmini) * self.anaOrtaklikPayi) / self.sermaye
             self.my_logger.info("Hisse Başına Ortalama Kar Tahmini: %s TL", format(self.hisseBasinaOrtalamaKarTahmini, ".2f"))
@@ -459,28 +558,99 @@ class Algoritma():
             self.my_logger.info("Bilanço Etkisi: %s TL", format(self.bilancoEtkisi, ".2f"))
 
             self.gercekDeger = (self.hisseBasinaOrtalamaKarTahmini * 7) + self.bilancoEtkisi
-            self.my_logger.info("Gerçek Hisse Değeri: %s TL", format(self.gercekDeger, ".2f"))
+            self.my_logger.info("Gerçek Hisse Değeri(EFK): %s TL", format(self.gercekDeger, ".2f"))
 
             self.targetBuy = self.gercekDeger * 0.66
-            self.my_logger.info("Target Buy: %s TL", format(self.targetBuy, ".2f"))
+            self.my_logger.info("Target Buy(EFK): %s TL", format(self.targetBuy, ".2f"))
 
             self.my_logger.info("Bilanço Tarihindeki Hisse Fiyatı: %s TL", format(self.hisseFiyati, ".2f"))
 
             self.gercekFiyataUzaklik = self.hisseFiyati / self.targetBuy
-            self.my_logger.info("Gerçek Fiyata Uzaklık Oranı: %s", "{:.2%}".format(self.gercekFiyataUzaklik))
+            self.my_logger.info("Gerçek Fiyata(EFK) Uzaklık Oranı: %s", "{:.2%}".format(self.gercekFiyataUzaklik))
 
             self.gercekFiyataUzaklikTl = self.hisseFiyati - self.targetBuy
-            self.my_logger.info("Gerçek Fiyata Uzaklık %s TL:", format(self.gercekFiyataUzaklikTl, ".2f"))
+            self.my_logger.info("Gerçek Fiyata(EFK) Uzaklık %s TL:", format(self.gercekFiyataUzaklikTl, ".2f"))
+
+
+
+
+
+
+
+        def gercek_deger_hesabi_nfk():
+            self.my_logger.info("")
+            self.my_logger.info("")
+            self.my_logger.info("----------------GERÇEK DEĞER HESABI NFK-------------------------------------------")
+
+            hasilat0Degisimi = self.onceki_yil_ayni_ceyrege_gore_degisimi_hesapla("Hasılat", 0)
+            hasilat1Degisimi = self.onceki_yil_ayni_ceyrege_gore_degisimi_hesapla("Hasılat", -1)
+            self.onumuzdekiDortCeyrekHasilatTahmini = ((((hasilat0Degisimi + hasilat1Degisimi) / 2) + 1) * self.yillikHasilat)
+            hasilatlarCeyrek = [self.hasilat3, self.hasilat2, self.hasilat1, self.hasilat0]
+            maxHasilatCeyrek = max(hasilatlarCeyrek)
+            self.my_logger.info("Önümüzdeki 4 Çeyrek Hasılat Tahmini: %s TL","{:,.0f}".format(self.onumuzdekiDortCeyrekHasilatTahmini).replace(",", "."))
+
+            if (self.onumuzdekiDortCeyrekHasilatTahmini > 4 * maxHasilatCeyrek):
+                self.onumuzdekiDortCeyrekHasilatTahmini = 4 * maxHasilatCeyrek
+                self.my_logger.info("Önümüzdeki 4 Çeyrek Hasılat Tahmini 4*maxCeyrek olarak duzeltildi:")
+                self.my_logger.info("Önümüzdeki 4 Çeyrek Hasılat Tahmini: %s TL",
+                               "{:,.0f}".format(self.onumuzdekiDortCeyrekHasilatTahmini).replace(",", "."))
+
+            # HASILAT TAHMININI MANUEL DEGISTIRMEK ICIN
+            # self.onumuzdekiDortCeyrekHasilatTahmini = 700000000000
+
+            self.onumuzdekiDortCeyrekNetFaaliyetKarMarjiTahmini = (self.nfk2_1 + self.nfk2_0) / (self.hasilat0 + self.hasilat1)
+            self.my_logger.info("Önümüzdeki 4 Çeyrek Net Faaliyet Kar Marjı Tahmini: %s ","{:.2%}".format(self.onumuzdekiDortCeyrekNetFaaliyetKarMarjiTahmini))
+
+            self.netFaaliyetKariTahmini1 = self.onumuzdekiDortCeyrekHasilatTahmini * self.onumuzdekiDortCeyrekNetFaaliyetKarMarjiTahmini
+            self.my_logger.info("Net Faaliyet Kar Tahmini1: %s TL", "{:,.0f}".format(self.netFaaliyetKariTahmini1).replace(",", "."))
+
+            self.netFaaliyetKariTahmini2 = ((self.nfk2_1 + self.nfk2_0) * 2 * 0.3) + (self.nfk2_0 * 4 * 0.5) + ((self.nfk2_3 + self.nfk2_2 + self.nfk2_1 + self.nfk2_0) * 0.2)
+            self.my_logger.info("Net Faaliyet Kar Tahmini2: %s TL", "{:,.0f}".format(self.netFaaliyetKariTahmini2).replace(",", "."))
+
+            self.ortalamaNetFaaliyetKariTahmini = (self.netFaaliyetKariTahmini1 + self.netFaaliyetKariTahmini2) / 2
+            self.my_logger.info("Ortalama Net Faaliyet Kari Tahmini: %s TL","{:,.0f}".format(self.ortalamaNetFaaliyetKariTahmini).replace(",", "."))
+
+            self.hisseBasinaOrtalamaNfkTahmini = ((self.ortalamaNetFaaliyetKariTahmini) * self.anaOrtaklikPayi) / self.sermaye
+            self.my_logger.info("Hisse Başına Ortalama Net Faaliyet Kari Tahmini: %s TL", format(self.hisseBasinaOrtalamaNfkTahmini, ".2f"))
+
+            self.likidasyonDegeri = self.likidasyonDegeriHesapla()
+            self.my_logger.info("Likidasyon Değeri: %s TL", "{:,.0f}".format(self.likidasyonDegeri).replace(",", "."))
+
+            self.my_logger.info("Borçlar: %s TL", "{:,.0f}".format(self.borclar).replace(",", "."))
+
+            self.bilancoEtkisi = (self.likidasyonDegeri - self.borclar) / self.sermaye * self.anaOrtaklikPayi
+            self.my_logger.info("Bilanço Etkisi: %s TL", format(self.bilancoEtkisi, ".2f"))
+
+            self.gercekDegerNfk = (self.hisseBasinaOrtalamaNfkTahmini * 7) + self.bilancoEtkisi
+            self.my_logger.info("Gerçek Hisse Değeri(NFK): %s TL", format(self.gercekDegerNfk, ".2f"))
+
+            self.targetBuyNfk = self.gercekDegerNfk * 0.66
+            self.my_logger.info("Target Buy(NFK): %s TL", format(self.targetBuyNfk, ".2f"))
+
+            self.my_logger.info("Bilanço Tarihindeki Hisse Fiyatı: %s TL", format(self.hisseFiyati, ".2f"))
+
+            self.gercekFiyataUzaklikNfk = self.hisseFiyati / self.targetBuyNfk
+            self.my_logger.info("Gerçek Fiyata(NFK) Uzaklık Oranı: %s", "{:.2%}".format(self.gercekFiyataUzaklikNfk))
+
+            self.gercekFiyataUzaklikTlNfk = self.hisseFiyati - self.targetBuyNfk
+            self.my_logger.info("Gerçek Fiyata(NFK) Uzaklık %s:", format(self.gercekFiyataUzaklikTlNfk, ".2f"))
+
+
+
+
+
+
+
+
+
 
 
 
 
         def netpro_kriteri_hesabi():
-            # Netpro Hesapla
             self.my_logger.info("")
             self.my_logger.info("")
-            self.my_logger.info("")
-            self.my_logger.info("----------------NETPRO  ve FORWARD_PE KRİTERİ-----------------------------------------------------------------")
+            self.my_logger.info("----------------NETPRO  ve FORWARD_PE KRİTERİ (EFK)-------------------------------------------------------------")
 
             sonDortDonemFaaliyetKariToplami = self.yilliklandirmisDegerHesapla("ESAS FAALİYET KARI (ZARARI)", 0)
             sonDortDonemNetKarToplami = self.yilliklandirmisDegerHesapla("Net Dönem Karı veya Zararı", 0)
@@ -491,41 +661,32 @@ class Algoritma():
             self.fkOrani = self.hisseFiyati / ((sonDortDonemNetKarToplami * self.anaOrtaklikPayi) / self.sermaye)
             self.my_logger.info("F/K Oranı: %s", "{:,.2f}".format(self.fkOrani))
 
-            # self.hbkOrani = sonDortDonemNetKarToplami / self.sermaye * self.anaOrtaklikPayi
-            # self.hbkOrani = sonDortDonemNetKarToplami / self.sermaye
-            # self.my_logger.info("HBK Oranı: %s", "{:,.2f}".format(self.hbkOrani))
-
             hbkOraniHesapla()
-
-            hasilat0Degisimi = self.onceki_yil_ayni_ceyrege_gore_degisimi_hesapla("Hasılat", 0)
-            hasilat1Degisimi = self.onceki_yil_ayni_ceyrege_gore_degisimi_hesapla("Hasılat", -1)
-            onumuzdekiDortCeyrekHasilatTahmini = ((((hasilat0Degisimi + hasilat1Degisimi) / 2) + 1) * self.yillikHasilat)
-
             onumuzdekiDortCeyrekFaaliyetKarMarjiTahmini = (self.faaliyetKari1 + self.faaliyetKari0) / (self.hasilat0 + self.hasilat1)
             self.my_logger.info("Önümüzdeki 4 Çeyrek Faaliyet Kar Marjı Tahmini: %s ", "{:.2%}".format(onumuzdekiDortCeyrekFaaliyetKarMarjiTahmini))
-            faaliyetKariTahmini1 = onumuzdekiDortCeyrekHasilatTahmini * onumuzdekiDortCeyrekFaaliyetKarMarjiTahmini
+            faaliyetKariTahmini1 = self.onumuzdekiDortCeyrekHasilatTahmini * onumuzdekiDortCeyrekFaaliyetKarMarjiTahmini
             faaliyetKariTahmini2 = ((self.faaliyetKari1 + self.faaliyetKari0) * 2 * 0.3) + (self.faaliyetKari0 * 4 * 0.5) + ((self.faaliyetKari3 + self.faaliyetKari2 + self.faaliyetKari1 + self.faaliyetKari0) * 0.2)
             ortalamaFaaliyetKariTahmini = (faaliyetKariTahmini1 + faaliyetKariTahmini2) / 2
 
             netProEstDegeri = ((ortalamaFaaliyetKariTahmini / sonDortDonemFaaliyetKariToplami) * sonDortDonemNetKarToplami) * self.anaOrtaklikPayi
+
             self.my_logger.info("NetPro Est Değeri: %s TL", "{:,.0f}".format(netProEstDegeri).replace(",", "."))
 
             likidasyonDegeri = self.likidasyonDegeriHesapla()
             borclar = int(self.getBilancoDegeri("TOPLAM YÜKÜMLÜLÜKLER", 0))
             bilancoEtkisi = (likidasyonDegeri - borclar) / self.sermaye * self.anaOrtaklikPayi
-            piyasaDegeri = (bilancoEtkisi * self.sermaye * -1) + (self.hisseFiyati * self.sermaye)
-
-            self.my_logger.info("Piyasa Değeri: %s TL", "{:,.0f}".format(piyasaDegeri).replace(",", "."))
+            piyasaDegeriEst = (bilancoEtkisi * self.sermaye * -1) + (self.hisseFiyati * self.sermaye)
+            self.my_logger.info("Piyasa Değeri: %s TL", "{:,.0f}".format(self.piyasaDegeri).replace(",", "."))
             self.my_logger.info("bondYield: %s", "{:.2%}".format(self.bondYield))
 
-            self.netProKriteri = (netProEstDegeri / piyasaDegeri) / self.bondYield
+            self.netProKriteri = (netProEstDegeri / piyasaDegeriEst) / self.bondYield
             self.netProKriteriGecmeDurumu = (self.netProKriteri > 2)
             self.my_logger.info("NetPro Kriteri (2'den Büyük Olmalı): %s %s", format(self.netProKriteri, ".2f"), str(self.netProKriteriGecmeDurumu))
 
             minNetProIcinhisseFiyati = (netProEstDegeri / (1.9 * self.bondYield) - (bilancoEtkisi * self.sermaye * -1)) / self.sermaye
             self.my_logger.info("NetPro 1.9 Olması İçin Olması Gereken Hisse Fiyatı: %s", format(minNetProIcinhisseFiyati, ".2f"))
 
-            self.forwardPeKriteri = (piyasaDegeri) / netProEstDegeri
+            self.forwardPeKriteri = (self.piyasaDegeri) / netProEstDegeri
             self.forwardPeKriteriGecmeDurumu = (self.forwardPeKriteri < 4)
             printText = "Forward PE Kriteri (4'ten Küçük Olmalı): " + format(self.forwardPeKriteri, ".2f") + " " + str(self.forwardPeKriteriGecmeDurumu)
             self.my_logger.info(printText)
@@ -801,7 +962,6 @@ class Algoritma():
 
             favok = yillikBrutKar + yillikPazarlamaGiderleri + yillikGenelYonetimGiderleri + yillikArgeGiderleri + yillikAmortisman
 
-
             fvk = "{:,.0f}".format(favok).replace(",", ".")
             self.my_logger.info(f"FAVÖK{ceyrek}: {fvk}")
             return favok
@@ -965,6 +1125,7 @@ class Algoritma():
             excelRow.bilancoTarihiHisseFiyati = self.hisseFiyati
             excelRow.gercekHisseDegeri = self.gercekDeger
             excelRow.targetBuy = self.targetBuy
+
             excelRow.gercekFiyataUzaklik = self.gercekFiyataUzaklik
             excelRow.netProKriteri = self.netProKriteri
             excelRow.forwardPeKriteri = self.forwardPeKriteri
@@ -1020,7 +1181,9 @@ class Algoritma():
         faaliyet_kari_hesaplari()
         net_kar_hesaplari()
         brut_kar_hesaplari()
-        gercek_deger_hesabi()
+        nfk_hesaplari()
+        gercek_deger_hesabi_efk()
+        gercek_deger_hesabi_nfk()
         netpro_kriteri_hesabi()
         bilanco_donemi_dolar_hesabi()
         dolar_hasilat_hesaplari()
