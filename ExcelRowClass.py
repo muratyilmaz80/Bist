@@ -45,6 +45,11 @@ class ExcelRowClass:
     gercekFiyataUzaklik = None
     netProKriteri = None
     forwardPeKriteri = None
+    gercekHisseDegeriNfk = None
+    targetBuyNfk = None
+    gercekFiyataUzaklikNfk = None
+    netProKriteriNfk = None
+    forwardPeKriteriNfk = None
 
     tarih = None
     netKarBuyumeYillik = None

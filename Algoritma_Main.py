@@ -10,7 +10,7 @@ varBilancoDonemi = 202309
 varBondYield = returnBondYield()
 varHisseFiyati = returnGuncelHisseDegeri(varHisseAdi)
 varReportFile = "//Users//myilmaz//Documents//bist//Report_202309.xls"
-varLogLevel = logging.DEBUG
+varLogLevel = logging.INFO
 varLogPath = "//Users//myilmaz//Documents//bist//log//2023_09//"
 
 
