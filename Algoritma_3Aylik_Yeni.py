@@ -44,7 +44,6 @@ class Algoritma():
         else:
             return yil * 100 + (ceyrek - 3)
 
-
     def bilancoDoneminiBul(self, i):
         if i > 0:
             print("Hatalı Bilanço Dönemi!")
@@ -67,7 +66,7 @@ class Algoritma():
             else:
                 return bilancoDegeri
         except:
-            print(f"Bilançoda ilgili alan bulunamadı! Label: {label} Çeyrek: {donem}")
+            self.my_logger.debug(f"Bilançoda ilgili alan bulunamadı! Label: {label} Çeyrek: {donem}")
             return -1
 
     def ceyrekDegeriHesapla(self, r, col):
@@ -345,37 +344,6 @@ class Algoritma():
                 printText = "Önceki Dönem Faaliyet Kar Artışı:" + "{:.2%}".format(self.faaliyetKari1Degisimi) + " < ? " + "{:.2%}".format(self.faaliyetKari0Degisimi) + str(self.birOncekibilancoDonemiFaaliyetKariDegisimiGecmeDurumu)
                 self.my_logger.info(printText)
 
-        def net_kar_hesaplari():
-
-            self.print_title("NET KAR (DÖNEM KARI/ZARARI)")
-
-            netKar0Print = "{:,.0f}".format(self.netKar0).replace(",", ".")
-            netKar4Print = "{:,.0f}".format(self.netKar4).replace(",", ".")
-            netKar0DegisimiPrint = "{:.2%}".format(self.onceki_yil_ayni_ceyrege_gore_degisimi_hesapla("Net Dönem Karı veya Zararı", 0))
-
-            netKar1Print = "{:,.0f}".format(self.netKar1).replace(",", ".")
-            netKar5Print = "{:,.0f}".format(self.netKar5).replace(",", ".")
-            netKar1DegisimiPrint = "{:.2%}".format(self.onceki_yil_ayni_ceyrege_gore_degisimi_hesapla("Net Dönem Karı veya Zararı", -1))
-
-            netKar2Print = "{:,.0f}".format(self.netKar2).replace(",", ".")
-            netKar6Print = "{:,.0f}".format(self.netKar6).replace(",", ".")
-            netKar2DegisimiPrint = "{:.2%}".format(self.onceki_yil_ayni_ceyrege_gore_degisimi_hesapla("Net Dönem Karı veya Zararı", -2))
-
-            netKar3Print = "{:,.0f}".format(self.netKar3).replace(",", ".")
-            netKar7Print = "{:,.0f}".format(self.netKar7).replace(",", ".")
-            netKar3DegisimiPrint = "{:.2%}".format(self.onceki_yil_ayni_ceyrege_gore_degisimi_hesapla("Net Dönem Karı veya Zararı", -3))
-
-            netKarTablosu = PrettyTable()
-            netKarTablosu.field_names = ["ÇEYREK", "NET KAR", "ÖNCEKİ YIL", "ÖNCEKİ YIL NET KAR", "YÜZDE DEĞİŞİM"]
-            netKarTablosu.align["NET KAR"] = "r"
-            netKarTablosu.align["ÖNCEKİ YIL NET KAR"] = "r"
-            netKarTablosu.align["YÜZDE DEĞİŞİM"] = "r"
-            netKarTablosu.add_row([self.bilancoDoneminiBul(0), netKar0Print, self.bilancoDoneminiBul(-4), netKar4Print, netKar0DegisimiPrint])
-            netKarTablosu.add_row([self.bilancoDoneminiBul(-1), netKar1Print, self.bilancoDoneminiBul(-5), netKar5Print, netKar1DegisimiPrint])
-            netKarTablosu.add_row([self.bilancoDoneminiBul(-2), netKar2Print, self.bilancoDoneminiBul(-6),netKar6Print, netKar2DegisimiPrint])
-            netKarTablosu.add_row([self.bilancoDoneminiBul(-3), netKar3Print, self.bilancoDoneminiBul(-7),netKar7Print, netKar3DegisimiPrint])
-            self.my_logger.info(netKarTablosu)
-
         def brut_kar_hesaplari():
 
             self.print_title("BRÜT KAR (BRÜT KAR/ZARAR)")
@@ -472,7 +440,36 @@ class Algoritma():
                                  nfk2_3DegisimiPrint])
             self.my_logger.info(nfk2Tablosu)
 
+        def net_kar_hesaplari():
 
+            self.print_title("NET KAR (DÖNEM KARI/ZARARI)")
+
+            netKar0Print = "{:,.0f}".format(self.netKar0).replace(",", ".")
+            netKar4Print = "{:,.0f}".format(self.netKar4).replace(",", ".")
+            netKar0DegisimiPrint = "{:.2%}".format(self.onceki_yil_ayni_ceyrege_gore_degisimi_hesapla("Net Dönem Karı veya Zararı", 0))
+
+            netKar1Print = "{:,.0f}".format(self.netKar1).replace(",", ".")
+            netKar5Print = "{:,.0f}".format(self.netKar5).replace(",", ".")
+            netKar1DegisimiPrint = "{:.2%}".format(self.onceki_yil_ayni_ceyrege_gore_degisimi_hesapla("Net Dönem Karı veya Zararı", -1))
+
+            netKar2Print = "{:,.0f}".format(self.netKar2).replace(",", ".")
+            netKar6Print = "{:,.0f}".format(self.netKar6).replace(",", ".")
+            netKar2DegisimiPrint = "{:.2%}".format(self.onceki_yil_ayni_ceyrege_gore_degisimi_hesapla("Net Dönem Karı veya Zararı", -2))
+
+            netKar3Print = "{:,.0f}".format(self.netKar3).replace(",", ".")
+            netKar7Print = "{:,.0f}".format(self.netKar7).replace(",", ".")
+            netKar3DegisimiPrint = "{:.2%}".format(self.onceki_yil_ayni_ceyrege_gore_degisimi_hesapla("Net Dönem Karı veya Zararı", -3))
+
+            netKarTablosu = PrettyTable()
+            netKarTablosu.field_names = ["ÇEYREK", "NET KAR", "ÖNCEKİ YIL", "ÖNCEKİ YIL NET KAR", "YÜZDE DEĞİŞİM"]
+            netKarTablosu.align["NET KAR"] = "r"
+            netKarTablosu.align["ÖNCEKİ YIL NET KAR"] = "r"
+            netKarTablosu.align["YÜZDE DEĞİŞİM"] = "r"
+            netKarTablosu.add_row([self.bilancoDoneminiBul(0), netKar0Print, self.bilancoDoneminiBul(-4), netKar4Print, netKar0DegisimiPrint])
+            netKarTablosu.add_row([self.bilancoDoneminiBul(-1), netKar1Print, self.bilancoDoneminiBul(-5), netKar5Print, netKar1DegisimiPrint])
+            netKarTablosu.add_row([self.bilancoDoneminiBul(-2), netKar2Print, self.bilancoDoneminiBul(-6),netKar6Print, netKar2DegisimiPrint])
+            netKarTablosu.add_row([self.bilancoDoneminiBul(-3), netKar3Print, self.bilancoDoneminiBul(-7),netKar7Print, netKar3DegisimiPrint])
+            self.my_logger.info(netKarTablosu)
 
         def gercek_deger_hesabi_efk():
 
@@ -574,10 +571,6 @@ class Algoritma():
             printText = "Forward PE Kriteri (4'ten Küçük Olmalı): " + format(self.forwardPeKriteri, ".2f") + " " + str(self.forwardPeKriteriGecmeDurumu)
             self.my_logger.info(printText)
 
-
-
-
-
         def gercek_deger_hesabi_nfk():
 
             self.print_title("GERÇEK DEĞER HESABI NFK")
@@ -671,8 +664,6 @@ class Algoritma():
             printText = "Forward PE Kriteri NFK (4'ten Küçük Olmalı): " + format(self.forwardPeNfkKriteri, ".2f") + " " + str(self.forwardPeNfkKriteriGecmeDurumu)
             self.my_logger.info(printText)
 
-
-
         def bilanco_donemi_dolar_hesabi():
 
             self.print_title("BİLANÇO DOLAR HESABI")
@@ -749,9 +740,6 @@ class Algoritma():
                 printText = "Önceki Dönem (DOLAR) Satış Gelir Artışı Bilanço Döneminden Düşük Mü: " + "{:.2%}".format(
                     self.dolarHasilat1Degisimi) + " <? " + "{:.2%}".format(self.dolarHasilat0Degisimi) + " " + str(self.oncekiBilancoDonemiDolarHasilatGelirArtisiGecmeDurumu)
                 self.my_logger.info(printText)
-
-
-
 
         def dolar_faaliyet_kari_hesaplari():
 
@@ -866,7 +854,6 @@ class Algoritma():
             self.fkOrani = self.hisseFiyati / (self.yillikNetKar / self.sermaye)
             fk = "{:,.2f}".format(self.fkOrani)
             self.my_logger.info(f"F/K Orani: {fk}")
-
 
         def piyasaDegeriHesapla():
             pd = "{:,.0f}".format(self.piyasaDegeri).replace(",", ".")
@@ -1042,7 +1029,6 @@ class Algoritma():
             yillikOzsermayeBuyumesi_print = "{:.2%}".format(self.yillikOzsermayeBuyumesi)
             self.my_logger.info(f"Yıllık Özsermaye Büyümesi: {yillikOzsermayeBuyumesi_print}")
 
-
         def rapor_olustur_excel():
 
             self.print_title("RAPOR DOSYASI OLUŞTURMA/GÜNCELLEME")
@@ -1141,12 +1127,11 @@ class Algoritma():
             self.my_logger.removeHandler(self.stdout_handler)
 
 
-
         hasilat_hesaplari()
         faaliyet_kari_hesaplari()
-        net_kar_hesaplari()
         brut_kar_hesaplari()
         nfk_hesaplari()
+        net_kar_hesaplari()
         gercek_deger_hesabi_efk()
         gercek_deger_hesabi_nfk()
         bilanco_donemi_dolar_hesabi()
