@@ -74,9 +74,18 @@ class Algoritma():
         quarter = donem % 100
         birOncekibilancoDonemi = self.birOncekibilancoDoneminiHesapla(donem)
         if (quarter == 3):
-            return self.bd_df.loc[r][donem]
+            try:
+                return self.bd_df.loc[r][donem]
+            except:
+                self.my_logger.info(f"{r}{donem} bulunamadı!")
+                return 0
+
         else:
-            return (self.bd_df.loc[r][donem] - self.bd_df.loc[r][birOncekibilancoDonemi])
+            try:
+                return (self.bd_df.loc[r][donem] - self.bd_df.loc[r][birOncekibilancoDonemi])
+            except:
+                self.my_logger.info(f"{r}{donem} ya da {r}{birOncekibilancoDonemi} bulunamadı!")
+                return 0
 
     def yilliklandirmisDegerHesapla(self, row, bd):
         toplam = self.ceyrekDegeriHesapla(row, bd) + self.ceyrekDegeriHesapla(row, bd - 1) + self.ceyrekDegeriHesapla(row,bd - 2) + self.ceyrekDegeriHesapla(row, bd - 3)
@@ -790,23 +799,26 @@ class Algoritma():
                 self.bilancoDonemiDolarFaaliyetKariDegisimiGecmeDurumu = False
                 printText = "Bilanço Dönemi (DOLAR) Faaliyet Karı Artışı: " + str(self.bilancoDonemiDolarFaaliyetKariDegisimiGecmeDurumu) + " Son Çeyrek Net Kar Negatif"
                 self.my_logger.info (printText)
+                print ("TEST IF1")
 
             elif self.dolarFaaliyetKari0 < 0:
                 self.bilancoDonemiDolarFaaliyetKariDegisimiGecmeDurumu = False
                 printText = "Bilanço Dönemi (DOLAR) Faaliyet Karı Artışı: " + str(self.bilancoDonemiDolarFaaliyetKariDegisimiGecmeDurumu) + " Son Ceyrek Dolar Faaliyet Kari Negatif"
                 self.my_logger.info (printText)
+                print("TEST IF2")
 
             elif (self.dolarFaaliyetKari0 > 0) and (self.dolarFaaliyetKari4 < 0):
                 self.bilancoDonemiDolarFaaliyetKariArtisi = 0
-                self.bilancoDonemiDolarFaaliyetKariArtisiGecmeDurumu = True
+                self.bilancoDonemiDolarFaaliyetKariDegisimiGecmeDurumu = True
                 printText = "Bilanço Dönemi (DOLAR) Faaliyet Karı Artışı: " + str(self.bilancoDonemiDolarFaaliyetKariDegisimiGecmeDurumu) + " Son Çeyrek Dolar Faaliyet Karı Negatiften Pozitife Geçmiş"
                 self.my_logger.info (printText)
+                print("TEST IF3")
 
             else:
                 self.bilancoDonemiDolarFaaliyetKariDegisimiGecmeDurumu = (self.dolarFaaliyetKari0Degisimi > 0.15)
                 printText = "Bilanço Dönemi (DOLAR) Faaliyet Karı Artışı: " + "{:.2%}".format(self.dolarFaaliyetKari0Degisimi) + " >? 15% " + str(self.bilancoDonemiDolarFaaliyetKariDegisimiGecmeDurumu)
                 self.my_logger.info(printText)
-
+                print("TEST IF4")
 
             # Önceki Dönem Faaliyet Kar Artış Kriteri (DOLAR)
 

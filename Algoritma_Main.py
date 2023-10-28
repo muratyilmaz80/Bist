@@ -3,7 +3,8 @@ from Algoritma_3Aylik_Yeni import Algoritma
 from GetBondYield import returnBondYield
 from GetGuncelHisseDegeri import returnGuncelHisseDegeri
 
-varHisseAdi ="ISDMR"
+varHisseAdi =("GEDIK")
+
 
 varBilancoDosyasi = "//Users//myilmaz//Documents//bist//bilancolar_yeni//bilancolar//" + varHisseAdi + ".xlsx"
 varBilancoDonemi = 202309
@@ -40,5 +41,5 @@ runAlgoritmaSingle()
 
 #algoritma.runAlgoritma()
 
-# runAlgoritmaMultiple("SISE-AKSA")
+# runAlgoritmaMultiple("AYGAZ-SEYKM-TAVHL")
 
