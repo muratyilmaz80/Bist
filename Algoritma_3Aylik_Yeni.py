@@ -36,6 +36,14 @@ class Algoritma():
         else:
             return 0
 
+    def checkMinimumBilancoSayisi(self):
+        minimumBilancoSayisi = 5
+        bilancoDonemListesi = (self.bd_df.columns.values.tolist())
+        bilancoDonemSayisi = len (bilancoDonemListesi)
+        if  bilancoDonemSayisi < minimumBilancoSayisi:
+            raise Exception(f"Yeterli bilanço yok, bilanço sayısı: {bilancoDonemSayisi}")
+
+
     def birOncekibilancoDoneminiHesapla(self, dnm):
         yil = int(dnm / 100)
         ceyrek = int(dnm % 100)
@@ -390,19 +398,19 @@ class Algoritma():
 
             nfk1_0Print = "{:,.0f}".format(self.nfk1_0).replace(",", ".")
             nfk1_4Print = "{:,.0f}".format(self.nfk1_4).replace(",", ".")
-            nfk1_0DegisimiPrint = "{:.2%}".format(self.nfk1_0 / self.nfk1_4)
+            nfk1_0DegisimiPrint = "{:.2%}".format(self.safe_divide(self.nfk1_0, self.nfk1_4))
 
             nfk1_1Print = "{:,.0f}".format(self.nfk1_1).replace(",", ".")
             nfk1_5Print = "{:,.0f}".format(self.nfk1_5).replace(",", ".")
-            nfk1_1DegisimiPrint = "{:.2%}".format(self.nfk1_1 / self.nfk1_5)
+            nfk1_1DegisimiPrint = "{:.2%}".format(self.safe_divide(self.nfk1_1, self.nfk1_5))
 
             nfk1_2Print = "{:,.0f}".format(self.nfk1_2).replace(",", ".")
             nfk1_6Print = "{:,.0f}".format(self.nfk1_6).replace(",", ".")
-            nfk1_2DegisimiPrint = "{:.2%}".format(self.nfk1_2 / self.nfk1_6)
+            nfk1_2DegisimiPrint = "{:.2%}".format(self.safe_divide(self.nfk1_2, self.nfk1_6))
 
             nfk1_3Print = "{:,.0f}".format(self.nfk1_3).replace(",", ".")
             nfk1_7Print = "{:,.0f}".format(self.nfk1_7).replace(",", ".")
-            nfk1_3DegisimiPrint = "{:.2%}".format(self.nfk1_3 / self.nfk1_7)
+            nfk1_3DegisimiPrint = "{:.2%}".format(self.safe_divide(self.nfk1_3, self.nfk1_7))
 
             nfk1Tablosu = PrettyTable()
             nfk1Tablosu.field_names = ["ÇEYREK", "NFK", "ÖNCEKİ YIL", "ÖNCEKİ YIL NFK", "YÜZDE DEĞİŞİM"]
@@ -420,19 +428,19 @@ class Algoritma():
 
             nfk2_0Print = "{:,.0f}".format(self.nfk2_0).replace(",", ".")
             nfk2_4Print = "{:,.0f}".format(self.nfk2_4).replace(",", ".")
-            nfk2_0DegisimiPrint = "{:.2%}".format(self.nfk2_0 / self.nfk2_4)
+            nfk2_0DegisimiPrint = "{:.2%}".format(self.safe_divide(self.nfk2_0, self.nfk2_4))
 
             nfk2_1Print = "{:,.0f}".format(self.nfk2_1).replace(",", ".")
             nfk2_5Print = "{:,.0f}".format(self.nfk2_5).replace(",", ".")
-            nfk2_1DegisimiPrint = "{:.2%}".format(self.nfk2_1 / self.nfk2_5)
+            nfk2_1DegisimiPrint = "{:.2%}".format(self.safe_divide(self.nfk2_1, self.nfk2_5))
 
             nfk2_2Print = "{:,.0f}".format(self.nfk2_2).replace(",", ".")
             nfk2_6Print = "{:,.0f}".format(self.nfk2_6).replace(",", ".")
-            nfk2_2DegisimiPrint = "{:.2%}".format(self.nfk2_2 / self.nfk2_6)
+            nfk2_2DegisimiPrint = "{:.2%}".format(self.safe_divide (self.nfk2_2, self.nfk2_6))
 
             nfk2_3Print = "{:,.0f}".format(self.nfk2_3).replace(",", ".")
             nfk2_7Print = "{:,.0f}".format(self.nfk2_7).replace(",", ".")
-            nfk2_3DegisimiPrint = "{:.2%}".format(self.nfk2_3 / self.nfk2_7)
+            nfk2_3DegisimiPrint = "{:.2%}".format(self.safe_divide(self.nfk2_3, self.nfk2_7))
 
             nfk2Tablosu = PrettyTable()
             nfk2Tablosu.field_names = ["ÇEYREK", "NFK (Özsermaye Y.D.)", "ÖNCEKİ YIL", "ÖNCEKİ YIL NFK (Özsermaye Y.D.)", "YÜZDE DEĞİŞİM"]
@@ -767,21 +775,21 @@ class Algoritma():
 
             dolarFaaliyetKari0Print = "{:,.0f}".format(self.dolarFaaliyetKari0).replace(",", ".")
             dolarFaaliyetKari4Print = "{:,.0f}".format(self.dolarFaaliyetKari4).replace(",", ".")
-            self.dolarFaaliyetKari0Degisimi = self.dolarFaaliyetKari0/self.dolarFaaliyetKari4-1
+            self.dolarFaaliyetKari0Degisimi = self.safe_divide(self.dolarFaaliyetKari0, self.dolarFaaliyetKari4-1)
             dolarFaaliyetKari0DegisimiPrint = "{:.2%}".format(self.dolarFaaliyetKari0Degisimi)
 
             dolarFaaliyetKari1Print = "{:,.0f}".format(self.dolarFaaliyetKari1).replace(",", ".")
             dolarFaaliyetKari5Print = "{:,.0f}".format(self.dolarFaaliyetKari5).replace(",", ".")
-            self.dolarFaaliyetKari1Degisimi = self.dolarFaaliyetKari1/self.dolarFaaliyetKari5-1
+            self.dolarFaaliyetKari1Degisimi = self.safe_divide(self.dolarFaaliyetKari1, self.dolarFaaliyetKari5-1)
             dolarFaaliyetKari1DegisimiPrint = "{:.2%}".format(self.dolarFaaliyetKari1Degisimi)
 
             dolarFaaliyetKari2Print = "{:,.0f}".format(self.dolarFaaliyetKari2).replace(",", ".")
             dolarFaaliyetKari6Print = "{:,.0f}".format(self.dolarFaaliyetKari6).replace(",", ".")
-            dolarFaaliyetKari2DegisimiPrint = "{:.2%}".format(self.dolarFaaliyetKari2/self.dolarFaaliyetKari6-1)
+            dolarFaaliyetKari2DegisimiPrint = "{:.2%}".format(self.safe_divide (self.dolarFaaliyetKari2,self.dolarFaaliyetKari6-1))
 
             dolarFaaliyetKari3Print = "{:,.0f}".format(self.dolarFaaliyetKari3).replace(",", ".")
             dolarFaaliyetKari7Print = "{:,.0f}".format(self.dolarFaaliyetKari7).replace(",", ".")
-            dolarFaaliyetKari3DegisimiPrint = "{:.2%}".format(self.dolarFaaliyetKari3/self.dolarFaaliyetKari7-1)
+            dolarFaaliyetKari3DegisimiPrint = "{:.2%}".format(self.safe_divide(self.dolarFaaliyetKari3,self.dolarFaaliyetKari7-1))
 
             dolarFaaliyetKariTablosu = PrettyTable()
             dolarFaaliyetKariTablosu.field_names = ["ÇEYREK", "FAALİYET KARI (DOLAR)", "ÖNCEKİ YIL", "ÖNCEKİ YIL FAALİYET KARI (DOLAR)", "YÜZDE DEĞİŞİM"]
@@ -799,26 +807,22 @@ class Algoritma():
                 self.bilancoDonemiDolarFaaliyetKariDegisimiGecmeDurumu = False
                 printText = "Bilanço Dönemi (DOLAR) Faaliyet Karı Artışı: " + str(self.bilancoDonemiDolarFaaliyetKariDegisimiGecmeDurumu) + " Son Çeyrek Net Kar Negatif"
                 self.my_logger.info (printText)
-                print ("TEST IF1")
 
             elif self.dolarFaaliyetKari0 < 0:
                 self.bilancoDonemiDolarFaaliyetKariDegisimiGecmeDurumu = False
                 printText = "Bilanço Dönemi (DOLAR) Faaliyet Karı Artışı: " + str(self.bilancoDonemiDolarFaaliyetKariDegisimiGecmeDurumu) + " Son Ceyrek Dolar Faaliyet Kari Negatif"
                 self.my_logger.info (printText)
-                print("TEST IF2")
 
             elif (self.dolarFaaliyetKari0 > 0) and (self.dolarFaaliyetKari4 < 0):
                 self.bilancoDonemiDolarFaaliyetKariArtisi = 0
                 self.bilancoDonemiDolarFaaliyetKariDegisimiGecmeDurumu = True
                 printText = "Bilanço Dönemi (DOLAR) Faaliyet Karı Artışı: " + str(self.bilancoDonemiDolarFaaliyetKariDegisimiGecmeDurumu) + " Son Çeyrek Dolar Faaliyet Karı Negatiften Pozitife Geçmiş"
                 self.my_logger.info (printText)
-                print("TEST IF3")
 
             else:
                 self.bilancoDonemiDolarFaaliyetKariDegisimiGecmeDurumu = (self.dolarFaaliyetKari0Degisimi > 0.15)
                 printText = "Bilanço Dönemi (DOLAR) Faaliyet Karı Artışı: " + "{:.2%}".format(self.dolarFaaliyetKari0Degisimi) + " >? 15% " + str(self.bilancoDonemiDolarFaaliyetKariDegisimiGecmeDurumu)
                 self.my_logger.info(printText)
-                print("TEST IF4")
 
             # Önceki Dönem Faaliyet Kar Artış Kriteri (DOLAR)
 
@@ -1138,7 +1142,7 @@ class Algoritma():
             self.my_logger.removeHandler(self.output_file_handler)
             self.my_logger.removeHandler(self.stdout_handler)
 
-
+        self.checkMinimumBilancoSayisi()
         hasilat_hesaplari()
         faaliyet_kari_hesaplari()
         brut_kar_hesaplari()
