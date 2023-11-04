@@ -13,6 +13,18 @@ import pandas as pd
 puanlama_dosyasi = "//Users//myilmaz//Documents//bist//puanlama_listesi.xls"
 puanlama_listesi_df = pd.read_excel(puanlama_dosyasi, index_col=0)
 
+for index, row in puanlama_listesi_df.iterrows():
+    puanlama_listesi_df.at[index, "PUAN"] = 0
+    puanlama_listesi_df.at[index, "Weighted PUAN"] = 0
+
+#tl_puanlama_listesi_df = puanlama_listesi_df.query("tr1  == True & tr2 == True & tr3 == True & tr4 == True")
+#usd_puanlama_listesi_df = puanlama_listesi_df.query("dlr1  == True & dlr2 == True & dlr3 == True & dlr4 == True")
+
+#print (f"Tum Liste Boyutu: {len(puanlama_listesi_df)}")
+#print (f"TL'den Geçen Liste Boyutu:  {len(tl_puanlama_listesi_df)}")
+#print (f"Dolar'dan Geçen Liste Boyutu {len(usd_puanlama_listesi_df)}")
+
+
 def sort_and_grade_column(column_title, type):
     global puanlama_listesi_df
 
@@ -56,6 +68,17 @@ sort_and_grade_column("Özsermaye Büyümesi", "Ascending")
 
 
 for index, row in puanlama_listesi_df.iterrows():
-    print (row["PUAN"])
+    gercek_fiyata_uzaklik = puanlama_listesi_df.at[index, "Gerçek Fiyata Uzaklık"]
+    gercek_fiyata_uzaklik_nfk = puanlama_listesi_df.at[index, "Gerçek Fiyata Uzaklık NFK"]
+    gercek_fiyata_uzaklik_ort = (gercek_fiyata_uzaklik + gercek_fiyata_uzaklik_nfk) / 2
+    puan = puanlama_listesi_df.at[index, "PUAN"]
+    weighted_puan = puan / gercek_fiyata_uzaklik_ort
+    puanlama_listesi_df.at[index, "Weighted PUAN"] = weighted_puan
 
-# puanlama_listesi_df.to_excel("//Users//myilmaz//Documents//bist//puanlama_listesi_out.xls")
+# for index, row in puanlama_listesi_df.iterrows():
+#     print (row["Weighted PUAN"])
+
+
+puanlama_listesi_df = puanlama_listesi_df.sort_values(by=["Weighted PUAN"], ascending=False)
+
+puanlama_listesi_df.to_excel("//Users//myilmaz//Documents//bist//puanlama_listesi_out.xls")
