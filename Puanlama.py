@@ -64,6 +64,8 @@ sort_and_grade_column("Son Çeyrek Net Kar Marjı", "Ascending")
 sort_and_grade_column("Aktif Devir Hızı", "Ascending")
 sort_and_grade_column("Borç/Kaynak", "Descending")
 sort_and_grade_column("Özsermaye Büyümesi", "Ascending")
+#sort_and_grade_column("Gerçek Fiyata Uzaklık", "Descending")
+#sort_and_grade_column("Gerçek Fiyata Uzaklık NFK", "Descending")
 
 
 
@@ -75,8 +77,8 @@ for index, row in puanlama_listesi_df.iterrows():
     weighted_puan = puan / gercek_fiyata_uzaklik_ort
     puanlama_listesi_df.at[index, "Weighted PUAN"] = weighted_puan
 
-# for index, row in puanlama_listesi_df.iterrows():
-#     print (row["Weighted PUAN"])
+for index, row in puanlama_listesi_df.iterrows():
+    print (row["Weighted PUAN"])
 
 
 puanlama_listesi_df = puanlama_listesi_df.sort_values(by=["Weighted PUAN"], ascending=False)
