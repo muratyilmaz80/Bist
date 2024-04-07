@@ -3,16 +3,16 @@ from Algoritma_3Aylik_Yeni import Algoritma
 from GetBondYield import returnBondYield
 from GetGuncelHisseDegeri import returnGuncelHisseDegeri
 
-varHisseAdi =("ALBRK")
+varHisseAdi =("FENER")
 
 
 varBilancoDosyasi = "//Users//myilmaz//Documents//bist//bilancolar_yeni//bilancolar//" + varHisseAdi + ".xlsx"
-varBilancoDonemi = 202309
+varBilancoDonemi = 202312
 varBondYield = returnBondYield()
 varHisseFiyati = returnGuncelHisseDegeri(varHisseAdi)
-varReportFile = "//Users//myilmaz//Documents//bist//Report_202309.xls"
+varReportFile = "//Users//myilmaz//Documents//bist//Report_202312.xls"
 varLogLevel = logging.INFO
-varLogPath = "//Users//myilmaz//Documents//bist//log//2023_09//"
+varLogPath = "//Users//myilmaz//Documents//bist//log//2023_12//"
 
 
 def runAlgoritmaSingle():

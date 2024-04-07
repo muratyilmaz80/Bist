@@ -160,4 +160,4 @@ def altiAylikBilancoDonemiOrtalamaDolarDegeriBul(bilancoDonemi):
 
 # print (tarihtekiDolarDegeriniBulVeriTabani("25.10.2010"))
 
-# print (ucAylikBilancoDonemiOrtalamaDolarDegeriBul(202309))
+# print (ucAylikBilancoDonemiOrtalamaDolarDegeriBul(202312))
