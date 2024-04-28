@@ -3,7 +3,7 @@ from Algoritma_3Aylik_Yeni import Algoritma
 from GetBondYield import returnBondYield
 from GetGuncelHisseDegeri import returnGuncelHisseDegeri
 
-varHisseAdi =("FENER")
+varHisseAdi =("MEGAP")
 
 
 varBilancoDosyasi = "//Users//myilmaz//Documents//bist//bilancolar_yeni//bilancolar//" + varHisseAdi + ".xlsx"

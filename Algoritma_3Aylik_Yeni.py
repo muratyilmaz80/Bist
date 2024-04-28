@@ -279,7 +279,11 @@ class Algoritma():
             self.my_logger.info(satisTablosu)
 
             # Bilanço Dönemi Satış Geliri Artış Kriteri
-            self.bilancoDonemiHasilatDegisimiGecmeDurumu = (self.hasilat0Degisimi > 0.1)
+            if (self.hasilat0Degisimi > 0.1):
+                self.bilancoDonemiHasilatDegisimiGecmeDurumu = True
+            else:
+                self.bilancoDonemiHasilatDegisimiGecmeDurumu = False
+
             printText = "Bilanço Dönemi Satış Geliri Artışı 10%'dan Büyük Mü: " + "{:.2%}".format(self.hasilat0Degisimi) + " >? 10% " + " " + str(self.bilancoDonemiHasilatDegisimiGecmeDurumu)
             self.my_logger.info(printText)
 
@@ -346,7 +350,11 @@ class Algoritma():
                 self.my_logger.info("Bilanço Dönemi Faaliyet Karı Artışı: %s Son Çeyrek Faaliyet Karı Negatiften Pozitife Geçmiş", str(self.bilancoDonemiFaaliyetKariDegisimiGecmeDurumu))
 
             else:
-                self.bilancoDonemiFaaliyetKariDegisimiGecmeDurumu = (self.faaliyetKari0Degisimi > 0.15)
+                if (self.faaliyetKari0Degisimi > 0.15):
+                    self.bilancoDonemiFaaliyetKariDegisimiGecmeDurumu = True
+                else:
+                    self.bilancoDonemiFaaliyetKariDegisimiGecmeDurumu = False
+                # self.bilancoDonemiFaaliyetKariDegisimiGecmeDurumu = (self.faaliyetKari0Degisimi > 0.15)
                 printText = "Bilanço Dönemi Faaliyet Karı Artışı:" + "{:.2%}".format(self.faaliyetKari0Degisimi) + " >? 15% " + str(self.bilancoDonemiFaaliyetKariDegisimiGecmeDurumu)
                 self.my_logger.info(printText)
 
@@ -738,7 +746,12 @@ class Algoritma():
             self.my_logger.info(dolarSatisTablosu)
 
             # Bilanço Dönemi (DOLAR) Satış Geliri Artış Kriteri
-            self.bilancoDonemiDolarHasilatGelirArtisiGecmeDurumu = (self.dolarHasilat0Degisimi > 0.1)
+            if (self.dolarHasilat0Degisimi > 0.1):
+                self.bilancoDonemiDolarHasilatGelirArtisiGecmeDurumu = True
+            else:
+                self.bilancoDonemiDolarHasilatGelirArtisiGecmeDurumu = False
+
+            # self.bilancoDonemiDolarHasilatGelirArtisiGecmeDurumu = (self.dolarHasilat0Degisimi > 0.1)
 
             printText = "Bilanço Dönemi (DOLAR) Satış Geliri Artışı 10%'dan Büyük Mü: " + "{:.2%}".format(self.dolarHasilat0Degisimi) + " >? 10%" + " " + str(self.bilancoDonemiDolarHasilatGelirArtisiGecmeDurumu)
             self.my_logger.info(printText)
@@ -820,7 +833,12 @@ class Algoritma():
                 self.my_logger.info (printText)
 
             else:
-                self.bilancoDonemiDolarFaaliyetKariDegisimiGecmeDurumu = (self.dolarFaaliyetKari0Degisimi > 0.15)
+                if (self.dolarFaaliyetKari0Degisimi > 0.15):
+                    self.bilancoDonemiDolarFaaliyetKariDegisimiGecmeDurumu = True
+                else:
+                    self.bilancoDonemiDolarFaaliyetKariDegisimiGecmeDurumu = False
+
+                # self.bilancoDonemiDolarFaaliyetKariDegisimiGecmeDurumu = (self.dolarFaaliyetKari0Degisimi > 0.15)
                 printText = "Bilanço Dönemi (DOLAR) Faaliyet Karı Artışı: " + "{:.2%}".format(self.dolarFaaliyetKari0Degisimi) + " >? 15% " + str(self.bilancoDonemiDolarFaaliyetKariDegisimiGecmeDurumu)
                 self.my_logger.info(printText)
 
@@ -1045,6 +1063,18 @@ class Algoritma():
             yillikOzsermayeBuyumesi_print = "{:.2%}".format(self.yillikOzsermayeBuyumesi)
             self.my_logger.info(f"Yıllık Özsermaye Büyümesi: {yillikOzsermayeBuyumesi_print}")
 
+        # Yeni eklenenler
+
+        def ozkaynakSermayeOraniHesapla():
+            ozkaynakSermayeOrani = self.defterDegeri / self.sermaye
+            ozkaynakSermayeOrani_print = "{:.2}".format(ozkaynakSermayeOrani)
+            self.my_logger.info(f"Ozkaynak/Sermaye Orani: {ozkaynakSermayeOrani_print}")
+
+        def faaliyetKariPdOraniHesapla():
+            faaliyetKariPdOrani = self.faaliyetKari0 / self.piyasaDegeri
+            faaliyetKariPdOrani_print = "{:.2}".format(faaliyetKariPdOrani)
+            self.my_logger.info(f"Faaliyet Kari / PD Orani: {faaliyetKariPdOrani_print}")
+
         def rapor_olustur_excel():
 
             self.print_title("RAPOR DOSYASI OLUŞTURMA/GÜNCELLEME")
@@ -1186,4 +1216,7 @@ class Algoritma():
         halkaAciklikOraniniGetir()
         sermayeArtirimPotansiyeliniHesapla()
         ozsermayeBuyumesiHesapla()
+        ozkaynakSermayeOraniHesapla()
+        faaliyetKariPdOraniHesapla()
+
         rapor_olustur_excel()
