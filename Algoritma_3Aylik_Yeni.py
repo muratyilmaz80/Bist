@@ -523,6 +523,10 @@ class Algoritma():
             # self.onumuzdekiDortCeyrekHasilatTahmini = 700000000000
 
             self.onumuzdekiDortCeyrekFaaliyetKarMarjiTahmini = (self.faaliyetKari1 + self.faaliyetKari0) / (self.hasilat0 + self.hasilat1)
+            # if (self.onumuzdekiDortCeyrekFaaliyetKarMarjiTahmini < 0):
+            #     self.my_logger.info("Faaliyet Kar Marjı Tahmini Son 2 Çeyrek Icin Negatif Olduğundan Son 4 Çeyrek Kullanılacak")
+            #     self.onumuzdekiDortCeyrekFaaliyetKarMarjiTahmini = self.yillikFaaliyetKari / self.yillikHasilat
+
             self.my_logger.info("Önümüzdeki 4 Çeyrek Faaliyet Kar Marjı Tahmini: %s ","{:.2%}".format(self.onumuzdekiDortCeyrekFaaliyetKarMarjiTahmini))
 
             self.faaliyetKariTahmini1 = self.onumuzdekiDortCeyrekHasilatTahmini * self.onumuzdekiDortCeyrekFaaliyetKarMarjiTahmini
@@ -569,6 +573,10 @@ class Algoritma():
             hbkOraniHesapla()
 
             onumuzdekiDortCeyrekFaaliyetKarMarjiTahmini = (self.faaliyetKari1 + self.faaliyetKari0) / (self.hasilat0 + self.hasilat1)
+            # if (self.onumuzdekiDortCeyrekFaaliyetKarMarjiTahmini < 0):
+            #     self.my_logger.info("Faaliyet Kar Marjı Tahmini Son 2 Çeyrek Icin Negatif Olduğundan Son 4 Çeyrek Kullanılacak")
+            #     self.onumuzdekiDortCeyrekFaaliyetKarMarjiTahmini = self.yillikFaaliyetKari / self.yillikHasilat
+
             self.my_logger.info("Önümüzdeki 4 Çeyrek Faaliyet Kar Marjı Tahmini: %s ", "{:.2%}".format(onumuzdekiDortCeyrekFaaliyetKarMarjiTahmini))
             faaliyetKariTahmini1 = self.onumuzdekiDortCeyrekHasilatTahmini * onumuzdekiDortCeyrekFaaliyetKarMarjiTahmini
             faaliyetKariTahmini2 = ((self.faaliyetKari1 + self.faaliyetKari0) * 2 * 0.3) + (self.faaliyetKari0 * 4 * 0.5) + ((self.faaliyetKari3 + self.faaliyetKari2 + self.faaliyetKari1 + self.faaliyetKari0) * 0.2)
@@ -1001,7 +1009,9 @@ class Algoritma():
             self.my_logger.info(f"Yıllık Net Kar Marjı: {yillikNetKarMarji_print}")
 
         def sonCeyrekNetKarMarjiHesapla():
-            self.sonCeyrekNetKarMarji = self.netKar0/self.hasilat0
+            # self.sonCeyrekNetKarMarji = self.netKar0/self.hasilat0
+            self.sonCeyrekNetKarMarji = self.safe_divide(self.netKar0, self.hasilat0)
+
             sonCeyrekNetKarMarji_print = "{:.2%}".format(self.sonCeyrekNetKarMarji)
             self.my_logger.info(f"Son Çeyrek Net Kar Marjı: {sonCeyrekNetKarMarji_print}")
 
